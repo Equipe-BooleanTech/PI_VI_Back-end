@@ -30,7 +30,7 @@ class CreateVaccineUseCase(
         val pet = petRepository.findById(petId)
             ?: throw EntityNotFoundException("Pet", petId)
 
-        if (pet.tutorId != ownerId) {
+        if (pet.ownerId != ownerId) {
             logger.warn("Tutor $ownerId tentou criar vacina para pet de outro tutor")
             throw BusinessRuleException("Você não tem permissão para adicionar vacinas a este pet")
         }
@@ -73,7 +73,7 @@ class GetVaccineByIdUseCase(
         val pet = petRepository.findById(vaccine.petId)
             ?: throw EntityNotFoundException("Pet", vaccine.petId)
 
-        if (pet.tutorId != ownerId) {
+        if (pet.ownerId != ownerId) {
             throw BusinessRuleException("Você não tem permissão para visualizar esta vacina")
         }
 
@@ -94,7 +94,7 @@ class GetVaccinesByPetUseCase(
         val pet = petRepository.findById(petId)
             ?: throw EntityNotFoundException("Pet", petId)
 
-        if (pet.tutorId != ownerId) {
+        if (pet.ownerId != ownerId) {
             throw BusinessRuleException("Você não tem permissão para visualizar vacinas deste pet")
         }
 
@@ -115,7 +115,7 @@ class GetDueVaccinesByPetUseCase(
         val pet = petRepository.findById(petId)
             ?: throw EntityNotFoundException("Pet", petId)
 
-        if (pet.tutorId != ownerId) {
+        if (pet.ownerId != ownerId) {
             throw BusinessRuleException("Você não tem permissão para visualizar vacinas deste pet")
         }
 
@@ -139,7 +139,7 @@ class UpdateVaccineUseCase(
         val pet = petRepository.findById(vaccine.petId)
             ?: throw EntityNotFoundException("Pet", vaccine.petId)
 
-        if (pet.tutorId != ownerId) {
+        if (pet.ownerId != ownerId) {
             throw BusinessRuleException("Você não tem permissão para atualizar esta vacina")
         }
 
@@ -172,7 +172,7 @@ class DeleteVaccineUseCase(
         val pet = petRepository.findById(vaccine.petId)
             ?: throw EntityNotFoundException("Pet", vaccine.petId)
 
-        if (pet.tutorId != ownerId) {
+        if (pet.ownerId != ownerId) {
             throw BusinessRuleException("Você não tem permissão para excluir esta vacina")
         }
 

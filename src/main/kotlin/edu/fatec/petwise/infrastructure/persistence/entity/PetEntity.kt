@@ -1,6 +1,8 @@
 package edu.fatec.petwise.infrastructure.persistence.entity
 
+import edu.fatec.petwise.domain.enums.HealthStatus
 import jakarta.persistence.*
+import java.math.BigDecimal
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.UUID
@@ -24,11 +26,18 @@ class PetEntity(
     @Column(nullable = false, name = "birth_date")
     var birthDate: LocalDate,
     
-    @Column
-    var weight: Double?,
+    @Column(precision = 5, scale = 2)
+    var weight: BigDecimal?,
     
-    @Column(nullable = false, name = "tutor_id")
-    var tutorId: UUID,
+    @Column(nullable = false, name = "owner_id")
+    var ownerId: UUID,
+    
+    @Column(nullable = false, name = "is_favorite")
+    var isFavorite: Boolean = false,
+    
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, name = "health_status")
+    var healthStatus: HealthStatus = HealthStatus.SAUDAVEL,
     
     @Column(nullable = false)
     var active: Boolean = true,

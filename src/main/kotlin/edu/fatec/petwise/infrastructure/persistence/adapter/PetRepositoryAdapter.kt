@@ -26,12 +26,20 @@ class PetRepositoryAdapter(
         return jpaPetRepository.findAll().map { it.toDomain() }
     }
 
-    override fun findByTutorId(tutorId: UUID): List<Pet> {
-        return jpaPetRepository.findByTutorId(tutorId).map { it.toDomain() }
+    override fun findByOwnerId(ownerId: UUID): List<Pet> {
+        return jpaPetRepository.findByOwnerId(ownerId).map { it.toDomain() }
     }
 
-    override fun findActiveByTutorId(tutorId: UUID): List<Pet> {
-        return jpaPetRepository.findByTutorIdAndActive(tutorId, true).map { it.toDomain() }
+    override fun findActiveByOwnerId(ownerId: UUID): List<Pet> {
+        return jpaPetRepository.findByOwnerIdAndActive(ownerId, true).map { it.toDomain() }
+    }
+
+    override fun findFavoritesByOwnerId(ownerId: UUID): List<Pet> {
+        return jpaPetRepository.findByOwnerIdAndIsFavorite(ownerId, true).map { it.toDomain() }
+    }
+
+    override fun searchByNameAndOwnerId(query: String, ownerId: UUID): List<Pet> {
+        return jpaPetRepository.findByOwnerIdAndNameContainingIgnoreCase(ownerId, query).map { it.toDomain() }
     }
 
     override fun existsById(id: UUID): Boolean {
@@ -55,7 +63,9 @@ class PetRepositoryAdapter(
         breed = this.breed,
         birthDate = this.birthDate,
         weight = this.weight,
-        tutorId = this.tutorId,
+        ownerId = this.ownerId,
+        isFavorite = this.isFavorite,
+        healthStatus = this.healthStatus,
         active = this.active,
         createdAt = this.createdAt,
         updatedAt = this.updatedAt
@@ -68,7 +78,9 @@ class PetRepositoryAdapter(
         breed = this.breed,
         birthDate = this.birthDate,
         weight = this.weight,
-        tutorId = this.tutorId,
+        ownerId = this.ownerId,
+        isFavorite = this.isFavorite,
+        healthStatus = this.healthStatus,
         active = this.active,
         createdAt = this.createdAt,
         updatedAt = this.updatedAt

@@ -32,7 +32,7 @@ class CreateAppointmentUseCase(
         val pet = petRepository.findById(petId)
             ?: throw EntityNotFoundException("Pet", petId)
 
-        if (pet.tutorId != ownerId) {
+        if (pet.ownerId != ownerId) {
             logger.warn("Tutor $ownerId tentou criar consulta para pet de outro tutor")
             throw BusinessRuleException("Você não tem permissão para agendar consultas para este pet")
         }
@@ -102,7 +102,7 @@ class GetAppointmentsByPetUseCase(
         val pet = petRepository.findById(petId)
             ?: throw EntityNotFoundException("Pet", petId)
 
-        if (pet.tutorId != ownerId) {
+        if (pet.ownerId != ownerId) {
             throw BusinessRuleException("Você não tem permissão para visualizar consultas deste pet")
         }
 

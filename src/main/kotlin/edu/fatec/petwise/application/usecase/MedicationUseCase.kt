@@ -30,7 +30,7 @@ class CreateMedicationUseCase(
         val pet = petRepository.findById(petId)
             ?: throw EntityNotFoundException("Pet", petId)
 
-        if (pet.tutorId != ownerId) {
+        if (pet.ownerId != ownerId) {
             logger.warn("Tutor $ownerId tentou criar medicação para pet de outro tutor")
             throw BusinessRuleException("Você não tem permissão para adicionar medicações a este pet")
         }
@@ -73,7 +73,7 @@ class GetMedicationByIdUseCase(
         val pet = petRepository.findById(medication.petId)
             ?: throw EntityNotFoundException("Pet", medication.petId)
 
-        if (pet.tutorId != ownerId) {
+        if (pet.ownerId != ownerId) {
             throw BusinessRuleException("Você não tem permissão para visualizar esta medicação")
         }
 
@@ -94,7 +94,7 @@ class GetMedicationsByPetUseCase(
         val pet = petRepository.findById(petId)
             ?: throw EntityNotFoundException("Pet", petId)
 
-        if (pet.tutorId != ownerId) {
+        if (pet.ownerId != ownerId) {
             throw BusinessRuleException("Você não tem permissão para visualizar medicações deste pet")
         }
 
@@ -115,7 +115,7 @@ class GetActiveMedicationsByPetUseCase(
         val pet = petRepository.findById(petId)
             ?: throw EntityNotFoundException("Pet", petId)
 
-        if (pet.tutorId != ownerId) {
+        if (pet.ownerId != ownerId) {
             throw BusinessRuleException("Você não tem permissão para visualizar medicações deste pet")
         }
 
@@ -139,7 +139,7 @@ class UpdateMedicationUseCase(
         val pet = petRepository.findById(medication.petId)
             ?: throw EntityNotFoundException("Pet", medication.petId)
 
-        if (pet.tutorId != ownerId) {
+        if (pet.ownerId != ownerId) {
             throw BusinessRuleException("Você não tem permissão para atualizar esta medicação")
         }
 
@@ -173,7 +173,7 @@ class DeactivateMedicationUseCase(
         val pet = petRepository.findById(medication.petId)
             ?: throw EntityNotFoundException("Pet", medication.petId)
 
-        if (pet.tutorId != ownerId) {
+        if (pet.ownerId != ownerId) {
             throw BusinessRuleException("Você não tem permissão para desativar esta medicação")
         }
 

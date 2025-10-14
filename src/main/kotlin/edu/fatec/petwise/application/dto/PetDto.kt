@@ -1,10 +1,8 @@
 package edu.fatec.petwise.application.dto
 
-import jakarta.validation.constraints.NotBlank
-import jakarta.validation.constraints.NotNull
-import jakarta.validation.constraints.PastOrPresent
-import jakarta.validation.constraints.Positive
-import jakarta.validation.constraints.Size
+import edu.fatec.petwise.domain.enums.HealthStatus
+import jakarta.validation.constraints.*
+import java.math.BigDecimal
 import java.time.LocalDate
 
 data class CreatePetRequest(
@@ -23,22 +21,31 @@ data class CreatePetRequest(
     @field:PastOrPresent(message = "{pet.birthDate.pastOrPresent}")
     val birthDate: LocalDate,
     
-    @field:Positive(message = "{pet.weight.positive}")
-    val weight: Double?,
+    @field:DecimalMin(value = "0.1", message = "{pet.weight.min}")
+    @field:DecimalMax(value = "500.0", message = "{pet.weight.max}")
+    val weight: BigDecimal?,
     
-    @field:NotBlank(message = "{pet.tutorId.required}")
-    val tutorId: String
+    @field:NotNull(message = "{pet.healthStatus.required}")
+    val healthStatus: HealthStatus
 )
 
 data class UpdatePetRequest(
-    @field:Size(min = 2, max = 50, message = "{pet.name.size}")
-    val name: String?,
-    
-    @field:Size(max = 50, message = "{pet.breed.size}")
-    val breed: String?,
-    
-    @field:Positive(message = "{pet.weight.positive}")
-    val weight: Double?
+    @field:NotBlank(message = "{pet.name.notBlank}")
+    @field:Size(min = 1, max = 50, message = "{pet.name.size}")
+    val name: String,
+
+    @field:NotBlank(message = "{pet.breed.notBlank}")
+    @field:Size(min = 1, max = 50, message = "{pet.breed.size}")
+    val breed: String,
+
+    @field:DecimalMin(value = "0.1", message = "{pet.weight.min}")
+    @field:DecimalMax(value = "500.0", message = "{pet.weight.max}")
+    val weight: BigDecimal
+)
+
+data class UpdateHealthStatusRequest(
+    @field:NotNull(message = "{pet.healthStatus.required}")
+    val healthStatus: HealthStatus
 )
 
 data class PetResponse(
@@ -48,8 +55,10 @@ data class PetResponse(
     val breed: String?,
     val birthDate: String,
     val age: Int,
-    val weight: Double?,
-    val tutorId: String,
+    val weight: BigDecimal?,
+    val ownerId: String,
+    val isFavorite: Boolean,
+    val healthStatus: String,
     val active: Boolean,
     val createdAt: String,
     val updatedAt: String

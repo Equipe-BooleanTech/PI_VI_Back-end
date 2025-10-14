@@ -1,5 +1,7 @@
 package edu.fatec.petwise.domain.entity
 
+import edu.fatec.petwise.domain.enums.HealthStatus
+import java.math.BigDecimal
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.UUID
@@ -10,8 +12,10 @@ data class Pet(
     val species: String,
     val breed: String?,
     val birthDate: LocalDate,
-    val weight: Double?,
-    val tutorId: UUID,
+    val weight: BigDecimal?,
+    val ownerId: UUID,
+    val isFavorite: Boolean = false,
+    val healthStatus: HealthStatus = HealthStatus.SAUDAVEL,
     val active: Boolean = true,
     val createdAt: LocalDateTime = LocalDateTime.now(),
     val updatedAt: LocalDateTime = LocalDateTime.now()
@@ -23,7 +27,7 @@ data class Pet(
             "Data de nascimento não pode ser futura"
         }
         weight?.let {
-            require(it > 0) { "Peso deve ser maior que zero" }
+            require(it > BigDecimal.ZERO) { "Peso deve ser maior que zero" }
         }
     }
 
@@ -33,14 +37,43 @@ data class Pet(
 
     fun deactivate(): Pet = this.copy(active = false, updatedAt = LocalDateTime.now())
     
+    fun toggleFavorite(): Pet = this.copy(isFavorite = !isFavorite, updatedAt = LocalDateTime.now())
+    
+    fun updateHealthStatus(newStatus: HealthStatus): Pet = this.copy(
+        healthStatus = newStatus,
+        updatedAt = LocalDateTime.now()
+    )
+    
     fun update(
         name: String? = null,
         breed: String? = null,
-        weight: Double? = null
+        weight: BigDecimal? = null
     ): Pet = this.copy(
         name = name ?: this.name,
         breed = breed ?: this.breed,
         weight = weight ?: this.weight,
         updatedAt = LocalDateTime.now()
     )
+    
+    companion object {
+        fun create(
+            name: String,
+            species: String,
+            breed: String?,
+            birthDate: LocalDate,
+            weight: BigDecimal?,
+            ownerId: UUID,
+            healthStatus: HealthStatus = HealthStatus.SAUDAVEL
+        ): Pet {
+            return Pet(
+                name = name,
+                species = species,
+                breed = breed,
+                birthDate = birthDate,
+                weight = weight,
+                ownerId = ownerId,
+                healthStatus = healthStatus
+            )
+        }
+    }
 }
