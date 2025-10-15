@@ -45,14 +45,49 @@ class SecurityConfig(
             .sessionManagement { it.sessionCreationPolicy(SessionCreationPolicy.STATELESS) }
             .authorizeHttpRequests { auth ->
                 auth
-                    .requestMatchers("/api/auth/register", "/api/auth/login").permitAll()
-                    .requestMatchers(HttpMethod.GET, "/api/pets/**").permitAll()
-                    .requestMatchers(HttpMethod.POST, "/api/pets/**").hasAnyRole("OWNER", "ADMIN")
-                    .requestMatchers(HttpMethod.PUT, "/api/pets/**").hasAnyRole("OWNER", "ADMIN")
-                    .requestMatchers(HttpMethod.DELETE, "/api/pets/**").hasAnyRole("OWNER", "ADMIN")
-                    .requestMatchers("/api/appointments/**").hasAnyRole("OWNER", "ADMIN", "VETERINARY")
-                    .requestMatchers("/api/medications/**").hasAnyRole("OWNER", "ADMIN", "VETERINARY")
-                    .requestMatchers("/api/vaccines/**").hasAnyRole("OWNER", "ADMIN", "VETERINARY")
+                    .requestMatchers("/api/auth/register",
+                        "/api/auth/login",
+                        "/v3/api-docs/**",
+                        "/swagger-ui/**",
+                        "/swagger-ui.html"
+                    ).permitAll()
+                    .requestMatchers(
+                        HttpMethod.GET,
+                        "/api/pets/**"
+                    ).permitAll()
+                    .requestMatchers(
+                        HttpMethod.POST,
+                        "/api/pets/**"
+                    ).hasAnyRole(
+                        "OWNER", "ADMIN"
+                    )
+                    .requestMatchers(
+                        HttpMethod.PUT,
+                        "/api/pets/**"
+                    ).hasAnyRole(
+                        "OWNER", "ADMIN"
+                    )
+                    .requestMatchers(
+                        HttpMethod.DELETE,
+                        "/api/pets/**"
+                    ).hasAnyRole(
+                        "OWNER", "ADMIN"
+                    )
+                    .requestMatchers(
+                        "/api/appointments/**"
+                    ).hasAnyRole(
+                        "OWNER", "ADMIN", "VETERINARY"
+                    )
+                    .requestMatchers(
+                        "/api/medications/**"
+                    ).hasAnyRole(
+                        "OWNER", "ADMIN", "VETERINARY"
+                    )
+                    .requestMatchers(
+                        "/api/vaccines/**"
+                    ).hasAnyRole(
+                        "OWNER", "ADMIN", "VETERINARY"
+                    )
                     .anyRequest().authenticated()
             }
             .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter::class.java)

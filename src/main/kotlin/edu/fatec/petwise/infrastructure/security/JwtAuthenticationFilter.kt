@@ -19,6 +19,18 @@ class JwtAuthenticationFilter(
         response: HttpServletResponse,
         filterChain: FilterChain
     ) {
+        val path = request.requestURI
+
+        // 🔒 Ignora rotas públicas e do Swagger/OpenAPI
+        if (path.startsWith("/api/auth/") ||
+            path.startsWith("/v3/api-docs") ||
+            path.startsWith("/swagger-ui") ||
+            path.startsWith("/swagger-ui.html")
+        ) {
+            filterChain.doFilter(request, response)
+            return
+        }
+
         val authHeader = request.getHeader("Authorization")
 
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
@@ -28,14 +40,15 @@ class JwtAuthenticationFilter(
 
         try {
             val token = authHeader.substring(7)
-            
+
             if (jwtService.validateToken(token)) {
                 val userId = jwtService.getUserIdFromToken(token)
                 val role = jwtService.getRoleFromToken(token)
-                
+
                 val authorities = listOf(SimpleGrantedAuthority("ROLE_$role"))
-                val authentication = UsernamePasswordAuthenticationToken(userId, null, authorities)
-                
+                val authentication =
+                    UsernamePasswordAuthenticationToken(userId, null, authorities)
+
                 SecurityContextHolder.getContext().authentication = authentication
             }
         } catch (e: Exception) {
