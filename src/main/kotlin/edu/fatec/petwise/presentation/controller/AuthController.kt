@@ -7,6 +7,8 @@ import edu.fatec.petwise.application.dto.UserResponse
 import edu.fatec.petwise.application.usecase.GetUserProfileUseCase
 import edu.fatec.petwise.application.usecase.LoginUserUseCase
 import edu.fatec.petwise.application.usecase.RegisterUserUseCase
+import jakarta.servlet.http.HttpServletRequest
+import jakarta.servlet.http.HttpServletResponse
 import jakarta.validation.Valid
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
@@ -43,5 +45,24 @@ class AuthController(
         logger.info("Requisição de perfil para usuário: $userId")
         val response = getUserProfileUseCase.execute(userId)
         return ResponseEntity.ok(response)
+    }
+
+    @PostMapping("/logout")
+    fun logout(request: HttpServletRequest, response: HttpServletResponse): ResponseEntity<Map<String, String>> {
+        val authHeader = request.getHeader("Authorization")
+
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(mapOf("message" to "Token ausente ou inválido"))
+        }
+
+        val token = authHeader.substring(7)
+
+        response.setHeader("Authorization", "")
+        response.setHeader("Clear-Site-Data", "\"cookies\"")
+
+        logger.info("Logout realizado com sucesso para token: $token")
+
+        return ResponseEntity.ok(mapOf("message" to "Logout realizado com sucesso"))
     }
 }

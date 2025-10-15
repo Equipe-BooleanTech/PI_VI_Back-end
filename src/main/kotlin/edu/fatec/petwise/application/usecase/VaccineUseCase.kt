@@ -41,26 +41,35 @@ class CreateVaccineUseCase(
 
         val vaccine = Vaccine(
             petId = petId,
-            name = request.name,
-            manufacturer = request.manufacturer,
-            batchNumber = request.batchNumber,
+            vaccineName = request.vaccineName,
+            vaccineType = request.vaccineType,
             applicationDate = request.applicationDate,
             nextDoseDate = request.nextDoseDate,
+            doseNumber = request.doseNumber,
+            totalDoses = request.totalDoses,
             veterinaryId = veterinaryId,
-            notes = request.notes
+            clinicName = request.clinicName,
+            batchNumber = request.batchNumber,
+            manufacturer = request.manufacturer,
+            observations = request.observations ?: "",
+            sideEffects = request.sideEffects ?: "",
+            status = request.status
         )
 
         val saved = vaccineRepository.save(vaccine)
         logger.info("Vacina criada com sucesso. ID: ${saved.id}")
 
-        return saved.toResponse()
+        val veterinarian = userRepository.findById(veterinaryId)!!
+        return saved.toResponse(pet.name, veterinarian.fullName, veterinarian.crmv ?: "")
     }
 }
 
 @Service
 class GetVaccineByIdUseCase(
     private val vaccineRepository: VaccineRepository,
-    private val petRepository: PetRepository
+    private val petRepository: PetRepository,
+    private val userRepository: UserRepository
+
 ) {
     private val logger = LoggerFactory.getLogger(javaClass)
 
@@ -77,14 +86,17 @@ class GetVaccineByIdUseCase(
             throw BusinessRuleException("Você não tem permissão para visualizar esta vacina")
         }
 
-        return vaccine.toResponse()
+        val veterinarian = userRepository.findById(vaccine.veterinaryId)!!
+        return vaccine.toResponse(pet.name, veterinarian.fullName, veterinarian.crmv ?: "")
     }
 }
 
 @Service
 class GetVaccinesByPetUseCase(
     private val vaccineRepository: VaccineRepository,
-    private val petRepository: PetRepository
+    private val petRepository: PetRepository,
+    private val userRepository: UserRepository
+
 ) {
     private val logger = LoggerFactory.getLogger(javaClass)
 
@@ -98,14 +110,19 @@ class GetVaccinesByPetUseCase(
             throw BusinessRuleException("Você não tem permissão para visualizar vacinas deste pet")
         }
 
-        return vaccineRepository.findByPetId(petId).map { it.toResponse() }
+        return vaccineRepository.findByPetId(petId).map { vaccine ->
+            val veterinarian = userRepository.findById(vaccine.veterinaryId)!!
+            vaccine.toResponse(pet.name, veterinarian.fullName, veterinarian.crmv ?: "")
+        }
     }
 }
 
 @Service
 class GetDueVaccinesByPetUseCase(
     private val vaccineRepository: VaccineRepository,
-    private val petRepository: PetRepository
+    private val petRepository: PetRepository,
+    private val userRepository: UserRepository
+
 ) {
     private val logger = LoggerFactory.getLogger(javaClass)
 
@@ -119,14 +136,18 @@ class GetDueVaccinesByPetUseCase(
             throw BusinessRuleException("Você não tem permissão para visualizar vacinas deste pet")
         }
 
-        return vaccineRepository.findDueVaccinesByPetId(petId).map { it.toResponse() }
+        return vaccineRepository.findDueVaccinesByPetId(petId).map { vaccine ->
+            val veterinarian = userRepository.findById(vaccine.veterinaryId)!!
+            vaccine.toResponse(pet.name, veterinarian.fullName, veterinarian.crmv ?: "")
+        }
     }
 }
 
 @Service
 class UpdateVaccineUseCase(
     private val vaccineRepository: VaccineRepository,
-    private val petRepository: PetRepository
+    private val petRepository: PetRepository,
+    private val userRepository: UserRepository
 ) {
     private val logger = LoggerFactory.getLogger(javaClass)
 
@@ -145,14 +166,17 @@ class UpdateVaccineUseCase(
 
         val updated = vaccine.copy(
             nextDoseDate = request.nextDoseDate ?: vaccine.nextDoseDate,
-            notes = request.notes ?: vaccine.notes,
+            observations = request.observations ?: vaccine.observations,
+            sideEffects = request.sideEffects ?: vaccine.sideEffects,
+            status = request.status ?: vaccine.status,
             updatedAt = java.time.LocalDateTime.now()
         )
 
         val saved = vaccineRepository.update(updated)
         logger.info("Vacina atualizada com sucesso. ID: $id")
 
-        return saved.toResponse()
+        val veterinarian = userRepository.findById(vaccine.veterinaryId)!!
+        return saved.toResponse(pet.name, veterinarian.fullName, veterinarian.crmv ?: "")
     }
 }
 
@@ -181,17 +205,24 @@ class DeleteVaccineUseCase(
     }
 }
 
-private fun Vaccine.toResponse() = VaccineResponse(
+private fun Vaccine.toResponse(petName: String, veterinarianName: String, veterinarianCrmv: String) = VaccineResponse(
     id = this.id.toString(),
     petId = this.petId.toString(),
-    name = this.name,
-    manufacturer = this.manufacturer,
+    petName = petName,
+    vaccineName = this.vaccineName,
+    vaccineType = this.vaccineType.name,
+    applicationDate = this.applicationDate,
+    nextDoseDate = this.nextDoseDate,
+    doseNumber = this.doseNumber,
+    totalDoses = this.totalDoses,
+    veterinarianName = veterinarianName,
+    veterinarianCrmv = veterinarianCrmv,
+    clinicName = this.clinicName,
     batchNumber = this.batchNumber,
-    applicationDate = this.applicationDate.toString(),
-    nextDoseDate = this.nextDoseDate?.toString(),
-    veterinaryId = this.veterinaryId.toString(),
-    notes = this.notes,
-    isDueForNextDose = this.isDueForNextDose(),
+    manufacturer = this.manufacturer,
+    observations = this.observations,
+    sideEffects = this.sideEffects,
+    status = this.status.name,
     createdAt = this.createdAt.toString(),
     updatedAt = this.updatedAt.toString()
 )

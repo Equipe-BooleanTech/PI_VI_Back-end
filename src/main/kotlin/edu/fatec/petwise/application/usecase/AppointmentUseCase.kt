@@ -1,11 +1,9 @@
 package edu.fatec.petwise.application.usecase
 
 import edu.fatec.petwise.application.dto.AppointmentResponse
-import edu.fatec.petwise.application.dto.CompleteAppointmentRequest
 import edu.fatec.petwise.application.dto.CreateAppointmentRequest
 import edu.fatec.petwise.application.dto.UpdateAppointmentRequest
 import edu.fatec.petwise.domain.entity.Appointment
-import edu.fatec.petwise.domain.entity.AppointmentStatus
 import edu.fatec.petwise.domain.exception.BusinessRuleException
 import edu.fatec.petwise.domain.exception.EntityNotFoundException
 import edu.fatec.petwise.domain.repository.AppointmentRepository
@@ -27,7 +25,6 @@ class CreateAppointmentUseCase(
         logger.info("Criando consulta para pet: ${request.petId}")
 
         val petId = UUID.fromString(request.petId)
-        val veterinaryId = UUID.fromString(request.veterinaryId)
 
         val pet = petRepository.findById(petId)
             ?: throw EntityNotFoundException("Pet", petId)
@@ -37,29 +34,36 @@ class CreateAppointmentUseCase(
             throw BusinessRuleException("Você não tem permissão para agendar consultas para este pet")
         }
 
-        if (!userRepository.existsById(veterinaryId)) {
-            throw EntityNotFoundException("Veterinário", veterinaryId)
-        }
-
         val appointment = Appointment(
             petId = petId,
-            veterinaryId = veterinaryId,
             ownerId = ownerId,
-            scheduledDate = request.scheduledDate,
-            reason = request.reason,
-            notes = request.notes
+            consultaType = request.consultaType,
+            consultaDate = request.consultaDate,
+            consultaTime = request.consultaTime,
+            symptoms = request.symptoms,
+            notes = request.notes,
+            price = request.price
         )
 
         val saved = appointmentRepository.save(appointment)
         logger.info("Consulta criada com sucesso. ID: ${saved.id}")
 
-        return saved.toResponse()
+        val owner = userRepository.findById(ownerId)!!
+        
+        return saved.toResponse(
+            petName = pet.name,
+            veterinarianName = "",
+            ownerName = owner.fullName,
+            ownerPhone = owner.phone.value,
+        )
     }
 }
 
 @Service
 class GetAppointmentByIdUseCase(
-    private val appointmentRepository: AppointmentRepository
+    private val appointmentRepository: AppointmentRepository,
+    private val petRepository: PetRepository,
+    private val userRepository: UserRepository
 ) {
     private val logger = LoggerFactory.getLogger(javaClass)
 
@@ -73,26 +77,48 @@ class GetAppointmentByIdUseCase(
             throw BusinessRuleException("Você não tem permissão para visualizar esta consulta")
         }
 
-        return appointment.toResponse()
+        val pet = petRepository.findById(appointment.petId)!!
+        val owner = userRepository.findById(appointment.ownerId)!!
+
+        return appointment.toResponse(
+            petName = pet.name,
+            veterinarianName = "",
+            ownerName = owner.fullName,
+            ownerPhone = owner.phone?.value,
+        )
     }
 }
 
 @Service
 class GetAppointmentsByOwnerUseCase(
-    private val appointmentRepository: AppointmentRepository
+    private val appointmentRepository: AppointmentRepository,
+    private val petRepository: PetRepository,
+    private val userRepository: UserRepository
 ) {
     private val logger = LoggerFactory.getLogger(javaClass)
 
     fun execute(ownerId: UUID): List<AppointmentResponse> {
-        logger.info("Buscando consultas do tutor: $ownerId")
-        return appointmentRepository.findByOwnerId(ownerId).map { it.toResponse() }
+        logger.info("Buscando consultas do owner: $ownerId")
+        val owner = userRepository.findById(ownerId)!!
+        
+        return appointmentRepository.findByOwnerId(ownerId).map { appointment ->
+            val pet = petRepository.findById(appointment.petId)!!
+            
+            appointment.toResponse(
+                petName = pet.name,
+                veterinarianName = "",
+                ownerName = owner.fullName,
+                ownerPhone = owner.phone?.value ?: ""
+            )
+        }
     }
 }
 
 @Service
 class GetAppointmentsByPetUseCase(
     private val appointmentRepository: AppointmentRepository,
-    private val petRepository: PetRepository
+    private val petRepository: PetRepository,
+    private val userRepository: UserRepository
 ) {
     private val logger = LoggerFactory.getLogger(javaClass)
 
@@ -106,13 +132,25 @@ class GetAppointmentsByPetUseCase(
             throw BusinessRuleException("Você não tem permissão para visualizar consultas deste pet")
         }
 
-        return appointmentRepository.findByPetId(petId).map { it.toResponse() }
+        val owner = userRepository.findById(ownerId)!!
+
+        return appointmentRepository.findByPetId(petId).map { appointment ->
+            
+            appointment.toResponse(
+                petName = pet.name,
+                veterinarianName = "",
+                ownerName = owner.fullName,
+                ownerPhone = owner.phone?.value ?: ""
+            )
+        }
     }
 }
 
 @Service
 class UpdateAppointmentUseCase(
-    private val appointmentRepository: AppointmentRepository
+    private val appointmentRepository: AppointmentRepository,
+    private val petRepository: PetRepository,
+    private val userRepository: UserRepository
 ) {
     private val logger = LoggerFactory.getLogger(javaClass)
 
@@ -131,22 +169,34 @@ class UpdateAppointmentUseCase(
         }
 
         val updated = appointment.copy(
-            scheduledDate = request.scheduledDate ?: appointment.scheduledDate,
-            reason = request.reason ?: appointment.reason,
+            consultaDate = request.consultaDate ?: appointment.consultaDate,
+            consultaTime = request.consultaTime ?: appointment.consultaTime,
+            symptoms = request.symptoms ?: appointment.symptoms,
             notes = request.notes ?: appointment.notes,
+            price = request.price ?: appointment.price,
             updatedAt = java.time.LocalDateTime.now()
         )
 
-        val saved = appointmentRepository.update(updated)
+        val saved = appointmentRepository.save(updated)
         logger.info("Consulta atualizada com sucesso. ID: $id")
 
-        return saved.toResponse()
+        val pet = petRepository.findById(appointment.petId)!!
+        val owner = userRepository.findById(ownerId)!!
+
+        return saved.toResponse(
+            petName = pet.name,
+            veterinarianName = "",
+            ownerName = owner.fullName,
+            ownerPhone = owner.phone?.value ?: ""
+        )
     }
 }
 
 @Service
 class CancelAppointmentUseCase(
-    private val appointmentRepository: AppointmentRepository
+    private val appointmentRepository: AppointmentRepository,
+    private val petRepository: PetRepository,
+    private val userRepository: UserRepository
 ) {
     private val logger = LoggerFactory.getLogger(javaClass)
 
@@ -165,24 +215,46 @@ class CancelAppointmentUseCase(
         }
 
         val cancelled = appointment.cancel()
-        val saved = appointmentRepository.update(cancelled)
+        val saved = appointmentRepository.save(cancelled)
 
         logger.info("Consulta cancelada com sucesso. ID: $id")
-        return saved.toResponse()
+        
+        val pet = petRepository.findById(appointment.petId)!!
+        val owner = userRepository.findById(ownerId)!!
+
+        return saved.toResponse(
+            petName = pet.name,
+            veterinarianName = "",
+            ownerName = owner.fullName,
+            ownerPhone = owner.phone?.value ?: ""
+        )
     }
 }
 
-private fun Appointment.toResponse() = AppointmentResponse(
+private fun Appointment.toResponse(
+    petName: String,
+    veterinarianName: String,
+    ownerName: String,
+    ownerPhone: String?
+) = AppointmentResponse(
     id = this.id.toString(),
     petId = this.petId.toString(),
-    veterinaryId = this.veterinaryId.toString(),
-    ownerId = this.ownerId.toString(),
-    scheduledDate = this.scheduledDate.toString(),
-    reason = this.reason,
-    notes = this.notes,
+    petName = petName,
+    veterinarianName = veterinarianName,
+    consultaType = this.consultaType.displayName,
+    consultaDate = this.consultaDate,
+    consultaTime = this.consultaTime,
+    status = this.status.displayName,
+    symptoms = this.symptoms,
     diagnosis = this.diagnosis,
     treatment = this.treatment,
-    status = this.status.name,
+    prescriptions = this.prescriptions,
+    notes = this.notes,
+    nextAppointment = this.nextAppointment,
+    price = this.price,
+    isPaid = this.isPaid,
+    ownerName = ownerName,
+    ownerPhone = ownerPhone.toString(),
     createdAt = this.createdAt.toString(),
     updatedAt = this.updatedAt.toString()
 )
