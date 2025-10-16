@@ -1,7 +1,8 @@
 package edu.fatec.petwise.infrastructure.persistence.entity
 
+import edu.fatec.petwise.domain.enums.VaccineType
+import edu.fatec.petwise.domain.enums.VaccinationStatus
 import jakarta.persistence.*
-import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.UUID
 
@@ -15,26 +16,46 @@ class VaccineEntity(
     @Column(nullable = false, name = "pet_id")
     var petId: UUID,
     
-    @Column(nullable = false, length = 100)
-    var name: String,
+    @Column(nullable = false, name = "vaccine_name", length = 100)
+    var vaccineName: String,
     
-    @Column(length = 100)
-    var manufacturer: String? = null,
-    
-    @Column(name = "batch_number", length = 50)
-    var batchNumber: String? = null,
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, name = "vaccine_type")
+    var vaccineType: VaccineType,
     
     @Column(nullable = false, name = "application_date")
-    var applicationDate: LocalDate,
+    var applicationDate: String,
     
     @Column(name = "next_dose_date")
-    var nextDoseDate: LocalDate? = null,
+    var nextDoseDate: String? = null,
+    
+    @Column(nullable = false, name = "dose_number")
+    var doseNumber: Int,
+    
+    @Column(nullable = false, name = "total_doses")
+    var totalDoses: Int,
     
     @Column(nullable = false, name = "veterinary_id")
     var veterinaryId: UUID,
     
+    @Column(nullable = false, name = "clinic_name", length = 100)
+    var clinicName: String,
+    
+    @Column(nullable = false, name = "batch_number", length = 50)
+    var batchNumber: String,
+    
+    @Column(nullable = false, length = 100)
+    var manufacturer: String,
+    
     @Column(columnDefinition = "TEXT")
-    var notes: String? = null,
+    var observations: String = "",
+    
+    @Column(columnDefinition = "TEXT", name = "side_effects")
+    var sideEffects: String = "",
+    
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    var status: VaccinationStatus,
     
     @Column(nullable = false, name = "created_at", updatable = false)
     var createdAt: LocalDateTime = LocalDateTime.now(),

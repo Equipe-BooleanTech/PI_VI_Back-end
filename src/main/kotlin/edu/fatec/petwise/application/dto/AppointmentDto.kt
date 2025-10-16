@@ -1,58 +1,73 @@
 package edu.fatec.petwise.application.dto
 
-import edu.fatec.petwise.domain.entity.AppointmentStatus
-import jakarta.validation.constraints.Future
+import edu.fatec.petwise.domain.enums.ConsultaType
+import jakarta.validation.constraints.Min
 import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.NotNull
-import jakarta.validation.constraints.Size
-import java.time.LocalDateTime
 
 data class CreateAppointmentRequest(
     @field:NotBlank(message = "{appointment.petId.required}")
     val petId: String,
     
-    @field:NotBlank(message = "{appointment.veterinaryId.required}")
-    val veterinaryId: String,
+    @field:NotNull(message = "{appointment.consultaType.required}")
+    val consultaType: ConsultaType,
     
-    @field:NotNull(message = "{appointment.scheduledDate.required}")
-    @field:Future(message = "{appointment.scheduledDate.future}")
-    val scheduledDate: LocalDateTime,
+    @field:NotBlank(message = "{appointment.consultaDate.required}")
+    val consultaDate: String,
     
-    @field:NotBlank(message = "{appointment.reason.required}")
-    @field:Size(min = 5, max = 500, message = "{appointment.reason.size}")
-    val reason: String,
+    @field:NotBlank(message = "{appointment.consultaTime.required}")
+    val consultaTime: String,
     
-    val notes: String? = null
+    val symptoms: String = "",
+    val notes: String = "",
+    
+    @field:Min(value = 0, message = "{appointment.price.min}")
+    val price: Float = 0f
 )
 
 data class UpdateAppointmentRequest(
-    @field:Future(message = "{appointment.scheduledDate.future}")
-    val scheduledDate: LocalDateTime? = null,
-    
-    @field:Size(min = 5, max = 500, message = "{appointment.reason.size}")
-    val reason: String? = null,
-    
-    val notes: String? = null
+    val consultaDate: String? = null,
+    val consultaTime: String? = null,
+    val symptoms: String? = null,
+    val notes: String? = null,
+    val price: Float? = null
 )
 
 data class CompleteAppointmentRequest(
     @field:NotBlank(message = "{appointment.diagnosis.required}")
     val diagnosis: String,
     
-    val treatment: String? = null
+    val treatment: String = "",
+    val prescriptions: String = ""
+)
+
+data class RescheduleAppointmentRequest(
+    @field:NotBlank(message = "{appointment.consultaDate.required}")
+    val newDate: String,
+    
+    @field:NotBlank(message = "{appointment.consultaTime.required}")
+    val newTime: String
 )
 
 data class AppointmentResponse(
     val id: String,
     val petId: String,
-    val veterinaryId: String,
-    val ownerId: String,
-    val scheduledDate: String,
-    val reason: String,
-    val notes: String?,
-    val diagnosis: String?,
-    val treatment: String?,
+    val petName: String,
+    val veterinarianName: String,
+    val consultaType: String,
+    val consultaDate: String,
+    val consultaTime: String,
     val status: String,
+    val symptoms: String,
+    val diagnosis: String,
+    val treatment: String,
+    val prescriptions: String,
+    val notes: String,
+    val nextAppointment: String?,
+    val price: Float,
+    val isPaid: Boolean,
+    val ownerName: String,
+    val ownerPhone: String,
     val createdAt: String,
     val updatedAt: String
 )

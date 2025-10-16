@@ -5,7 +5,6 @@ import edu.fatec.petwise.domain.repository.VaccineRepository
 import edu.fatec.petwise.infrastructure.persistence.entity.VaccineEntity
 import edu.fatec.petwise.infrastructure.persistence.jpa.JpaVaccineRepository
 import org.springframework.stereotype.Component
-import java.time.LocalDate
 import java.util.UUID
 
 @Component
@@ -32,7 +31,8 @@ class VaccineRepositoryAdapter(
     }
 
     override fun findDueVaccinesByPetId(petId: UUID): List<Vaccine> {
-        return jpaVaccineRepository.findDueVaccinesByPetIdAndDate(petId, LocalDate.now()).map { it.toDomain() }
+        return jpaVaccineRepository.findByPetId(petId).map { it.toDomain() }
+            .filter { it.nextDoseDate != null && it.nextDoseDate!!.isNotEmpty() }
     }
 
     override fun existsById(id: UUID): Boolean {
@@ -52,13 +52,19 @@ class VaccineRepositoryAdapter(
     private fun Vaccine.toEntity() = VaccineEntity(
         id = this.id,
         petId = this.petId,
-        name = this.name,
-        manufacturer = this.manufacturer,
-        batchNumber = this.batchNumber,
+        vaccineName = this.vaccineName,
+        vaccineType = this.vaccineType,
         applicationDate = this.applicationDate,
         nextDoseDate = this.nextDoseDate,
+        doseNumber = this.doseNumber,
+        totalDoses = this.totalDoses,
         veterinaryId = this.veterinaryId,
-        notes = this.notes,
+        clinicName = this.clinicName,
+        batchNumber = this.batchNumber,
+        manufacturer = this.manufacturer,
+        observations = this.observations,
+        sideEffects = this.sideEffects,
+        status = this.status,
         createdAt = this.createdAt,
         updatedAt = this.updatedAt
     )
@@ -66,13 +72,19 @@ class VaccineRepositoryAdapter(
     private fun VaccineEntity.toDomain() = Vaccine(
         id = this.id,
         petId = this.petId,
-        name = this.name,
-        manufacturer = this.manufacturer,
-        batchNumber = this.batchNumber,
+        vaccineName = this.vaccineName,
+        vaccineType = this.vaccineType,
         applicationDate = this.applicationDate,
         nextDoseDate = this.nextDoseDate,
+        doseNumber = this.doseNumber,
+        totalDoses = this.totalDoses,
         veterinaryId = this.veterinaryId,
-        notes = this.notes,
+        clinicName = this.clinicName,
+        batchNumber = this.batchNumber,
+        manufacturer = this.manufacturer,
+        observations = this.observations,
+        sideEffects = this.sideEffects,
+        status = this.status,
         createdAt = this.createdAt,
         updatedAt = this.updatedAt
     )

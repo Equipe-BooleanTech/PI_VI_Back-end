@@ -2,6 +2,7 @@ package edu.fatec.petwise.application.usecase
 
 import edu.fatec.petwise.application.dto.CreatePetRequest
 import edu.fatec.petwise.application.dto.PetResponse
+import edu.fatec.petwise.application.dto.PetFilterRequest
 import edu.fatec.petwise.application.dto.UpdateHealthStatusRequest
 import edu.fatec.petwise.application.dto.UpdatePetRequest
 import edu.fatec.petwise.domain.entity.Pet
@@ -32,24 +33,28 @@ class CreatePetUseCase(
 
         val pet = Pet.create(
             name = request.name,
-            species = request.species,
             breed = request.breed,
-            birthDate = request.birthDate,
+            species = request.species,
+            gender = request.gender,
+            age = request.age,
             weight = request.weight,
             ownerId = ownerId,
-            healthStatus = request.healthStatus
+            healthStatus = request.healthStatus,
+            healthHistory = request.healthHistory,
+            profileImageUrl = request.profileImageUrl
         )
 
-        val savedPet = petRepository.save(pet)
-        logger.info("Pet criado com sucesso. ID: ${savedPet.id}")
+        val saved = petRepository.save(pet)
+        logger.info("Pet criado com sucesso. ID: ${saved.id}")
         
-        return savedPet.toResponse()
+        return saved.toResponse(owner.fullName, owner.phone?.value ?: "")
     }
 }
 
 @Service
 class GetPetByIdUseCase(
-    private val petRepository: PetRepository
+    private val petRepository: PetRepository,
+    private val userRepository: UserRepository
 ) {
     private val logger = LoggerFactory.getLogger(javaClass)
 
@@ -63,25 +68,31 @@ class GetPetByIdUseCase(
             throw BusinessRuleException("Você não tem permissão para visualizar este pet")
         }
         
-        return pet.toResponse()
+        val owner = userRepository.findById(ownerId)!!
+        return pet.toResponse(owner.fullName, owner.phone?.value ?: "")
     }
 }
 
 @Service
 class GetAllPetsUseCase(
-    private val petRepository: PetRepository
+    private val petRepository: PetRepository,
+    private val userRepository: UserRepository
 ) {
     private val logger = LoggerFactory.getLogger(javaClass)
 
     fun execute(ownerId: UUID): List<PetResponse> {
-        logger.info("Buscando todos os pets do tutor: $ownerId")
-        return petRepository.findByOwnerId(ownerId).map { it.toResponse() }
+        logger.info("Buscando todos os pets do owner: $ownerId")
+        val owner = userRepository.findById(ownerId)!!
+        return petRepository.findByOwnerId(ownerId).map { 
+            it.toResponse(owner.fullName, owner.phone?.value ?: "")
+        }
     }
 }
 
 @Service
 class UpdatePetUseCase(
-    private val petRepository: PetRepository
+    private val petRepository: PetRepository,
+    private val userRepository: UserRepository
 ) {
     private val logger = LoggerFactory.getLogger(javaClass)
 
@@ -98,13 +109,18 @@ class UpdatePetUseCase(
         val updatedPet = pet.update(
             name = request.name,
             breed = request.breed,
-            weight = request.weight
+            weight = request.weight,
+            age = request.age,
+            healthHistory = request.healthHistory,
+            profileImageUrl = request.profileImageUrl,
+            nextAppointment = request.nextAppointment
         )
 
         val saved = petRepository.save(updatedPet)
         logger.info("Pet atualizado com sucesso. ID: $id")
         
-        return saved.toResponse()
+        val owner = userRepository.findById(ownerId)!!
+        return saved.toResponse(owner.fullName, owner.phone?.value ?: "")
     }
 }
 
@@ -131,7 +147,8 @@ class DeletePetUseCase(
 
 @Service
 class ToggleFavoritePetUseCase(
-    private val petRepository: PetRepository
+    private val petRepository: PetRepository,
+    private val userRepository: UserRepository
 ) {
     private val logger = LoggerFactory.getLogger(javaClass)
 
@@ -148,14 +165,16 @@ class ToggleFavoritePetUseCase(
         val updatedPet = pet.toggleFavorite()
         val saved = petRepository.save(updatedPet)
         
+        val owner = userRepository.findById(ownerId)!!
         logger.info("Status de favorito alternado com sucesso. ID: $id")
-        return saved.toResponse()
+        return saved.toResponse(owner.fullName, owner.phone?.value ?: "")
     }
 }
 
 @Service
 class UpdateHealthStatusUseCase(
-    private val petRepository: PetRepository
+    private val petRepository: PetRepository,
+    private val userRepository: UserRepository
 ) {
     private val logger = LoggerFactory.getLogger(javaClass)
 
@@ -172,47 +191,93 @@ class UpdateHealthStatusUseCase(
         val updatedPet = pet.updateHealthStatus(request.healthStatus)
         val saved = petRepository.save(updatedPet)
         
+        val owner = userRepository.findById(ownerId)!!
         logger.info("Status de saúde atualizado com sucesso. ID: $id")
-        return saved.toResponse()
+        return saved.toResponse(owner.fullName, owner.phone?.value ?: "")
     }
 }
 
 @Service
 class SearchPetsUseCase(
-    private val petRepository: PetRepository
+    private val petRepository: PetRepository,
+    private val userRepository: UserRepository
 ) {
     private val logger = LoggerFactory.getLogger(javaClass)
 
     fun execute(query: String, ownerId: UUID): List<PetResponse> {
         logger.info("Buscando pets com query: $query")
-        return petRepository.searchByNameAndOwnerId(query, ownerId).map { it.toResponse() }
+        val owner = userRepository.findById(ownerId)!!
+        return petRepository.searchByNameAndOwnerId(query, ownerId).map { it.toResponse(owner.fullName, owner.phone?.value ?: "") }
     }
 }
 
 @Service
 class GetFavoritePetsUseCase(
-    private val petRepository: PetRepository
+    private val petRepository: PetRepository,
+    private val userRepository: UserRepository
 ) {
     private val logger = LoggerFactory.getLogger(javaClass)
 
     fun execute(ownerId: UUID): List<PetResponse> {
-        logger.info("Buscando pets favoritos do tutor: $ownerId")
-        return petRepository.findFavoritesByOwnerId(ownerId).map { it.toResponse() }
+        logger.info("Buscando pets favoritos do owner: $ownerId")
+        val owner = userRepository.findById(ownerId)!!
+        return petRepository.findFavoritesByOwnerId(ownerId).map { 
+            it.toResponse(owner.fullName, owner.phone?.value ?: "")
+        }
     }
 }
 
-private fun Pet.toResponse() = PetResponse(
+@Service
+class FilterPetsUseCase(
+    private val petRepository: PetRepository,
+    private val userRepository: UserRepository
+) {
+    private val logger = LoggerFactory.getLogger(javaClass)
+
+    fun execute(filterOptions: PetFilterRequest, ownerId: UUID): List<PetResponse> {
+        logger.info("Filtrando pets do owner: $ownerId")
+        val owner = userRepository.findById(ownerId)!!
+        
+        var pets = if (filterOptions.favoritesOnly) {
+            petRepository.findFavoritesByOwnerId(ownerId)
+        } else {
+            petRepository.findByOwnerId(ownerId)
+        }
+        
+        if (filterOptions.species != null) {
+            pets = pets.filter { it.species == filterOptions.species }
+        }
+        
+        if (filterOptions.healthStatus != null) {
+            pets = pets.filter { it.healthStatus == filterOptions.healthStatus }
+        }
+        
+        if (filterOptions.searchQuery.isNotEmpty()) {
+            pets = pets.filter { 
+                it.name.contains(filterOptions.searchQuery, ignoreCase = true) ||
+                it.breed.contains(filterOptions.searchQuery, ignoreCase = true)
+            }
+        }
+        
+        return pets.map { it.toResponse(owner.fullName, owner.phone?.value ?: "") }
+    }
+}
+
+private fun Pet.toResponse(ownerName: String, ownerPhone: String) = PetResponse(
     id = this.id.toString(),
     name = this.name,
-    species = this.species,
     breed = this.breed,
-    birthDate = this.birthDate.toString(),
-    age = this.calculateAge(),
+    species = this.species.displayName,
+    gender = this.gender.displayName,
+    age = this.age,
     weight = this.weight,
-    ownerId = this.ownerId.toString(),
+    healthStatus = this.healthStatus.displayName,
+    ownerName = ownerName,
+    ownerPhone = ownerPhone,
+    healthHistory = this.healthHistory,
+    profileImageUrl = this.profileImageUrl,
     isFavorite = this.isFavorite,
-    healthStatus = this.healthStatus.name,
-    active = this.active,
+    nextAppointment = this.nextAppointment,
     createdAt = this.createdAt.toString(),
     updatedAt = this.updatedAt.toString()
 )

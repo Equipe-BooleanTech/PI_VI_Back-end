@@ -1,9 +1,9 @@
 package edu.fatec.petwise.infrastructure.persistence.entity
 
 import edu.fatec.petwise.domain.enums.HealthStatus
+import edu.fatec.petwise.domain.enums.PetSpecies
+import edu.fatec.petwise.domain.enums.PetGender
 import jakarta.persistence.*
-import java.math.BigDecimal
-import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.UUID
 
@@ -17,27 +17,41 @@ class PetEntity(
     @Column(nullable = false, length = 50)
     var name: String,
     
-    @Column(nullable = false, length = 30)
-    var species: String,
+    @Column(nullable = false, length = 50)
+    var breed: String,
     
-    @Column(length = 50)
-    var breed: String?,
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    var species: PetSpecies,
     
-    @Column(nullable = false, name = "birth_date")
-    var birthDate: LocalDate,
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    var gender: PetGender,
     
-    @Column(precision = 5, scale = 2)
-    var weight: BigDecimal?,
+    @Column(nullable = false)
+    var age: Int,
+    
+    @Column(nullable = false)
+    var weight: Float,
+    
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, name = "health_status")
+    var healthStatus: HealthStatus = HealthStatus.GOOD,
     
     @Column(nullable = false, name = "owner_id")
     var ownerId: UUID,
     
+    @Column(columnDefinition = "TEXT")
+    var healthHistory: String = "",
+    
+    @Column(name = "profile_image_url")
+    var profileImageUrl: String? = null,
+    
     @Column(nullable = false, name = "is_favorite")
     var isFavorite: Boolean = false,
     
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false, name = "health_status")
-    var healthStatus: HealthStatus = HealthStatus.SAUDAVEL,
+    @Column(name = "next_appointment")
+    var nextAppointment: String? = null,
     
     @Column(nullable = false)
     var active: Boolean = true,

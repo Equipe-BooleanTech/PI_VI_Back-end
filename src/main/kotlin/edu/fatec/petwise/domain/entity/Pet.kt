@@ -1,7 +1,8 @@
 package edu.fatec.petwise.domain.entity
 
 import edu.fatec.petwise.domain.enums.HealthStatus
-import java.math.BigDecimal
+import edu.fatec.petwise.domain.enums.PetSpecies
+import edu.fatec.petwise.domain.enums.PetGender
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.UUID
@@ -9,30 +10,26 @@ import java.util.UUID
 data class Pet(
     val id: UUID? = null,
     val name: String,
-    val species: String,
-    val breed: String?,
-    val birthDate: LocalDate,
-    val weight: BigDecimal?,
+    val breed: String,
+    val species: PetSpecies,
+    val gender: PetGender,
+    val age: Int,
+    val weight: Float,
+    val healthStatus: HealthStatus = HealthStatus.GOOD,
     val ownerId: UUID,
+    val healthHistory: String = "",
+    val profileImageUrl: String? = null,
     val isFavorite: Boolean = false,
-    val healthStatus: HealthStatus = HealthStatus.SAUDAVEL,
+    val nextAppointment: String? = null,
     val active: Boolean = true,
     val createdAt: LocalDateTime = LocalDateTime.now(),
     val updatedAt: LocalDateTime = LocalDateTime.now()
 ) {
     init {
         require(name.isNotBlank()) { "Nome do pet não pode estar vazio" }
-        require(species.isNotBlank()) { "Espécie do pet não pode estar vazia" }
-        require(birthDate.isBefore(LocalDate.now()) || birthDate.isEqual(LocalDate.now())) {
-            "Data de nascimento não pode ser futura"
-        }
-        weight?.let {
-            require(it > BigDecimal.ZERO) { "Peso deve ser maior que zero" }
-        }
-    }
-
-    fun calculateAge(): Int {
-        return LocalDate.now().year - birthDate.year
+        require(breed.isNotBlank()) { "Raça do pet não pode estar vazia" }
+        require(age >= 0) { "Idade não pode ser negativa" }
+        require(weight > 0) { "Peso deve ser maior que zero" }
     }
 
     fun deactivate(): Pet = this.copy(active = false, updatedAt = LocalDateTime.now())
@@ -47,32 +44,46 @@ data class Pet(
     fun update(
         name: String? = null,
         breed: String? = null,
-        weight: BigDecimal? = null
+        weight: Float? = null,
+        age: Int? = null,
+        healthHistory: String? = null,
+        profileImageUrl: String? = null,
+        nextAppointment: String? = null
     ): Pet = this.copy(
         name = name ?: this.name,
         breed = breed ?: this.breed,
         weight = weight ?: this.weight,
+        age = age ?: this.age,
+        healthHistory = healthHistory ?: this.healthHistory,
+        profileImageUrl = profileImageUrl ?: this.profileImageUrl,
+        nextAppointment = nextAppointment ?: this.nextAppointment,
         updatedAt = LocalDateTime.now()
     )
     
     companion object {
         fun create(
             name: String,
-            species: String,
-            breed: String?,
-            birthDate: LocalDate,
-            weight: BigDecimal?,
+            breed: String,
+            species: PetSpecies,
+            gender: PetGender,
+            age: Int,
+            weight: Float,
             ownerId: UUID,
-            healthStatus: HealthStatus = HealthStatus.SAUDAVEL
+            healthStatus: HealthStatus = HealthStatus.GOOD,
+            healthHistory: String = "",
+            profileImageUrl: String? = null
         ): Pet {
             return Pet(
                 name = name,
-                species = species,
                 breed = breed,
-                birthDate = birthDate,
+                species = species,
+                gender = gender,
+                age = age,
                 weight = weight,
                 ownerId = ownerId,
-                healthStatus = healthStatus
+                healthStatus = healthStatus,
+                healthHistory = healthHistory,
+                profileImageUrl = profileImageUrl
             )
         }
     }

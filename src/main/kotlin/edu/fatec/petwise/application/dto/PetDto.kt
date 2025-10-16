@@ -1,46 +1,48 @@
 package edu.fatec.petwise.application.dto
 
 import edu.fatec.petwise.domain.enums.HealthStatus
+import edu.fatec.petwise.domain.enums.PetSpecies
+import edu.fatec.petwise.domain.enums.PetGender
 import jakarta.validation.constraints.*
-import java.math.BigDecimal
-import java.time.LocalDate
 
 data class CreatePetRequest(
     @field:NotBlank(message = "{pet.name.required}")
     @field:Size(min = 2, max = 50, message = "{pet.name.size}")
     val name: String,
     
-    @field:NotBlank(message = "{pet.species.required}")
-    @field:Size(min = 2, max = 30, message = "{pet.species.size}")
-    val species: String,
+    @field:NotBlank(message = "{pet.breed.required}")
+    @field:Size(min = 2, max = 50, message = "{pet.breed.size}")
+    val breed: String,
     
-    @field:Size(max = 50, message = "{pet.breed.size}")
-    val breed: String?,
+    @field:NotNull(message = "{pet.species.required}")
+    val species: PetSpecies,
     
-    @field:NotNull(message = "{pet.birthDate.required}")
-    @field:PastOrPresent(message = "{pet.birthDate.pastOrPresent}")
-    val birthDate: LocalDate,
+    @field:NotNull(message = "{pet.gender.required}")
+    val gender: PetGender,
     
-    @field:DecimalMin(value = "0.1", message = "{pet.weight.min}")
-    @field:DecimalMax(value = "500.0", message = "{pet.weight.max}")
-    val weight: BigDecimal?,
+    @field:Min(value = 0, message = "{pet.age.min}")
+    @field:Max(value = 50, message = "{pet.age.max}")
+    val age: Int,
+    
+    @field:Min(value = 1, message = "{pet.weight.min}")
+    val weight: Float,
     
     @field:NotNull(message = "{pet.healthStatus.required}")
-    val healthStatus: HealthStatus
+    val healthStatus: HealthStatus,
+    
+    val healthHistory: String = "",
+    
+    val profileImageUrl: String? = null
 )
 
 data class UpdatePetRequest(
-    @field:NotBlank(message = "{pet.name.notBlank}")
-    @field:Size(min = 1, max = 50, message = "{pet.name.size}")
-    val name: String,
-
-    @field:NotBlank(message = "{pet.breed.notBlank}")
-    @field:Size(min = 1, max = 50, message = "{pet.breed.size}")
-    val breed: String,
-
-    @field:DecimalMin(value = "0.1", message = "{pet.weight.min}")
-    @field:DecimalMax(value = "500.0", message = "{pet.weight.max}")
-    val weight: BigDecimal
+    val name: String?,
+    val breed: String?,
+    val weight: Float?,
+    val age: Int?,
+    val healthHistory: String?,
+    val profileImageUrl: String?,
+    val nextAppointment: String?
 )
 
 data class UpdateHealthStatusRequest(
@@ -48,18 +50,28 @@ data class UpdateHealthStatusRequest(
     val healthStatus: HealthStatus
 )
 
+data class PetFilterRequest(
+    val species: PetSpecies? = null,
+    val healthStatus: HealthStatus? = null,
+    val favoritesOnly: Boolean = false,
+    val searchQuery: String = ""
+)
+
 data class PetResponse(
     val id: String,
     val name: String,
+    val breed: String,
     val species: String,
-    val breed: String?,
-    val birthDate: String,
+    val gender: String,
     val age: Int,
-    val weight: BigDecimal?,
-    val ownerId: String,
-    val isFavorite: Boolean,
+    val weight: Float,
     val healthStatus: String,
-    val active: Boolean,
+    val ownerName: String,
+    val ownerPhone: String,
+    val healthHistory: String,
+    val profileImageUrl: String?,
+    val isFavorite: Boolean,
+    val nextAppointment: String?,
     val createdAt: String,
     val updatedAt: String
 )

@@ -1,7 +1,7 @@
 package edu.fatec.petwise.infrastructure.persistence.adapter
 
 import edu.fatec.petwise.domain.entity.Appointment
-import edu.fatec.petwise.domain.entity.AppointmentStatus
+import edu.fatec.petwise.domain.enums.ConsultaStatus
 import edu.fatec.petwise.domain.repository.AppointmentRepository
 import edu.fatec.petwise.infrastructure.persistence.entity.AppointmentEntity
 import edu.fatec.petwise.infrastructure.persistence.jpa.JpaAppointmentRepository
@@ -36,16 +36,12 @@ class AppointmentRepositoryAdapter(
         return jpaAppointmentRepository.findByOwnerId(ownerId).map { it.toDomain() }
     }
 
-    override fun findByVeterinaryId(veterinaryId: UUID): List<Appointment> {
-        return jpaAppointmentRepository.findByVeterinaryId(veterinaryId).map { it.toDomain() }
-    }
-
-    override fun findByStatus(status: AppointmentStatus): List<Appointment> {
+    override fun findByStatus(status: ConsultaStatus): List<Appointment> {
         return jpaAppointmentRepository.findByStatus(status).map { it.toDomain() }
     }
 
-    override fun findByScheduledDateBetween(start: LocalDateTime, end: LocalDateTime): List<Appointment> {
-        return jpaAppointmentRepository.findByScheduledDateBetween(start, end).map { it.toDomain() }
+    override fun findByConsultaDateBetween(startDate: String, endDate: String): List<Appointment> {
+        return jpaAppointmentRepository.findByConsultaDate(startDate).map { it.toDomain() }
     }
 
     override fun existsById(id: UUID): Boolean {
@@ -65,14 +61,19 @@ class AppointmentRepositoryAdapter(
     private fun Appointment.toEntity() = AppointmentEntity(
         id = this.id,
         petId = this.petId,
-        veterinaryId = this.veterinaryId,
         ownerId = this.ownerId,
-        scheduledDate = this.scheduledDate,
-        reason = this.reason,
-        notes = this.notes,
+        consultaType = this.consultaType,
+        consultaDate = this.consultaDate,
+        consultaTime = this.consultaTime,
+        status = this.status,
+        symptoms = this.symptoms,
         diagnosis = this.diagnosis,
         treatment = this.treatment,
-        status = this.status,
+        prescriptions = this.prescriptions,
+        notes = this.notes,
+        nextAppointment = this.nextAppointment,
+        price = this.price,
+        isPaid = this.isPaid,
         createdAt = this.createdAt,
         updatedAt = this.updatedAt
     )
@@ -80,14 +81,19 @@ class AppointmentRepositoryAdapter(
     private fun AppointmentEntity.toDomain() = Appointment(
         id = this.id,
         petId = this.petId,
-        veterinaryId = this.veterinaryId,
         ownerId = this.ownerId,
-        scheduledDate = this.scheduledDate,
-        reason = this.reason,
-        notes = this.notes,
+        consultaType = this.consultaType,
+        consultaDate = this.consultaDate,
+        consultaTime = this.consultaTime,
+        status = this.status,
+        symptoms = this.symptoms,
         diagnosis = this.diagnosis,
         treatment = this.treatment,
-        status = this.status,
+        prescriptions = this.prescriptions,
+        notes = this.notes,
+        nextAppointment = this.nextAppointment,
+        price = this.price,
+        isPaid = this.isPaid,
         createdAt = this.createdAt,
         updatedAt = this.updatedAt
     )

@@ -1,57 +1,65 @@
 package edu.fatec.petwise.domain.entity
 
+import edu.fatec.petwise.domain.enums.ConsultaType
+import edu.fatec.petwise.domain.enums.ConsultaStatus
 import java.time.LocalDateTime
 import java.util.UUID
 
 data class Appointment(
     val id: UUID? = null,
     val petId: UUID,
-    val veterinaryId: UUID,
     val ownerId: UUID,
-    val scheduledDate: LocalDateTime,
-    val reason: String,
-    val notes: String? = null,
-    val diagnosis: String? = null,
-    val treatment: String? = null,
-    val status: AppointmentStatus = AppointmentStatus.SCHEDULED,
+    val consultaType: ConsultaType,
+    val consultaDate: String,
+    val consultaTime: String,
+    val status: ConsultaStatus = ConsultaStatus.SCHEDULED,
+    val symptoms: String = "",
+    val diagnosis: String = "",
+    val treatment: String = "",
+    val prescriptions: String = "",
+    val notes: String = "",
+    val nextAppointment: String? = null,
+    val price: Float = 0f,
+    val isPaid: Boolean = false,
     val createdAt: LocalDateTime = LocalDateTime.now(),
     val updatedAt: LocalDateTime = LocalDateTime.now()
 ) {
     init {
-        require(reason.isNotBlank()) { "Motivo da consulta não pode estar vazio" }
-        require(scheduledDate.isAfter(LocalDateTime.now())) { "Data da consulta deve ser futura" }
+        require(consultaDate.isNotBlank()) { "Data da consulta não pode estar vazia" }
+        require(consultaTime.isNotBlank()) { "Horário da consulta não pode estar vazio" }
+        require(price >= 0) { "Preço não pode ser negativo" }
     }
-
-    fun confirm(): Appointment = this.copy(
-        status = AppointmentStatus.CONFIRMED,
-        updatedAt = LocalDateTime.now()
-    )
 
     fun start(): Appointment = this.copy(
-        status = AppointmentStatus.IN_PROGRESS,
+        status = ConsultaStatus.IN_PROGRESS,
         updatedAt = LocalDateTime.now()
     )
 
-    fun complete(diagnosis: String?, treatment: String?): Appointment {
-        require(!diagnosis.isNullOrBlank()) { "Diagnóstico é obrigatório para finalizar consulta" }
-        return this.copy(
-            status = AppointmentStatus.COMPLETED,
-            diagnosis = diagnosis,
-            treatment = treatment,
-            updatedAt = LocalDateTime.now()
-        )
-    }
+    fun complete(diagnosis: String, treatment: String, prescriptions: String = ""): Appointment = this.copy(
+        status = ConsultaStatus.COMPLETED,
+        diagnosis = diagnosis,
+        treatment = treatment,
+        prescriptions = prescriptions,
+        updatedAt = LocalDateTime.now()
+    )
 
     fun cancel(): Appointment = this.copy(
-        status = AppointmentStatus.CANCELLED,
+        status = ConsultaStatus.CANCELLED,
         updatedAt = LocalDateTime.now()
     )
 
-    fun addNotes(notes: String): Appointment = this.copy(
-        notes = notes,
+    fun reschedule(newDate: String, newTime: String): Appointment = this.copy(
+        status = ConsultaStatus.RESCHEDULED,
+        consultaDate = newDate,
+        consultaTime = newTime,
         updatedAt = LocalDateTime.now()
     )
 
-    fun canBeModified(): Boolean = status in listOf(AppointmentStatus.SCHEDULED, AppointmentStatus.CONFIRMED)
-    fun canBeCancelled(): Boolean = status !in listOf(AppointmentStatus.COMPLETED, AppointmentStatus.CANCELLED)
+    fun markAsPaid(): Appointment = this.copy(
+        isPaid = true,
+        updatedAt = LocalDateTime.now()
+    )
+
+    fun canBeModified(): Boolean = status in listOf(ConsultaStatus.SCHEDULED, ConsultaStatus.RESCHEDULED)
+    fun canBeCancelled(): Boolean = status !in listOf(ConsultaStatus.COMPLETED, ConsultaStatus.CANCELLED)
 }
