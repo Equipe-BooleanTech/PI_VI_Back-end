@@ -17,6 +17,7 @@ import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
+import java.util.*
 
 @Service
 class RegisterUserUseCase(
@@ -65,7 +66,8 @@ class RegisterUserUseCase(
             fullName = savedUser.fullName,
             email = savedUser.email.value,
             userType = savedUser.userType.name,
-            expiresIn = jwtExpiration
+            expiresIn = jwtExpiration,
+            refreshToken = TODO()
         )
     }
 
@@ -124,25 +126,29 @@ class LoginUserUseCase(
             ?: throw EntityNotFoundException("Usuário", request.email)
 
         if (!user.active) {
-            logger.warn("Tentativa de login com usuário inativo: ${request.email}")
             throw BusinessRuleException("Usuário inativo")
         }
 
         if (!passwordEncoder.matches(request.password, user.passwordHash)) {
-            logger.warn("Tentativa de login com senha incorreta: ${request.email}")
             throw BusinessRuleException("Email ou senha incorretos")
         }
 
         logger.info("Login realizado com sucesso: ${request.email}")
 
-        val token = jwtService.generateToken(
+        val accessToken = jwtService.generateToken(
             userId = user.id.toString(),
             email = user.email.value,
             userType = user.userType
         )
 
+        val refreshToken = jwtService.generateRefreshToken(
+            userId = user.id.toString(),
+            email = user.email.value
+        )
+
         return AuthResponse(
-            token = token,
+            token = accessToken,
+            refreshToken = refreshToken,
             userId = user.id.toString(),
             fullName = user.fullName,
             email = user.email.value,
@@ -161,14 +167,14 @@ class GetUserProfileUseCase(
     fun execute(userId: String): UserResponse {
         logger.info("Buscando perfil do usuário: $userId")
         
-        val user = userRepository.findById(java.util.UUID.fromString(userId))
+        val user = userRepository.findById(UUID.fromString(userId))
             ?: throw EntityNotFoundException("Usuário", userId)
         
         return user.toResponse()
     }
 }
 
-private fun User.toResponse() = UserResponse(
+fun User.toResponse() = UserResponse(
     id = this.id.toString(),
     fullName = this.fullName,
     email = this.email.value,

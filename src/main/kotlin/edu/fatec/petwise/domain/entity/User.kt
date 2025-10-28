@@ -7,10 +7,10 @@ import java.util.UUID
 
 data class User(
     val id: UUID? = null,
-    val fullName: String,
+    var fullName: String,
     val email: Email,
-    val phone: Telefone,
-    val passwordHash: String,
+    var phone: Telefone,
+    var passwordHash: String,
     val userType: UserType,
     val cpf: String? = null,
     val crmv: String? = null,
