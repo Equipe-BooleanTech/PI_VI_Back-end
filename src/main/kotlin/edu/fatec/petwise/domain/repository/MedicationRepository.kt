@@ -12,4 +12,5 @@ interface MedicationRepository {
     fun existsById(id: UUID): Boolean
     fun update(medication: Medication): Medication
     fun delete(id: UUID)
+    fun findActiveMedications(ownerId: UUID): List<Medication>
 }

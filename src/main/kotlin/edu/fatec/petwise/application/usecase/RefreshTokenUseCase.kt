@@ -16,13 +16,17 @@ class RefreshTokenUseCase(
     private val logger = LoggerFactory.getLogger(javaClass)
 
     fun execute(refreshToken: String): AuthResponse {
+        // ✅ CORREÇÃO 6: Logs sanitizados - não expõe tokens
         logger.info("Renovando token...")
 
         if (!jwtService.validateToken(refreshToken, "REFRESH")) {
+            logger.warn("Tentativa de refresh com token inválido ou expirado")
             throw IllegalArgumentException("Refresh token inválido ou expirado")
         }
 
         val email = jwtService.extractEmail(refreshToken)
+        val maskedEmail = maskEmail(email)
+
         val user = userRepository.findByEmail(email)
             ?: throw IllegalArgumentException("Usuário não encontrado")
 
@@ -32,12 +36,13 @@ class RefreshTokenUseCase(
             userType = user.userType
         )
 
+        // ✅ MELHORIA: Rotação de refresh token (recomendação de segurança)
         val newRefreshToken = jwtService.generateRefreshToken(
             userId = user.id.toString(),
             email = user.email.value
         )
 
-        logger.info("Novo token gerado com sucesso para $email")
+        logger.info("Novo token gerado com sucesso para usuário: ${user.id}")
 
         return AuthResponse(
             token = newAccessToken,
@@ -48,5 +53,22 @@ class RefreshTokenUseCase(
             userType = user.userType.name,
             expiresIn = jwtExpiration
         )
+    }
+
+    // 🔒 SEGURANÇA: Função para mascarar email nos logs
+    private fun maskEmail(email: String): String {
+        val parts = email.split("@")
+        if (parts.size != 2) return "***@***"
+
+        val localPart = parts[0]
+        val domain = parts[1]
+
+        val maskedLocal = if (localPart.length <= 2) {
+            "***"
+        } else {
+            localPart.take(2) + "***"
+        }
+
+        return "$maskedLocal@$domain"
     }
 }

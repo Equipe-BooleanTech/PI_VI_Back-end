@@ -16,4 +16,7 @@ interface AppointmentRepository {
     fun existsById(id: UUID): Boolean
     fun update(appointment: Appointment): Appointment
     fun delete(id: UUID)
+    fun countUpcomingAppointments(ownerId: UUID, fromDate: LocalDateTime, toDate: LocalDateTime): Int
+    fun countRecentAppointments(ownerId: UUID, fromDate: LocalDateTime): Int
+    fun findUpcomingAppointments(ownerId: UUID, fromDate: LocalDateTime, toDate: LocalDateTime): List<Appointment>
 }

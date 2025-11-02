@@ -3,7 +3,10 @@ package edu.fatec.petwise.infrastructure.security
 import edu.fatec.petwise.domain.entity.UserType
 import io.jsonwebtoken.Claims
 import io.jsonwebtoken.Jwts
+import io.jsonwebtoken.SignatureAlgorithm
 import io.jsonwebtoken.security.Keys
+import jakarta.annotation.PostConstruct
+import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
 import java.util.*
@@ -11,6 +14,8 @@ import javax.crypto.SecretKey
 
 @Service
 class JwtService {
+
+    private val logger = LoggerFactory.getLogger(javaClass)
 
     @Value("\${JWT_SECRET}")
     private lateinit var secret: String
@@ -23,6 +28,19 @@ class JwtService {
 
     @Value("\${JWT_REFRESH_EXPIRATION:604800000}") // 7 dias padrão
     private var refreshExpiration: Long = 604800000
+
+    @PostConstruct
+    fun validateSecretKey() {
+        // 🔒 VALIDAÇÃO DE SEGURANÇA: JWT Secret deve ter no mínimo 256 bits (64 caracteres hex)
+        if (secret.length < 64) {
+            throw IllegalStateException(
+                "JWT_SECRET deve ter no mínimo 256 bits (64 caracteres). " +
+                        "Tamanho atual: ${secret.length}. " +
+                        "Use: openssl rand -hex 64"
+            )
+        }
+        logger.info("JWT Secret validado com sucesso (${secret.length} caracteres)")
+    }
 
     private fun getSigningKey(): SecretKey =
         Keys.hmacShaKeyFor(secret.toByteArray())
@@ -58,16 +76,15 @@ class JwtService {
     }
 
     fun generateResetToken(userId: String, email: String): String {
-        val now = Date()
-        val expiryDate = Date(now.time + resetExpiration)
+        val expirationTime = Date(System.currentTimeMillis() + resetExpiration)
 
         return Jwts.builder()
-            .subject(userId)
+            .setSubject(userId)
             .claim("email", email)
             .claim("type", "RESET")
-            .issuedAt(now)
-            .expiration(expiryDate)
-            .signWith(getSigningKey())
+            .setIssuedAt(Date())
+            .setExpiration(expirationTime)
+            .signWith(getSigningKey(), SignatureAlgorithm.HS256)
             .compact()
     }
 
@@ -84,6 +101,12 @@ class JwtService {
     fun extractRole(token: String): String =
         extractAllClaims(token)["role"]?.toString() ?: "UNKNOWN"
 
+    fun getUserIdFromToken(token: String): String = extractUserId(token)
+
+    fun getRoleFromToken(token: String): String = extractRole(token)
+
+    fun validateToken(token: String): Boolean = validateToken(token, "ACCESS")
+
     fun validateToken(token: String, expectedType: String = "ACCESS"): Boolean {
         return try {
             val claims = extractAllClaims(token)
@@ -92,12 +115,10 @@ class JwtService {
             val type = claims["type"] as? String ?: return false
             !expiration.before(now) && type == expectedType
         } catch (e: Exception) {
+            logger.warn("Token inválido: ${e.message}")
             false
         }
     }
-
-
-
 
     private fun extractAllClaims(token: String): Claims {
         return Jwts.parser()

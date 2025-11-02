@@ -25,7 +25,8 @@ class JwtAuthenticationFilter(
         if (path.startsWith("/api/auth/") ||
             path.startsWith("/v3/api-docs") ||
             path.startsWith("/swagger-ui") ||
-            path.startsWith("/swagger-ui.html")
+            path.startsWith("/swagger-ui.html") ||
+            path.startsWith("/actuator/health")
         ) {
             filterChain.doFilter(request, response)
             return
@@ -41,7 +42,9 @@ class JwtAuthenticationFilter(
         try {
             val token = authHeader.substring(7)
 
+            // ✅ CORREÇÃO 2: validateToken agora aceita 1 parâmetro (usa "ACCESS" como padrão)
             if (jwtService.validateToken(token)) {
+                // ✅ CORREÇÃO 1: Métodos renomeados para getUserIdFromToken e getRoleFromToken
                 val userId = jwtService.getUserIdFromToken(token)
                 val role = jwtService.getRoleFromToken(token)
 
@@ -52,7 +55,10 @@ class JwtAuthenticationFilter(
                 SecurityContextHolder.getContext().authentication = authentication
             }
         } catch (e: Exception) {
-            logger.error("Erro ao processar token JWT: ${e.message}")
+            // 🔒 SEGURANÇA: Não expõe detalhes do erro (apenas loga)
+            logger.error("Erro ao processar token JWT: ${e.javaClass.simpleName}")
+            // 🔒 Log detalhado apenas em nível DEBUG
+            logger.debug("Detalhes do erro JWT: ${e.message}", e)
         }
 
         filterChain.doFilter(request, response)
