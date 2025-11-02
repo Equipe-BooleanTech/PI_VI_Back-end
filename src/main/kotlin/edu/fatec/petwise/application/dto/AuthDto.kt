@@ -51,12 +51,14 @@ data class LoginRequest(
 
 data class AuthResponse(
     val token: String,
+    val refreshToken: String,
     val userId: String,
     val fullName: String,
     val email: String,
     val userType: String,
     val expiresIn: Long
 )
+
 
 data class UserResponse(
     val id: String,

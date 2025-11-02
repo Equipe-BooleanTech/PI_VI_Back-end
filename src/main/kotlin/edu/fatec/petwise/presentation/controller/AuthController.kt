@@ -6,6 +6,7 @@ import edu.fatec.petwise.application.dto.RegisterRequest
 import edu.fatec.petwise.application.dto.UserResponse
 import edu.fatec.petwise.application.usecase.GetUserProfileUseCase
 import edu.fatec.petwise.application.usecase.LoginUserUseCase
+import edu.fatec.petwise.application.usecase.RefreshTokenUseCase
 import edu.fatec.petwise.application.usecase.RegisterUserUseCase
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
@@ -21,7 +22,8 @@ import org.springframework.web.bind.annotation.*
 class AuthController(
     private val registerUserUseCase: RegisterUserUseCase,
     private val loginUserUseCase: LoginUserUseCase,
-    private val getUserProfileUseCase: GetUserProfileUseCase
+    private val getUserProfileUseCase: GetUserProfileUseCase,
+    private val refreshTokenUseCase: RefreshTokenUseCase
 ) {
     private val logger = LoggerFactory.getLogger(javaClass)
 
@@ -65,4 +67,15 @@ class AuthController(
 
         return ResponseEntity.ok(mapOf("message" to "Logout realizado com sucesso"))
     }
+
+    @PostMapping("/refresh-token")
+    fun refreshToken(@RequestBody request: Map<String, String>): ResponseEntity<AuthResponse> {
+        val refreshToken = request["refreshToken"]
+            ?: return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(null)
+
+        val response = refreshTokenUseCase.execute(refreshToken)
+        return ResponseEntity.ok(response)
+    }
+
 }
