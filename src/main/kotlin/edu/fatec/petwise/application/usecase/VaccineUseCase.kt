@@ -6,7 +6,6 @@ import edu.fatec.petwise.application.dto.VaccineResponse
 import edu.fatec.petwise.domain.entity.Vaccine
 import edu.fatec.petwise.domain.exception.BusinessRuleException
 import edu.fatec.petwise.domain.exception.EntityNotFoundException
-import edu.fatec.petwise.domain.repository.PetRepository
 import edu.fatec.petwise.domain.repository.UserRepository
 import edu.fatec.petwise.domain.repository.VaccineRepository
 import org.slf4j.LoggerFactory
