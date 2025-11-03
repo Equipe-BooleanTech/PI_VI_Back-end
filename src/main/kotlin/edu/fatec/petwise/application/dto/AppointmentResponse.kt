@@ -1,6 +1,7 @@
 package edu.fatec.petwise.application.dto
 
 import edu.fatec.petwise.domain.entity.Appointment
+import edu.fatec.petwise.domain.entity.AppointmentStatus
 import java.time.LocalDateTime
 import java.util.UUID
 
@@ -29,8 +30,8 @@ data class AppointmentResponse(
             veterinaryNome: String? = null
         ): AppointmentResponse {
             return AppointmentResponse(
-                id = appointment.id.toString(),
-                petId = appointment.petId.toString(),
+                id = UUID.fromString(appointment.id.toString()),
+                petId =  UUID.fromString(appointment.petId.toString()),
                 petNome = petNome,
                 ownerId = appointment.ownerId,
                 veterinaryId = appointment.veterinaryId,
@@ -38,7 +39,7 @@ data class AppointmentResponse(
                 appointmentDatetime = appointment.appointmentDatetime,
                 durationMinutes = appointment.durationMinutes,
                 motivo = appointment.motivo,
-                status = appointment.status.toString(),
+                status = appointment.status,
                 observacoesCliente = appointment.observacoesCliente,
                 observacoesVeterinario = appointment.observacoesVeterinario,
                 valor = appointment.valor,

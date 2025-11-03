@@ -10,7 +10,7 @@ import java.util.UUID
 data class Pet(
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    val id: UUID = UUID.randomUUID(),
+    val id: UUID,
 
     @Column(name = "owner_id", nullable = false)
     val ownerId: UUID,

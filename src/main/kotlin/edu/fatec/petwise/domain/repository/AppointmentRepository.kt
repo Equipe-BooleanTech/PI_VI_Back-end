@@ -4,6 +4,7 @@ import edu.fatec.petwise.domain.entity.Appointment
 import edu.fatec.petwise.domain.entity.AppointmentStatus
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Query
+import org.springframework.data.repository.query.Param
 import org.springframework.stereotype.Repository
 import java.time.LocalDateTime
 import java.util.UUID
@@ -46,4 +47,22 @@ interface AppointmentRepository : JpaRepository<Appointment, UUID> {
         startTime: LocalDateTime, 
         endTime: LocalDateTime
     ): Boolean
+
+    @Query("""
+    SELECT a FROM Appointment a
+    WHERE a.veterinaryId = :veterinaryId
+      AND a.appointmentDatetime BETWEEN :start AND :end
+    ORDER BY a.appointmentDatetime ASC
+""")
+    fun findByVeterinaryIdAndAppointmentDatetimeBetweenOrderByAppointmentDatetimeAsc(
+        veterinaryId: UUID,
+        start: LocalDateTime,
+        end: LocalDateTime
+    ): List<Appointment>
+
+    @Query("SELECT DISTINCT a.petId FROM Appointment a WHERE a.veterinaryId = :veterinaryId")
+    fun findDistinctPetIdsByVeterinaryId(@Param("veterinaryId") veterinaryId: UUID): List<UUID>
+    @Query("SELECT DISTINCT mr.petId FROM MedicalRecord mr WHERE mr.veterinarian = :veterinarian AND mr.active = true")
+    fun findDistinctPetIdsByVeterinarian(@Param("veterinarian") veterinarian: String): List<UUID>
+
 }

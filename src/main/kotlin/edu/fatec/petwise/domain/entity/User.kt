@@ -27,7 +27,7 @@ data class User(
         when (userType) {
             UserType.OWNER -> {
                 require(!cpf.isNullOrBlank()) { "CPF é obrigatório para tutores" }
-                require(validateCpf(cpf)) { "CPF inválido" }
+                require(validateCpf(cpf!!)) { "CPF inválido" }
             }
             UserType.VETERINARY -> {
                 require(!crmv.isNullOrBlank()) { "CRMV é obrigatório para veterinários" }
@@ -36,7 +36,7 @@ data class User(
             UserType.PHARMACY -> {
                 require(!cnpj.isNullOrBlank()) { "CNPJ é obrigatório para farmácias" }
                 require(!companyName.isNullOrBlank()) { "Nome da empresa é obrigatório para farmácias" }
-                require(validateCnpj(cnpj)) { "CNPJ inválido" }
+                require(validateCnpj(cnpj!!)) { "CNPJ inválido" }
             }
             UserType.ADMIN -> {}
         }

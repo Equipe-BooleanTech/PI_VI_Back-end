@@ -24,9 +24,7 @@ data class PetResponse(
     val updatedAt: LocalDateTime
 ) {
     companion object {
-        /**
-         * Converte uma entidade Pet em PetResponse
-         */
+
         fun fromEntity(pet: Pet): PetResponse {
             return PetResponse(
                 id = pet.id,
