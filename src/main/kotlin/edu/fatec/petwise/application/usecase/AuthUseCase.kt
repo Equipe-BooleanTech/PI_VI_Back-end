@@ -5,7 +5,7 @@ import edu.fatec.petwise.application.dto.LoginRequest
 import edu.fatec.petwise.application.dto.RegisterRequest
 import edu.fatec.petwise.application.dto.UserResponse
 import edu.fatec.petwise.domain.entity.User
-import edu.fatec.petwise.domain.entity.UserType
+import edu.fatec.petwise.domain.enums.UserType
 import edu.fatec.petwise.domain.exception.BusinessRuleException
 import edu.fatec.petwise.domain.exception.DuplicateEntityException
 import edu.fatec.petwise.domain.exception.EntityNotFoundException

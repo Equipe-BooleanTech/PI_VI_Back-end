@@ -3,11 +3,10 @@ package edu.fatec.petwise.application.usecase
 import edu.fatec.petwise.application.dto.AppointmentResponse
 import edu.fatec.petwise.application.dto.UpdateAppointmentRequest
 import edu.fatec.petwise.domain.entity.AppointmentStatus
-import edu.fatec.petwise.domain.entity.UserType
+import edu.fatec.petwise.domain.enums.UserType
 import edu.fatec.petwise.domain.repository.AppointmentRepository
 import edu.fatec.petwise.domain.repository.PetRepository
 import edu.fatec.petwise.domain.repository.UserRepository
-import edu.fatec.petwise.infrastructure.exception.ResourceNotFoundException
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import java.util.UUID

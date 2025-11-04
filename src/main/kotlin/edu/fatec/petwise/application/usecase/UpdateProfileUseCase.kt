@@ -2,7 +2,7 @@ package edu.fatec.petwise.application.usecase
 
 import edu.fatec.petwise.application.dto.UpdateProfileDto
 import edu.fatec.petwise.application.dto.UserResponse
-import edu.fatec.petwise.domain.entity.UserType
+import edu.fatec.petwise.domain.enums.UserType
 import edu.fatec.petwise.domain.exception.BusinessRuleException
 import edu.fatec.petwise.domain.exception.DuplicateEntityException
 import edu.fatec.petwise.domain.exception.EntityNotFoundException

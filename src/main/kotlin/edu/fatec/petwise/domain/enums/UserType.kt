@@ -1,4 +1,4 @@
-package edu.fatec.petwise.domain.entity
+package edu.fatec.petwise.domain.enums
 
 enum class UserType {
     ADMIN,

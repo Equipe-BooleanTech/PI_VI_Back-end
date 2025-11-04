@@ -1,5 +1,6 @@
 package edu.fatec.petwise.domain.entity
 
+import edu.fatec.petwise.domain.enums.UserType
 import edu.fatec.petwise.domain.valueobject.Email
 import edu.fatec.petwise.domain.valueobject.Telefone
 import java.time.LocalDateTime

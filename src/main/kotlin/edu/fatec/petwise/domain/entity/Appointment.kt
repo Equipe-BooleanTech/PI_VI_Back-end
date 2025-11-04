@@ -1,17 +1,11 @@
 package edu.fatec.petwise.domain.entity
 
+import edu.fatec.petwise.domain.enums.AppointmentStatus
 import jakarta.persistence.*
 import java.time.LocalDateTime
 import java.util.UUID
 
-enum class AppointmentStatus {
-    AGENDADA,    // Consulta agendada
-    CONFIRMADA,  // Cliente confirmou presença
-    EM_ANDAMENTO,// Consulta em andamento
-    CONCLUIDA,   // Consulta finalizada
-    CANCELADA,   // Cancelada pelo cliente ou veterinário
-    NAO_COMPARECEU // Cliente não compareceu (no-show)
-}
+
 
 @Entity
 @Table(name = "appointments")

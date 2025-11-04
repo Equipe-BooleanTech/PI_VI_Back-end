@@ -3,7 +3,7 @@ package edu.fatec.petwise.application.usecase
 import edu.fatec.petwise.application.dto.AppointmentResponse
 import edu.fatec.petwise.application.dto.CreateAppointmentRequest
 import edu.fatec.petwise.domain.entity.Appointment
-import edu.fatec.petwise.domain.entity.UserType
+import edu.fatec.petwise.domain.enums.UserType
 import edu.fatec.petwise.domain.repository.AppointmentRepository
 import edu.fatec.petwise.domain.repository.PetRepository
 import edu.fatec.petwise.domain.repository.UserRepository

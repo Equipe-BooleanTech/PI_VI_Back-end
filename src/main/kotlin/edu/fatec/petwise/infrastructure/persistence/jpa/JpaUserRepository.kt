@@ -1,6 +1,6 @@
 package edu.fatec.petwise.infrastructure.persistence.jpa
 
-import edu.fatec.petwise.domain.entity.UserType
+import edu.fatec.petwise.domain.enums.UserType
 import edu.fatec.petwise.infrastructure.persistence.entity.UserEntity
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.stereotype.Repository
