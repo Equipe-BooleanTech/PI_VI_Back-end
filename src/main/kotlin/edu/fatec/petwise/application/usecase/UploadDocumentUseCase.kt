@@ -1,6 +1,5 @@
 package edu.fatec.petwise.application.usecase
 
-
 import edu.fatec.petwise.application.dto.DocumentUploadResponse
 import edu.fatec.petwise.domain.entity.Document
 import edu.fatec.petwise.domain.repository.DocumentRepository
@@ -11,7 +10,7 @@ import org.springframework.web.multipart.MultipartFile
 import java.nio.file.Files
 import java.nio.file.Paths
 import java.time.LocalDateTime
-import java.util.UUID
+import java.util.*
 
 @Service
 class UploadDocumentUseCase(
@@ -19,50 +18,54 @@ class UploadDocumentUseCase(
     private val petRepository: PetRepository
 ) {
     private val uploadDirectory = "uploads/medical-documents"
-    
+
     init {
-        // Criar diretório de upload se não existir
         Files.createDirectories(Paths.get(uploadDirectory))
     }
-    
-    fun execute(file: MultipartFile, documentType: String, authentication: Authentication, 
-                description: String?, petId: UUID?, medicalRecordId: UUID?, appointmentId: UUID?): DocumentUploadResponse {
+
+    fun execute(
+        file: MultipartFile,
+        documentType: String,
+        authentication: Authentication,
+        description: String?,
+        petId: UUID?,
+        medicalRecordId: UUID?,
+        appointmentId: UUID?
+    ): DocumentUploadResponse {
         val userId = UUID.fromString(authentication.principal.toString())
-        
+
         // Validar arquivo
         if (file.isEmpty) {
             throw IllegalArgumentException("Arquivo não pode estar vazio")
         }
-        
-        // Verificar tamanho máximo (5MB)
-        val maxSize = 5 * 1024 * 1024
+
+        val maxSize = 5 * 1024 * 1024 // 5 MB
         if (file.size > maxSize) {
             throw IllegalArgumentException("Arquivo muito grande. Tamanho máximo: 5MB")
         }
-        
-        // Validar pet se fornecido
-        var finalPetId: UUID? = null
-        if (petId != null) {
-            val pet = petRepository.findByIdAndOwnerId(petId, userId)
+
+        // Validar pet (se informado)
+        val finalPetId = petId?.let {
+            val pet = petRepository.findByIdAndOwnerId(it, userId)
                 ?: throw IllegalArgumentException("Pet não encontrado ou não pertence ao usuário")
-            finalPetId = petId
+            pet.id
         }
-        
+
         // Gerar nome único para o arquivo
         val originalFilename = file.originalFilename ?: "document"
-        val fileExtension = originalFilename.substringAfterLast(".")
+        val fileExtension = originalFilename.substringAfterLast(".", "")
         val uniqueFilename = "${UUID.randomUUID()}.$fileExtension"
         val filePath = "$uploadDirectory/$uniqueFilename"
-        
-        // Salvar arquivo
-        val fileBytes = file.bytes
-        Files.write(Paths.get(filePath), fileBytes)
-        
+
+        // Salvar o arquivo no diretório
+        Files.write(Paths.get(filePath), file.bytes)
+
         // Criar registro do documento
         val document = finalPetId?.let {
             Document(
+                id = UUID.randomUUID(),
                 userId = userId,
-                petId = it, // Será zero se não fornecido, mas o campo não é nullable
+                petId = it,
                 medicalRecordId = medicalRecordId,
                 appointmentId = appointmentId,
                 documentName = originalFilename,
@@ -72,19 +75,19 @@ class UploadDocumentUseCase(
                 mimeType = file.contentType,
                 uploadDate = LocalDateTime.now(),
                 description = description,
-                id = it,
                 active = true,
-                createdAt = TODO(),
-                updatedAt = TODO()
+                createdAt = LocalDateTime.now(),
+                updatedAt = LocalDateTime.now()
             )
         }
-        
+
         val savedDocument = document?.let { documentRepository.save(it) }
-        return savedDocument.toDocumentUploadResponse()
+        return savedDocument?.toDocumentUploadResponse()
+            ?: throw IllegalStateException("Falha ao salvar documento")
     }
 }
 
-// Extension function para Document
+// Extension function para converter para DTO
 private fun Document.toDocumentUploadResponse(): DocumentUploadResponse {
     return DocumentUploadResponse(
         id = id,
