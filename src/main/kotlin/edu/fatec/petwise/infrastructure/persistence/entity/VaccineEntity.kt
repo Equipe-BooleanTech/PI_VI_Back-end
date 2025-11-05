@@ -24,10 +24,10 @@ class VaccineEntity(
     var vaccineType: VaccineType,
     
     @Column(nullable = false, name = "application_date")
-    var applicationDate: String,
+    var applicationDate: LocalDateTime,
     
     @Column(name = "next_dose_date")
-    var nextDoseDate: String? = null,
+    var nextDoseDate: LocalDateTime,
     
     @Column(nullable = false, name = "dose_number")
     var doseNumber: Int,

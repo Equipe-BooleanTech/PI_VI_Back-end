@@ -1,0 +1,345 @@
+{
+  "info": {
+    "name": "Petwise API - Sprint 2",
+    "description": "Coleção completa de endpoints para gestão de Pets, Consultas e Dashboard",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{access_token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:8080/api",
+      "type": "string"
+    },
+    {
+      "key": "access_token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "pet_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "appointment_id",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Pets",
+      "item": [
+        {
+          "name": "Listar Meus Pets",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/pets",
+              "host": ["{{base_url}}"],
+              "path": ["pets"]
+            },
+            "description": "Lista todos os pets ativos do usuário autenticado"
+          }
+        },
+        {
+          "name": "Listar Meus Pets (incluindo inativos)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/pets?includeInactive=true",
+              "host": ["{{base_url}}"],
+              "path": ["pets"],
+              "query": [
+                {
+                  "key": "includeInactive",
+                  "value": "true"
+                }
+              ]
+            },
+            "description": "Lista todos os pets do usuário, incluindo os inativos"
+          }
+        },
+        {
+          "name": "Adicionar Novo Pet",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.collectionVariables.set('pet_id', jsonData.id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"Thor\",\n  \"especie\": \"cachorro\",\n  \"raca\": \"Golden Retriever\",\n  \"sexo\": \"M\",\n  \"dataNascimento\": \"2020-05-15\",\n  \"peso\": 32.5,\n  \"cor\": \"Dourado\",\n  \"observacoes\": \"Muito dócil e brincalhão\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/pets",
+              "host": ["{{base_url}}"],
+              "path": ["pets"]
+            },
+            "description": "Cadastra um novo pet para o usuário autenticado"
+          }
+        },
+        {
+          "name": "Obter Detalhes do Pet",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/pets/{{pet_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["pets", "{{pet_id}}"]
+            },
+            "description": "Obtém informações detalhadas de um pet específico"
+          }
+        },
+        {
+          "name": "Atualizar Pet",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"peso\": 33.2,\n  \"observacoes\": \"Peso atualizado após consulta. Pet muito saudável.\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/pets/{{pet_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["pets", "{{pet_id}}"]
+            },
+            "description": "Atualiza informações de um pet (partial update)"
+          }
+        },
+        {
+          "name": "Deletar Pet (Soft Delete)",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/pets/{{pet_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["pets", "{{pet_id}}"]
+            },
+            "description": "Desativa um pet (soft delete)"
+          }
+        },
+        {
+          "name": "Deletar Pet (Hard Delete)",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/pets/{{pet_id}}?forceDelete=true",
+              "host": ["{{base_url}}"],
+              "path": ["pets", "{{pet_id}}"],
+              "query": [
+                {
+                  "key": "forceDelete",
+                  "value": "true"
+                }
+              ]
+            },
+            "description": "Remove permanentemente um pet do sistema"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Appointments (Consultas)",
+      "item": [
+        {
+          "name": "Listar Minhas Consultas",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/appointments",
+              "host": ["{{base_url}}"],
+              "path": ["appointments"]
+            },
+            "description": "Lista todas as consultas do usuário"
+          }
+        },
+        {
+          "name": "Listar Consultas por Status",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/appointments?status=AGENDADA",
+              "host": ["{{base_url}}"],
+              "path": ["appointments"],
+              "query": [
+                {
+                  "key": "status",
+                  "value": "AGENDADA",
+                  "description": "Valores: AGENDADA, CONFIRMADA, EM_ANDAMENTO, CONCLUIDA, CANCELADA, NAO_COMPARECEU"
+                }
+              ]
+            },
+            "description": "Lista consultas filtradas por status"
+          }
+        },
+        {
+          "name": "Agendar Nova Consulta",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.collectionVariables.set('appointment_id', jsonData.id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"petId\": \"{{pet_id}}\",\n  \"veterinaryId\": \"VET_UUID_AQUI\",\n  \"appointmentDatetime\": \"2025-11-10T14:30:00\",\n  \"durationMinutes\": 30,\n  \"motivo\": \"Consulta de rotina\",\n  \"observacoesCliente\": \"Gostaria de verificar o peso e fazer check-up geral\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/appointments",
+              "host": ["{{base_url}}"],
+              "path": ["appointments"]
+            },
+            "description": "Agenda uma nova consulta veterinária"
+          }
+        },
+        {
+          "name": "Obter Detalhes da Consulta",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/appointments/{{appointment_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["appointments", "{{appointment_id}}"]
+            },
+            "description": "Obtém detalhes completos de uma consulta"
+          }
+        },
+        {
+          "name": "Atualizar Consulta",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"appointmentDatetime\": \"2025-11-10T15:00:00\",\n  \"observacoesCliente\": \"Horário alterado. Também gostaria de atualizar vacinas.\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/appointments/{{appointment_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["appointments", "{{appointment_id}}"]
+            },
+            "description": "Atualiza informações de uma consulta (partial update)"
+          }
+        },
+        {
+          "name": "Cancelar Consulta",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/appointments/{{appointment_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["appointments", "{{appointment_id}}"]
+            },
+            "description": "Cancela uma consulta agendada"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Dashboard",
+      "item": [
+        {
+          "name": "Obter Status Cards",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/dashboard/status-cards",
+              "host": ["{{base_url}}"],
+              "path": ["dashboard", "status-cards"]
+            },
+            "description": "Obtém cards de status para o dashboard (métricas resumidas)"
+          }
+        },
+        {
+          "name": "Obter Quick Actions",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/dashboard/quick-actions",
+              "host": ["{{base_url}}"],
+              "path": ["dashboard", "quick-actions"]
+            },
+            "description": "Obtém ações rápidas disponíveis no dashboard"
+          }
+        },
+        {
+          "name": "Obter Lembretes",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/dashboard/reminders",
+              "host": ["{{base_url}}"],
+              "path": ["dashboard", "reminders"]
+            },
+            "description": "Obtém lembretes e notificações importantes"
+          }
+        }
+      ]
+    }
+  ]
+}

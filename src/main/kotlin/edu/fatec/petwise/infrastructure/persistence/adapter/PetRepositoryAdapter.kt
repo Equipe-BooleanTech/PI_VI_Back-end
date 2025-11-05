@@ -1,7 +1,6 @@
 package edu.fatec.petwise.infrastructure.persistence.adapter
 
 import edu.fatec.petwise.domain.entity.Pet
-import edu.fatec.petwise.domain.repository.PetRepository
 import edu.fatec.petwise.infrastructure.persistence.entity.PetEntity
 import edu.fatec.petwise.infrastructure.persistence.jpa.JpaPetRepository
 import org.springframework.stereotype.Component

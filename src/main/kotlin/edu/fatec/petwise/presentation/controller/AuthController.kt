@@ -1,13 +1,7 @@
 package edu.fatec.petwise.presentation.controller
 
-import edu.fatec.petwise.application.dto.AuthResponse
-import edu.fatec.petwise.application.dto.LoginRequest
-import edu.fatec.petwise.application.dto.RegisterRequest
-import edu.fatec.petwise.application.dto.UserResponse
-import edu.fatec.petwise.application.usecase.GetUserProfileUseCase
-import edu.fatec.petwise.application.usecase.LoginUserUseCase
-import edu.fatec.petwise.application.usecase.RefreshTokenUseCase
-import edu.fatec.petwise.application.usecase.RegisterUserUseCase
+import edu.fatec.petwise.application.dto.*
+import edu.fatec.petwise.application.usecase.*
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
 import jakarta.validation.Valid
@@ -23,20 +17,23 @@ class AuthController(
     private val registerUserUseCase: RegisterUserUseCase,
     private val loginUserUseCase: LoginUserUseCase,
     private val getUserProfileUseCase: GetUserProfileUseCase,
-    private val refreshTokenUseCase: RefreshTokenUseCase
+    private val updateProfileUseCase: UpdateProfileUseCase, // NOVO
+    private val refreshTokenUseCase: RefreshTokenUseCase,
+    private val forgotPasswordUseCase: ForgotPasswordUseCase, // NOVO
+    private val resetPasswordUseCase: ResetPasswordUseCase // NOVO
 ) {
     private val logger = LoggerFactory.getLogger(javaClass)
 
     @PostMapping("/register")
     fun register(@Valid @RequestBody request: RegisterRequest): ResponseEntity<AuthResponse> {
-        logger.info("Requisição de registro recebida para: ${request.email}")
+        logger.info("Requisição de registro recebida")
         val response = registerUserUseCase.execute(request)
         return ResponseEntity.status(HttpStatus.CREATED).body(response)
     }
 
     @PostMapping("/login")
     fun login(@Valid @RequestBody request: LoginRequest): ResponseEntity<AuthResponse> {
-        logger.info("Requisição de login recebida para: ${request.email}")
+        logger.info("Requisição de login recebida")
         val response = loginUserUseCase.execute(request)
         return ResponseEntity.ok(response)
     }
@@ -49,6 +46,59 @@ class AuthController(
         return ResponseEntity.ok(response)
     }
 
+    /**
+     * ✨ NOVO - Sprint 1
+     * Atualiza perfil do usuário autenticado
+     * Permite atualização parcial (apenas campos enviados são atualizados)
+     */
+    @PutMapping("/profile")
+    fun updateProfile(
+        authentication: Authentication,
+        @Valid @RequestBody request: UpdateProfileRequest
+    ): ResponseEntity<UserResponse> {
+        val userId = authentication.name
+        logger.info("Requisição de atualização de perfil para usuário: $userId")
+        val response = updateProfileUseCase.execute(userId, request)
+        return ResponseEntity.ok(response)
+    }
+
+    @PostMapping("/refresh-token")
+    fun refreshToken(@RequestBody request: Map<String, String>): ResponseEntity<AuthResponse> {
+        val refreshToken = request["refreshToken"]
+            ?: return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(null)
+
+        logger.info("Requisição de refresh token recebida")
+        val response = refreshTokenUseCase.execute(refreshToken)
+        return ResponseEntity.ok(response)
+    }
+
+    /**
+     * ✨ NOVO - Sprint 1
+     * Solicita redefinição de senha
+     * Gera token de reset e simula envio de email
+     *
+     * 🔒 SEGURANÇA: Sempre retorna mesma mensagem (não revela se email existe)
+     */
+    @PostMapping("/forgot-password")
+    fun forgotPassword(@Valid @RequestBody request: ForgotPasswordRequest): ResponseEntity<MessageResponse> {
+        logger.info("Requisição de forgot password recebida")
+        val response = forgotPasswordUseCase.execute(request)
+        return ResponseEntity.ok(response)
+    }
+
+    /**
+     * ✨ NOVO - Sprint 1
+     * Redefine senha usando token de reset
+     * Valida token e atualiza senha do usuário
+     */
+    @PostMapping("/reset-password")
+    fun resetPassword(@Valid @RequestBody request: ResetPasswordRequest): ResponseEntity<MessageResponse> {
+        logger.info("Requisição de reset password recebida")
+        val response = resetPasswordUseCase.execute(request)
+        return ResponseEntity.ok(response)
+    }
+
     @PostMapping("/logout")
     fun logout(request: HttpServletRequest, response: HttpServletResponse): ResponseEntity<Map<String, String>> {
         val authHeader = request.getHeader("Authorization")
@@ -58,24 +108,15 @@ class AuthController(
                 .body(mapOf("message" to "Token ausente ou inválido"))
         }
 
-        val token = authHeader.substring(7)
 
         response.setHeader("Authorization", "")
         response.setHeader("Clear-Site-Data", "\"cookies\"")
 
-        logger.info("Logout realizado com sucesso para token: $token")
+        logger.info("Logout realizado - token invalidado no cliente")
 
-        return ResponseEntity.ok(mapOf("message" to "Logout realizado com sucesso"))
+        return ResponseEntity.ok(mapOf(
+            "message" to "Logout realizado com sucesso",
+            "note" to "Token será válido até expiração. Para revogação imediata, implemente blacklist."
+        ))
     }
-
-    @PostMapping("/refresh-token")
-    fun refreshToken(@RequestBody request: Map<String, String>): ResponseEntity<AuthResponse> {
-        val refreshToken = request["refreshToken"]
-            ?: return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body(null)
-
-        val response = refreshTokenUseCase.execute(refreshToken)
-        return ResponseEntity.ok(response)
-    }
-
 }

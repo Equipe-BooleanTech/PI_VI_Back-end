@@ -1,39 +1,83 @@
 package edu.fatec.petwise.domain.entity
 
-import java.time.LocalDate
+import com.petwise.dto.MedicationResponse
+import jakarta.persistence.*
 import java.time.LocalDateTime
-import java.util.UUID
+import java.util.*
 
+@Entity
+@Table(name = "medications")
 data class Medication(
-    val id: UUID? = null,
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    val id: UUID,
+
+    @Column(name = "user_id", nullable = false)
+    val userId: UUID,
+
+    @Column(name = "pet_id", nullable = false)
     val petId: UUID,
-    val name: String,
+
+    @Column(name = "prescription_id", nullable = false)
+    val prescriptionId: UUID,
+    
+    @Column(name = "medication_name", nullable = false, length = 100)
+    val medicationName: String,
+    
+    @Column(name = "dosage", nullable = false, length = 100)
     val dosage: String,
+    
+    @Column(name = "frequency", nullable = false, length = 50)
     val frequency: String,
-    val startDate: LocalDate,
-    val endDate: LocalDate,
-    val prescribedBy: UUID,
-    val instructions: String? = null,
+    
+    @Column(name = "duration_days")
+    val durationDays: Int? = null,
+    
+    @Column(name = "start_date")
+    val startDate: LocalDateTime? = null,
+    
+    @Column(name = "end_date")
+    val endDate: LocalDateTime? = null,
+    
+    @Column(name = "administered", nullable = false)
+    val administered: Boolean = false,
+    
+    @Column(name = "administered_at")
+    val administeredAt: LocalDateTime? = null,
+    
+    @Column(name = "administration_notes", columnDefinition = "TEXT")
+    val administrationNotes: String? = null,
+    
+    @Column(name = "side_effects", columnDefinition = "TEXT")
+    val sideEffects: String? = null,
+    
+    @Column(name = "active", nullable = false)
     val active: Boolean = true,
+    
+    @Column(name = "created_at", nullable = false)
     val createdAt: LocalDateTime = LocalDateTime.now(),
+    
+    @Column(name = "updated_at", nullable = false)
     val updatedAt: LocalDateTime = LocalDateTime.now()
 ) {
-    init {
-        require(name.isNotBlank()) { "Nome do medicamento não pode estar vazio" }
-        require(dosage.isNotBlank()) { "Dosagem não pode estar vazia" }
-        require(frequency.isNotBlank()) { "Frequência não pode estar vazia" }
-        require(!endDate.isBefore(startDate)) { "Data final não pode ser anterior à data inicial" }
+    fun toMedicationResponse(): MedicationResponse {
+        return MedicationResponse(
+            id = id,
+            petId = petId,
+            prescriptionId = prescriptionId,
+            medicationName = medicationName,
+            dosage = dosage,
+            frequency = frequency,
+            durationDays = durationDays,
+            startDate = startDate,
+            endDate = endDate,
+            administered = administered,
+            administeredAt = administeredAt,
+            administrationNotes = administrationNotes,
+            sideEffects = sideEffects,
+            active = active,
+            createdAt = createdAt,
+            updatedAt = updatedAt
+        )
     }
-
-    fun isExpired(): Boolean = LocalDate.now().isAfter(endDate)
-
-    fun deactivate(): Medication = this.copy(
-        active = false,
-        updatedAt = LocalDateTime.now()
-    )
-
-    fun updateInstructions(instructions: String): Medication = this.copy(
-        instructions = instructions,
-        updatedAt = LocalDateTime.now()
-    )
 }

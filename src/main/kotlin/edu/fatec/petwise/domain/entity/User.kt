@@ -1,5 +1,6 @@
 package edu.fatec.petwise.domain.entity
 
+import edu.fatec.petwise.domain.enums.UserType
 import edu.fatec.petwise.domain.valueobject.Email
 import edu.fatec.petwise.domain.valueobject.Telefone
 import java.time.LocalDateTime
@@ -8,15 +9,15 @@ import java.util.UUID
 data class User(
     val id: UUID? = null,
     var fullName: String,
-    val email: Email,
+    var email: Email,
     var phone: Telefone,
     var passwordHash: String,
     val userType: UserType,
-    val cpf: String? = null,
-    val crmv: String? = null,
-    val specialization: String? = null,
-    val cnpj: String? = null,
-    val companyName: String? = null,
+    var cpf: String? = null,
+    var crmv: String? = null,
+    var specialization: String? = null,
+    var cnpj: String? = null,
+    var companyName: String? = null,
     val active: Boolean = true,
     val createdAt: LocalDateTime = LocalDateTime.now(),
     val updatedAt: LocalDateTime = LocalDateTime.now()
@@ -27,7 +28,7 @@ data class User(
         when (userType) {
             UserType.OWNER -> {
                 require(!cpf.isNullOrBlank()) { "CPF é obrigatório para tutores" }
-                require(validateCpf(cpf)) { "CPF inválido" }
+                require(validateCpf(cpf!!)) { "CPF inválido" }
             }
             UserType.VETERINARY -> {
                 require(!crmv.isNullOrBlank()) { "CRMV é obrigatório para veterinários" }
@@ -36,7 +37,7 @@ data class User(
             UserType.PHARMACY -> {
                 require(!cnpj.isNullOrBlank()) { "CNPJ é obrigatório para farmácias" }
                 require(!companyName.isNullOrBlank()) { "Nome da empresa é obrigatório para farmácias" }
-                require(validateCnpj(cnpj)) { "CNPJ inválido" }
+                require(validateCnpj(cnpj!!)) { "CNPJ inválido" }
             }
             UserType.ADMIN -> {}
         }

@@ -1,62 +1,84 @@
 package edu.fatec.petwise.domain.entity
 
-import edu.fatec.petwise.domain.enums.VaccineType
-import edu.fatec.petwise.domain.enums.VaccinationStatus
+import edu.fatec.petwise.application.dto.VaccineResponse
+import jakarta.persistence.*
+import java.time.LocalDate
 import java.time.LocalDateTime
-import java.util.UUID
+import java.util.*
 
+@Entity
+@Table(name = "vaccines")
 data class Vaccine(
-    val id: UUID? = null,
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    val id: UUID,
+
+    @Column(name = "user_id", nullable = false)
+    val userId: UUID,
+
+    @Column(name = "pet_id", nullable = false)
     val petId: UUID,
-    val vaccineName: String,
-    val vaccineType: VaccineType,
-    val applicationDate: String,
-    val nextDoseDate: String?,
-    val doseNumber: Int,
-    val totalDoses: Int,
-    val veterinaryId: UUID,
-    val clinicName: String,
-    val batchNumber: String,
-    val manufacturer: String,
-    val observations: String = "",
-    val sideEffects: String = "",
-    val status: VaccinationStatus,
+    
+    @Column(name = "vaccine_type_id", nullable = false)
+    val vaccineTypeId: UUID,
+    
+    @Column(name = "veterinarian", nullable = false, length = 100)
+    val veterinarian: String,
+    
+    @Column(name = "vaccination_date", nullable = false)
+    val vaccinationDate: LocalDate,
+    
+    @Column(name = "batch_number", length = 50)
+    val batchNumber: String? = null,
+    
+    @Column(name = "manufacturer", length = 100)
+    val manufacturer: String? = null,
+    
+    @Column(name = "dose_number", nullable = false)
+    val doseNumber: Int = 1,
+    
+    @Column(name = "total_doses")
+    val totalDoses: Int? = null,
+    
+    @Column(name = "valid_until")
+    val validUntil: LocalDate? = null,
+    
+    @Column(name = "site_of_injection", length = 100)
+    val siteOfInjection: String? = null,
+    
+    @Column(name = "reactions", columnDefinition = "TEXT")
+    val reactions: String? = null,
+    
+    @Column(name = "observations", columnDefinition = "TEXT")
+    val observations: String? = null,
+    
+    @Column(name = "active", nullable = false)
+    val active: Boolean = true,
+    
+    @Column(name = "created_at", nullable = false)
     val createdAt: LocalDateTime = LocalDateTime.now(),
+    
+    @Column(name = "updated_at", nullable = false)
     val updatedAt: LocalDateTime = LocalDateTime.now()
 ) {
-    init {
-        require(vaccineName.isNotBlank()) { "Nome da vacina não pode estar vazio" }
-        require(applicationDate.isNotBlank()) { "Data de aplicação não pode estar vazia" }
-        require(batchNumber.isNotBlank()) { "Número do lote não pode estar vazio" }
-        require(manufacturer.isNotBlank()) { "Fabricante não pode estar vazio" }
-        require(clinicName.isNotBlank()) { "Nome da clínica não pode estar vazio" }
-        require(doseNumber > 0) { "Número da dose deve ser maior que zero" }
-        require(totalDoses > 0) { "Total de doses deve ser maior que zero" }
-        require(doseNumber <= totalDoses) { "Número da dose não pode ser maior que o total de doses" }
+    fun toVaccineResponse(): VaccineResponse {
+        return VaccineResponse(
+            id = id,
+            petId = petId,
+            vaccineTypeId = vaccineTypeId,
+            veterinarian = veterinarian,
+            vaccinationDate = vaccinationDate,
+            batchNumber = batchNumber,
+            manufacturer = manufacturer,
+            doseNumber = doseNumber,
+            totalDoses = totalDoses,
+            validUntil = validUntil,
+            siteOfInjection = siteOfInjection,
+            reactions = reactions,
+            observations = observations,
+            active = active,
+            createdAt = createdAt,
+            updatedAt = updatedAt
+        )
     }
-
-    fun apply(): Vaccine = this.copy(
-        status = VaccinationStatus.APLICADA,
-        updatedAt = LocalDateTime.now()
-    )
-
-    fun markAsDelayed(): Vaccine = this.copy(
-        status = VaccinationStatus.ATRASADA,
-        updatedAt = LocalDateTime.now()
-    )
-
-    fun cancel(): Vaccine = this.copy(
-        status = VaccinationStatus.CANCELADA,
-        updatedAt = LocalDateTime.now()
-    )
-
-    fun addObservations(observations: String): Vaccine = this.copy(
-        observations = observations,
-        updatedAt = LocalDateTime.now()
-    )
-
-    fun addSideEffects(sideEffects: String): Vaccine = this.copy(
-        sideEffects = sideEffects,
-        updatedAt = LocalDateTime.now()
-    )
 }

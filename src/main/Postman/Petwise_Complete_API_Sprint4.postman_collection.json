@@ -1,0 +1,1575 @@
+{
+	"info": {
+		"_postman_id": "petwise-complete-api-v4",
+		"name": "Petwise Complete API - Sprints 1, 2, 3 e 4",
+		"description": "Collection completa da API Petwise incluindo todas as funcionalidades implementadas nas Sprints 1, 2, 3 e 4.\n\n**Sprint 1**: Sistema básico de autenticação e usuários\n**Sprint 2**: Gestão de pets, agendamentos e dashboard\n**Sprint 3**: Funcionalidades veterinárias avançadas\n**Sprint 4**: Sistema completo de farmácia veterinária\n\nNovos endpoints na Sprint 4:\n- 💊 Farmácia: Inventário, Pedidos, Vendas, Fornecedores\n- 📊 Dashboard Farmácia: Cards de status e estatísticas\n- 🔧 Utils: Lista de medicamentos comuns\n\nAutores: MiniMax Agent\nData: 2025-11-03\nVersão: 4.0",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "🏠 Dashboard",
+			"item": [
+				{
+					"name": "Status Cards",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/dashboard/status-cards",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"dashboard",
+								"status-cards"
+							]
+						}
+					}
+				},
+				{
+					"name": "Quick Actions",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/dashboard/quick-actions",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"dashboard",
+								"quick-actions"
+							]
+						}
+					}
+				},
+				{
+					"name": "Reminders",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/dashboard/reminders",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"dashboard",
+								"reminders"
+							]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "🐕 Pets",
+			"item": [
+				{
+					"name": "Listar Pets",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/pets",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"pets"
+							]
+						}
+					}
+				},
+				{
+					"name": "Criar Pet",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Rex\",\n  \"species\": \"Cão\",\n  \"breed\": \"Labrador\",\n  \"birthDate\": \"2022-05-15\",\n  \"gender\": \"MASCULINO\",\n  \"weightKg\": 25.5,\n  \"color\": \"Dourado\",\n  \"microchipId\": \"123456789\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/pets",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"pets"
+							]
+						}
+					}
+				},
+				{
+					"name": "Detalhes do Pet",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/pets/{{petId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"pets",
+								"{{petId}}"
+							]
+						}
+					}
+				},
+				{
+					"name": "Atualizar Pet",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Rex Atualizado\",\n  \"weightKg\": 26.0,\n  \"color\": \"Dourado Escuro\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/pets/{{petId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"pets",
+								"{{petId}}"
+							]
+						}
+					}
+				},
+				{
+					"name": "Remover Pet",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/pets/{{petId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"pets",
+								"{{petId}}"
+							]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "📅 Appointments",
+			"item": [
+				{
+					"name": "Listar Consultas",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/appointments",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"appointments"
+							],
+							"query": [
+								{
+									"key": "status",
+									"value": "AGENDADA"
+								}
+							]
+						}
+					}
+				},
+				{
+					"name": "Criar Consulta",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"petId\": {{petId}},\n  \"veterinarian\": \"Dr. João Silva\",\n  \"appointmentDate\": \"2025-11-10\",\n  \"appointmentTime\": \"14:30\",\n  \"reason\": \"Consulta de rotina\",\n  \"observations\": \"Primeira visita\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/appointments",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"appointments"
+							]
+						}
+					}
+				},
+				{
+					"name": "Detalhes da Consulta",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/appointments/{{appointmentId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"appointments",
+								"{{appointmentId}}"
+							]
+						}
+					}
+				},
+				{
+					"name": "Atualizar Consulta",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"appointmentTime\": \"15:00\",\n  \"reason\": \"Consulta de rotina - actualizada\",\n  \"observations\": \"Actualizada para novo horário\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/appointments/{{appointmentId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"appointments",
+								"{{appointmentId}}"
+							]
+						}
+					}
+				},
+				{
+					"name": "Cancelar Consulta",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/appointments/{{appointmentId}}/cancel",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"appointments",
+								"{{appointmentId}}",
+								"cancel"
+							]
+						}
+					}
+				},
+				{
+					"name": "Consultas do Pet",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/appointments/pet/{{petId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"appointments",
+								"pet",
+								"{{petId}}"
+							]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "🦷 Veterinário",
+			"item": [
+				{
+					"name": "Listar Pacientes",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{vetAuthToken}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/vet/patients",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"vet",
+								"patients"
+							]
+						}
+					}
+				},
+				{
+					"name": "Agenda do Veterinário",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{vetAuthToken}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/vet/schedule",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"vet",
+								"schedule"
+							],
+							"query": [
+								{
+									"key": "startDate",
+									"value": "2025-11-01"
+								},
+								{
+									"key": "endDate",
+									"value": "2025-11-07"
+								}
+							]
+						}
+					}
+				},
+				{
+					"name": "Criar Registro Médico",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{vetAuthToken}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"petId\": {{petId}},\n  \"veterinarian\": \"{{vetUsername}}\",\n  \"appointmentId\": {{appointmentId}},\n  \"diagnosis\": \"Gastrite aguda\",\n  \"treatment\": \"Dieta especial por 7 dias\",\n  \"observations\": \"Pet apresentou vômitos\",\n  \"vitalSigns\": \"FC: 120 bpm, FR: 24 rpm, Temp: 38.5°C\",\n  \"weightKg\": 25.5,\n  \"temperature\": 38.5\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/vet/medical-records",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"vet",
+								"medical-records"
+							]
+						}
+					}
+				},
+				{
+					"name": "Criar Prescrição",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{vetAuthToken}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"petId\": {{petId}},\n  \"veterinarian\": \"{{vetUsername}}\",\n  \"medicalRecordId\": 1,\n  \"instructions\": \"1 comprimido de 10mg a cada 12 horas por 7 dias. Administrar com comida.\",\n  \"diagnosis\": \"Gastrite aguda\",\n  \"validUntil\": \"2025-11-17T23:59:59\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/vet/prescriptions",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"vet",
+								"prescriptions"
+							]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "📝 Registros Médicos",
+			"item": [
+				{
+					"name": "Histórico Médico do Pet",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/pets/{{petId}}/medical-records",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"pets",
+								"{{petId}}",
+								"medical-records"
+							],
+							"query": [
+								{
+									"key": "startDate",
+									"value": "2025-01-01"
+								},
+								{
+									"key": "endDate",
+									"value": "2025-12-31"
+								}
+							]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "💊 Prescrições",
+			"item": [
+				{
+					"name": "Listar Prescrições",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/vet/prescriptions",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"vet",
+								"prescriptions"
+							],
+							"query": [
+								{
+									"key": "petId",
+									"value": "{{petId}}"
+								},
+								{
+									"key": "status",
+									"value": "ATIVA"
+								}
+							]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "💊 Medicações",
+			"item": [
+				{
+					"name": "Listar Medicações",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/medications",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"medications"
+							],
+							"query": [
+								{
+									"key": "petId",
+									"value": "{{petId}}"
+								},
+								{
+									"key": "administered",
+									"value": "false"
+								}
+							]
+						}
+					}
+				},
+				{
+					"name": "Adicionar Medicação",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"prescriptionId\": 1,\n  \"medicationName\": \"Omeprazol\",\n  \"dosage\": \"10mg\",\n  \"frequency\": \"12 horas\",\n  \"durationDays\": 7,\n  \"startDate\": \"2025-11-03T08:00:00\",\n  \"endDate\": \"2025-11-10T08:00:00\",\n  \"administrationNotes\": \"Administrar com comida\",\n  \"sideEffects\": \"Pode causar sonolência\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/medications",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"medications"
+							]
+						}
+					}
+				},
+				{
+					"name": "Detalhes da Medicação",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/medications/{{medicationId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"medications",
+								"{{medicationId}}"
+							]
+						}
+					}
+				},
+				{
+					"name": "Atualizar Medicação",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/medications/{{medicationId}}?administered=true&administrationNotes=Administrado com sucesso às 08:00",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"medications",
+								"{{medicationId}}"
+							],
+							"query": [
+								{
+									"key": "administered",
+									"value": "true"
+								},
+								{
+									"key": "administrationNotes",
+									"value": "Administrado com sucesso às 08:00"
+								}
+							]
+						}
+					}
+				},
+				{
+					"name": "Remover Medicação",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/medications/{{medicationId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"medications",
+								"{{medicationId}}"
+							]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "💉 Vacinas",
+			"item": [
+				{
+					"name": "Listar Vacinas",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/vaccines",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"vaccines"
+							],
+							"query": [
+								{
+									"key": "petId",
+									"value": "{{petId}}"
+								},
+								{
+									"key": "validOnly",
+									"value": "false"
+								}
+							]
+						}
+					}
+				},
+				{
+					"name": "Registrar Vacina",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"vaccineTypeId\": 1,\n  \"veterinarian\": \"Dr. João Silva\",\n  \"vaccinationDate\": \"2025-11-03\",\n  \"batchNumber\": \"VAC2025001\",\n  \"manufacturer\": \"Nobivac\",\n  \"doseNumber\": 1,\n  \"totalDoses\": 2,\n  \"validUntil\": \"2026-11-03\",\n  \"siteOfInjection\": \"Pescoço\",\n  \"observations\": \"Primeira dose da série V8\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/vaccines?petId={{petId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"vaccines"
+							],
+							"query": [
+								{
+									"key": "petId",
+									"value": "{{petId}}"
+								}
+							]
+						}
+					}
+				},
+				{
+					"name": "Listar Tipos de Vacinas",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/vaccines/types",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"vaccines",
+								"types"
+							],
+							"query": [
+								{
+									"key": "species",
+									"value": "Cão"
+								}
+							]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "📄 Documentos",
+			"item": [
+				{
+					"name": "Upload Documento Médico",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "file",
+									"type": "file",
+									"src": []
+								},
+								{
+									"key": "documentType",
+									"value": "Exame de Sangue"
+								},
+								{
+									"key": "description",
+									"value": "Hemograma completo realizado em 03/11/2025"
+								},
+								{
+									"key": "petId",
+									"value": "{{petId}}"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{baseUrl}}/uploads/medical-document",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"uploads",
+								"medical-document"
+							],
+							"query": [
+								{
+									"key": "documentType",
+									"value": "Exame de Sangue"
+								},
+								{
+									"key": "description",
+									"value": "Hemograma completo"
+								},
+								{
+									"key": "petId",
+									"value": "{{petId}}"
+								}
+							]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "🗺️ Status de Consultas",
+			"item": [
+				{
+					"name": "Atualizar Status da Consulta",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/appointments/{{appointmentId}}/status?status=CONCLUIDA",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"appointments",
+								"{{appointmentId}}",
+								"status"
+							],
+							"query": [
+								{
+									"key": "status",
+									"value": "CONCLUIDA"
+								}
+							]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "💊 Farmácia - Inventário",
+			"item": [
+				{
+					"name": "Listar Inventário",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/pharmacy/inventory",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"pharmacy",
+								"inventory"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "0"
+								},
+								{
+									"key": "size",
+									"value": "20"
+								}
+							]
+						}
+					}
+				},
+				{
+					"name": "Adicionar Item ao Inventário",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"medicationName\": \"Amoxicilina 500mg\",\n  \"genericName\": \"Amoxicillin\",\n  \"description\": \"Antibiótico de amplo espectro para cães e gatos\",\n  \"currentStock\": 50,\n  \"minimumStock\": 10,\n  \"maximumStock\": 100,\n  \"unitPrice\": 25.50,\n  \"supplierId\": 1,\n  \"batchNumber\": \"AMX001\",\n  \"expirationDate\": \"2025-12-31\",\n  \"location\": \"A-01\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/pharmacy/inventory",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"pharmacy",
+								"inventory"
+							]
+						}
+					}
+				},
+				{
+					"name": "Detalhes do Item",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/pharmacy/inventory/{{inventoryItemId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"pharmacy",
+								"inventory",
+								"{{inventoryItemId}}"
+							]
+						}
+					}
+				},
+				{
+					"name": "Atualizar Item",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"medicationName\": \"Amoxicilina 500mg - Atualizada\",\n  \"currentStock\": 45,\n  \"unitPrice\": 26.00\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/pharmacy/inventory/{{inventoryItemId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"pharmacy",
+								"inventory",
+								"{{inventoryItemId}}"
+							]
+						}
+					}
+				},
+				{
+					"name": "Remover Item",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/pharmacy/inventory/{{inventoryItemId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"pharmacy",
+								"inventory",
+								"{{inventoryItemId}}"
+							]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "📦 Farmácia - Pedidos",
+			"item": [
+				{
+					"name": "Listar Pedidos",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/pharmacy/orders",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"pharmacy",
+								"orders"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "0"
+								},
+								{
+									"key": "size",
+									"value": "20"
+								}
+							]
+						}
+					}
+				},
+				{
+					"name": "Criar Pedido",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"orderNumber\": \"PED-2025-001\",\n  \"supplierId\": 1,\n  \"expectedDeliveryDate\": \"2025-11-15\",\n  \"status\": \"PENDING\",\n  \"notes\": \"Pedido urgente para reposição de estoque\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/pharmacy/orders",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"pharmacy",
+								"orders"
+							]
+						}
+					}
+				},
+				{
+					"name": "Detalhes do Pedido",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/pharmacy/orders/{{pharmacyOrderId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"pharmacy",
+								"orders",
+								"{{pharmacyOrderId}}"
+							]
+						}
+					}
+				},
+				{
+					"name": "Atualizar Status do Pedido",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/pharmacy/orders/{{pharmacyOrderId}}/status?status=CONFIRMED",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"pharmacy",
+								"orders",
+								"{{pharmacyOrderId}}",
+								"status"
+							],
+							"query": [
+								{
+									"key": "status",
+									"value": "CONFIRMED"
+								}
+							]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "💰 Farmácia - Vendas",
+			"item": [
+				{
+					"name": "Histórico de Vendas",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/pharmacy/sales",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"pharmacy",
+								"sales"
+							],
+							"query": [
+								{
+									"key": "startDate",
+									"value": "2025-11-01T00:00:00"
+								},
+								{
+									"key": "endDate",
+									"value": "2025-11-03T23:59:59"
+								},
+								{
+									"key": "paymentMethod",
+									"value": "CARD"
+								}
+							]
+						}
+					}
+				},
+				{
+					"name": "Registrar Venda",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"saleNumber\": \"VND-2025-004\",\n  \"customerName\": \"Maria Silva\",\n  \"veterinarianName\": \"Dr. João Silva\",\n  \"medicationName\": \"Amoxicilina 500mg\",\n  \"quantity\": 2,\n  \"unitPrice\": 25.50,\n  \"totalAmount\": 51.00,\n  \"paymentMethod\": \"CARD\",\n  \"prescriptionNumber\": \"RX-004\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/pharmacy/sales",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"pharmacy",
+								"sales"
+							]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "🏢 Farmácia - Fornecedores",
+			"item": [
+				{
+					"name": "Listar Fornecedores",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/pharmacy/suppliers",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"pharmacy",
+								"suppliers"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "0"
+								},
+								{
+									"key": "size",
+									"value": "20"
+								}
+							]
+						}
+					}
+				},
+				{
+					"name": "Adicionar Fornecedor",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"companyName\": \"VetDistribuidora Ltda\",\n  \"tradeName\": \"VetDist\",\n  \"cnpj\": \"12.345.678/0001-90\",\n  \"contactPerson\": \"Dr. Carlos Lima\",\n  \"email\": \"contato@vetdist.com.br\",\n  \"phone\": \"(11) 1234-5678\",\n  \"address\": \"Rua das Flores, 123\",\n  \"city\": \"São Paulo\",\n  \"state\": \"SP\",\n  \"zipCode\": \"01234-567\",\n  \"paymentTerms\": \"30 dias\",\n  \"creditLimit\": 50000.00,\n  \"rating\": 5\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/pharmacy/suppliers",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"pharmacy",
+								"suppliers"
+							]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "📊 Dashboard Farmácia",
+			"item": [
+				{
+					"name": "Cards de Status",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/dashboard/status-cards",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"dashboard",
+								"status-cards"
+							]
+						}
+					}
+				},
+				{
+					"name": "Estatísticas da Farmácia",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/dashboard/statistics",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"dashboard",
+								"statistics"
+							],
+							"query": [
+								{
+									"key": "startDate",
+									"value": "2025-11-01"
+								},
+								{
+									"key": "endDate",
+									"value": "2025-11-03"
+								}
+							]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "🔧 Utils",
+			"item": [
+				{
+					"name": "Lista de Medicamentos Comuns",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/utils/medication-list",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"utils",
+								"medication-list"
+							]
+						}
+					}
+				}
+			]
+		}
+	],
+	"event": [],
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://localhost:8080/api",
+			"type": "string"
+		},
+		{
+			"key": "authToken",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "vetAuthToken",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "petId",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "appointmentId",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "medicationId",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "prescriptionId",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "vetUsername",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "inventoryItemId",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "pharmacyOrderId",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "saleId",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "supplierId",
+			"value": "",
+			"type": "string"
+		}
+	]
+}
