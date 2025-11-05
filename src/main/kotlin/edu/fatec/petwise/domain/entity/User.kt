@@ -3,14 +3,20 @@ package edu.fatec.petwise.domain.entity
 import edu.fatec.petwise.domain.enums.UserType
 import edu.fatec.petwise.domain.valueobject.Email
 import edu.fatec.petwise.domain.valueobject.Telefone
+import jakarta.persistence.Entity
+import jakarta.persistence.Id
+import jakarta.persistence.Table
 import java.time.LocalDateTime
 import java.util.UUID
 
+@Entity
+@Table(name = "Users")
 data class User(
+    @Id
     val id: UUID? = null,
     var fullName: String,
-    var email: Email,
-    var phone: Telefone,
+    var email:String,
+    var phone: String? = null,
     var passwordHash: String,
     val userType: UserType,
     var cpf: String? = null,
@@ -22,6 +28,7 @@ data class User(
     val createdAt: LocalDateTime = LocalDateTime.now(),
     val updatedAt: LocalDateTime = LocalDateTime.now()
 ) {
+
     init {
         require(fullName.isNotBlank()) { "Nome completo não pode estar vazio" }
         
@@ -52,7 +59,7 @@ data class User(
         companyName: String? = null
     ): User = this.copy(
         fullName = fullName ?: this.fullName,
-        phone = phone ?: this.phone,
+        phone = (phone ?: this.phone).toString(),
         specialization = specialization ?: this.specialization,
         companyName = companyName ?: this.companyName,
         updatedAt = LocalDateTime.now()
