@@ -1,21 +1,23 @@
 package edu.fatec.petwise.presentation.controller
 
-import edu.fatec.petwise.application.dto.AppointmentResponse
-import edu.fatec.petwise.application.dto.CreateAppointmentRequest
-import edu.fatec.petwise.application.dto.MessageResponse
-import edu.fatec.petwise.application.dto.UpdateAppointmentRequest
-import edu.fatec.petwise.application.usecase.*
-import edu.fatec.petwise.domain.entity.AppointmentStatus
+import edu.fatec.petwise.application.usecase.CancelAppointmentUseCase
+import edu.fatec.petwise.application.usecase.CreateAppointmentUseCase
+import edu.fatec.petwise.application.usecase.GetAppointmentDetailsUseCase
+import edu.fatec.petwise.application.usecase.ListAppointmentsUseCase
+import edu.fatec.petwise.application.usecase.UpdateAppointmentUseCase
+import edu.fatec.petwise.application.dto.*
+import edu.fatec.petwise.domain.enums.ConsultaStatus
 import jakarta.validation.Valid
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.security.core.Authentication
 import org.springframework.web.bind.annotation.*
+import java.util.UUID
 
 @RestController
 @RequestMapping("/api/appointments")
 class AppointmentController(
-    private val listUserAppointmentsUseCase: ListUserAppointmentsUseCase,
+    private val listAppointmentsUseCase: ListAppointmentsUseCase,
     private val createAppointmentUseCase: CreateAppointmentUseCase,
     private val getAppointmentDetailsUseCase: GetAppointmentDetailsUseCase,
     private val updateAppointmentUseCase: UpdateAppointmentUseCase,
@@ -24,11 +26,9 @@ class AppointmentController(
 
     @GetMapping
     fun listAppointments(
-        authentication: Authentication,
-        @RequestParam(required = false) status: AppointmentStatus?
+        @RequestParam(required = false) status: ConsultaStatus?
     ): ResponseEntity<List<AppointmentResponse>> {
-        val userId = authentication.name
-        val appointments = listUserAppointmentsUseCase.execute(userId, status)
+        val appointments = listAppointmentsUseCase.execute(status)
         return ResponseEntity.ok(appointments)
     }
 
@@ -37,40 +37,35 @@ class AppointmentController(
         authentication: Authentication,
         @Valid @RequestBody request: CreateAppointmentRequest
     ): ResponseEntity<AppointmentResponse> {
-        val userId = authentication.name
+        val userId = UUID.fromString(authentication.name)
         val appointment = createAppointmentUseCase.execute(userId, request)
         return ResponseEntity.status(HttpStatus.CREATED).body(appointment)
     }
 
     @GetMapping("/{id}")
-    fun getAppointmentDetails(
-        authentication: Authentication,
-        @PathVariable id: String
-    ): ResponseEntity<AppointmentResponse> {
-        val userId = authentication.name
-        val appointment = getAppointmentDetailsUseCase.execute(userId, id)
+    fun getAppointmentDetails(@PathVariable id: UUID): ResponseEntity<AppointmentResponse> {
+        val appointment = getAppointmentDetailsUseCase.execute(id)
         return ResponseEntity.ok(appointment)
     }
-    
 
     @PutMapping("/{id}")
     fun updateAppointment(
         authentication: Authentication,
-        @PathVariable id: String,
+        @PathVariable id: UUID,
         @Valid @RequestBody request: UpdateAppointmentRequest
     ): ResponseEntity<AppointmentResponse> {
         val userId = authentication.name
-        val appointment = updateAppointmentUseCase.execute(userId, id, request)
+        val appointment = updateAppointmentUseCase.execute(userId as UUID, id, request)
         return ResponseEntity.ok(appointment)
     }
 
     @DeleteMapping("/{id}")
     fun cancelAppointment(
         authentication: Authentication,
-        @PathVariable id: String
+        @PathVariable id: UUID
     ): ResponseEntity<MessageResponse> {
         val userId = authentication.name
-        val response = cancelAppointmentUseCase.execute(userId, id)
+        val response = cancelAppointmentUseCase.execute(userId as UUID, id)
         return ResponseEntity.ok(response)
     }
 }

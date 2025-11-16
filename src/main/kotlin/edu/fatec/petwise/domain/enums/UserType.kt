@@ -4,5 +4,6 @@ enum class UserType {
     ADMIN,
     OWNER,
     VETERINARY,
-    PHARMACY
+    PHARMACY,
+    PETSHOP
 }

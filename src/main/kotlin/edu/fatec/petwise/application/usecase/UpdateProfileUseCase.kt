@@ -19,11 +19,10 @@ class UpdateProfileUseCase(
 ) {
     private val logger = LoggerFactory.getLogger(javaClass)
 
-    fun execute(userId: String, request: UpdateProfileDto): UserResponse {
+    fun execute(userId: UUID, request: UpdateProfileDto): UserResponse {
         logger.info("Atualizando perfil do usuário: $userId")
 
-        val user = userRepository.findById(UUID.fromString(userId))
-            ?: throw EntityNotFoundException("Usuário", userId)
+        val user = userRepository.findById(userId).orElseThrow { EntityNotFoundException("Usuário", userId) }
 
         if (!user.active) {
             throw BusinessRuleException("Usuário inativo não pode atualizar perfil")
@@ -105,9 +104,29 @@ class UpdateProfileUseCase(
                 }
             }
 
+            UserType.PETSHOP -> {
+                request.cnpj?.let { newCnpj ->
+                    val cleanCnpj = newCnpj.replace(Regex("[^0-9]"), "")
+                    if (cleanCnpj != user.cnpj) {
+                        if (userRepository.existsByCnpj(cleanCnpj)) {
+                            throw DuplicateEntityException("Já existe um petshop cadastrado com este CNPJ")
+                        }
+                        user.cnpj = cleanCnpj
+                        logger.info("CNPJ atualizado para usuário: $userId")
+                    }
+                }
+
+                request.companyName?.let { newCompanyName ->
+                    if (newCompanyName.isBlank()) {
+                        throw BusinessRuleException("Nome da empresa não pode ser vazio")
+                    }
+                    user.companyName = newCompanyName.trim()
+                }
+            }
+
             UserType.ADMIN -> {
                 if (request.cpf != null || request.crmv != null ||
-                    request.cnpj != null || request.companyName != null || 
+                    request.cnpj != null || request.companyName != null ||
                     request.specialization != null) {
                     throw BusinessRuleException("Admin não pode atualizar campos específicos de outros tipos")
                 }

@@ -1,30 +1,27 @@
 package edu.fatec.petwise.application.dto
 
+import edu.fatec.petwise.domain.enums.VaccinationStatus
+import edu.fatec.petwise.domain.enums.VaccineType
 import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.NotNull
 import jakarta.validation.constraints.Positive
-import java.time.LocalDate
-import java.util.UUID
+import java.time.LocalDateTime
 
 data class VaccineRequest(
-    @field:NotNull(message = "Vaccine Type ID é obrigatório")
-    val vaccineTypeId: UUID,
-    
-    @field:NotBlank(message = "Veterinário é obrigatório")
-    val veterinarian: String,
-    
+    @field:NotNull(message = "Tipo de vacina é obrigatório")
+    val vaccineType: VaccineType,
+
     @field:NotNull(message = "Data da vacinação é obrigatória")
-    val vaccinationDate: LocalDate,
-    
-    val batchNumber: String? = null,
+    val vaccinationDate: LocalDateTime,
+
+    val nextDoseDate: LocalDateTime? = null,
+
+    @field:Positive(message = "Total de doses deve ser positivo")
+    val totalDoses: Int,
+
     val manufacturer: String? = null,
-    
-    @field:Positive(message = "Número da dose deve ser positivo")
-    val doseNumber: Int = 1,
-    
-    val totalDoses: Int? = null,
-    val validUntil: LocalDate? = null,
-    val siteOfInjection: String? = null,
-    val reactions: String? = null,
-    val observations: String? = null
+    val observations: String = "",
+
+    @field:NotNull(message = "Status é obrigatório")
+    val status: VaccinationStatus
 )

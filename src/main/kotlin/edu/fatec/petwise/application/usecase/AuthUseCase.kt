@@ -3,7 +3,6 @@ package edu.fatec.petwise.application.usecase
 import edu.fatec.petwise.application.dto.AuthResponse
 import edu.fatec.petwise.application.dto.LoginRequest
 import edu.fatec.petwise.application.dto.RegisterRequest
-import edu.fatec.petwise.application.dto.UserResponse
 import edu.fatec.petwise.domain.entity.User
 import edu.fatec.petwise.domain.enums.UserType
 import edu.fatec.petwise.domain.exception.BusinessRuleException
@@ -111,6 +110,18 @@ class RegisterUserUseCase(
                     throw DuplicateEntityException("Já existe uma farmácia cadastrada com este CNPJ")
                 }
             }
+            UserType.PETSHOP -> {
+                if (request.cnpj.isNullOrBlank()) {
+                    throw BusinessRuleException("CNPJ é obrigatório para petshops")
+                }
+                if (request.companyName.isNullOrBlank()) {
+                    throw BusinessRuleException("Nome da empresa é obrigatório para petshops")
+                }
+                val cleanCnpj = request.cnpj.replace(Regex("[^0-9]"), "")
+                if (userRepository.existsByCnpj(cleanCnpj)) {
+                    throw DuplicateEntityException("Já existe um petshop cadastrado com este CNPJ")
+                }
+            }
             UserType.ADMIN -> {}
         }
     }
@@ -200,35 +211,3 @@ class LoginUserUseCase(
         return "$maskedLocal@$domain"
     }
 }
-
-@Service
-class GetUserProfileUseCase(
-    private val userRepository: UserRepository
-) {
-    private val logger = LoggerFactory.getLogger(javaClass)
-
-    fun execute(userId: String): UserResponse {
-        logger.info("Buscando perfil do usuário: $userId")
-
-        val user = userRepository.findById(UUID.fromString(userId))
-            ?: throw EntityNotFoundException("Usuário", userId)
-
-        return user.toResponse()
-    }
-}
-
-fun User.toResponse() = UserResponse(
-    id = this.id.toString(),
-    fullName = this.fullName,
-    email = this.email.value,
-    phone = this.phone.value,
-    userType = this.userType.name,
-    cpf = this.cpf,
-    crmv = this.crmv,
-    specialization = this.specialization,
-    cnpj = this.cnpj,
-    companyName = this.companyName,
-    active = this.active,
-    createdAt = this.createdAt.toString(),
-    updatedAt = this.updatedAt.toString()
-)

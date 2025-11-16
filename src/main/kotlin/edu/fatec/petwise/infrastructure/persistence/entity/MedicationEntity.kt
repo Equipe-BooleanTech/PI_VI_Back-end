@@ -1,47 +1,50 @@
 package edu.fatec.petwise.infrastructure.persistence.entity
 
+import edu.fatec.petwise.domain.enums.MedicationStatus
 import jakarta.persistence.*
-import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.UUID
 
 @Entity
 @Table(name = "medications")
-class MedicationEntity(
+data class MedicationEntity(
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     var id: UUID? = null,
-    
-    @Column(nullable = false, name = "pet_id")
-    var petId: UUID,
-    
+
+    @Column(nullable = false, name = "user_id")
+    val userId: UUID,
+
+    @Column(nullable = false, name = "prescription_id")
+    val prescriptionId: UUID,
+
+    @Column(nullable = false, name = "medication_name", length = 100)
+    val medicationName: String,
+
     @Column(nullable = false, length = 100)
-    var name: String,
-    
-    @Column(nullable = false, length = 100)
-    var dosage: String,
-    
-    @Column(nullable = false, length = 100)
-    var frequency: String,
-    
-    @Column(nullable = false, name = "start_date")
-    var startDate: LocalDate,
-    
-    @Column(nullable = false, name = "end_date")
-    var endDate: LocalDate,
-    
-    @Column(nullable = false, name = "prescribed_by")
-    var prescribedBy: UUID,
-    
-    @Column(columnDefinition = "TEXT")
-    var instructions: String? = null,
-    
-    @Column(nullable = false)
-    var active: Boolean = true,
-    
+    val dosage: String,
+
+    @Column(nullable = false, length = 50)
+    val frequency: String,
+
+    @Column(name = "duration_days")
+    val durationDays: Int,
+
+    @Column(name = "start_date")
+    val startDate: LocalDateTime,
+
+    @Column(name = "end_date")
+    val endDate: LocalDateTime,
+
+    @Column(name = "side_effects", columnDefinition = "TEXT")
+    val sideEffects: String = "",
+
+    @Enumerated(EnumType.STRING)
+    val status: MedicationStatus = MedicationStatus.ACTIVE,
+
     @Column(nullable = false, name = "created_at", updatable = false)
-    var createdAt: LocalDateTime = LocalDateTime.now(),
-    
+    val createdAt: LocalDateTime,
+
     @Column(nullable = false, name = "updated_at")
-    var updatedAt: LocalDateTime = LocalDateTime.now()
+    val updatedAt: LocalDateTime
 )

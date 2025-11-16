@@ -12,15 +12,11 @@ class GetPetDetailsUseCase(
 ) {
     private val logger = LoggerFactory.getLogger(javaClass)
 
-    fun execute(userId: String, petId: String): PetResponse {
-        val ownerId = UUID.fromString(userId)
-        val petUuid = UUID.fromString(petId)
-        
-        val pet = petRepository.findByIdAndOwnerId(petUuid, ownerId)
-            ?: throw Exception("Pet não encontrado ou você não tem permissão para acessá-lo")
-        
-        logger.info("Detalhes do pet $petId obtidos pelo usuário $userId")
-        
+    fun execute(petId: UUID): PetResponse {
+        val pet = petRepository.findById(petId).orElseThrow { Exception("Pet não encontrado") }
+
+        logger.info("Detalhes do pet $petId obtidos")
+
         return PetResponse.fromEntity(pet)
     }
 }

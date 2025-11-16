@@ -1,7 +1,14 @@
 package edu.fatec.petwise.presentation.controller
 
+import edu.fatec.petwise.application.usecase.ForgotPasswordUseCase
+import edu.fatec.petwise.application.usecase.GetUserProfileUseCase
+import edu.fatec.petwise.application.usecase.LoginUserUseCase
+import edu.fatec.petwise.application.usecase.RefreshTokenUseCase
+import edu.fatec.petwise.application.usecase.RegisterUserUseCase
+import edu.fatec.petwise.application.usecase.ResetPasswordUseCase
+import edu.fatec.petwise.application.usecase.UpdateProfileUseCase
 import edu.fatec.petwise.application.dto.*
-import edu.fatec.petwise.application.usecase.*
+import edu.fatec.petwise.domain.entity.User
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
 import jakarta.validation.Valid
@@ -10,6 +17,8 @@ import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.security.core.Authentication
 import org.springframework.web.bind.annotation.*
+import java.util.Optional
+import java.util.UUID
 
 @RestController
 @RequestMapping("/api/auth")
@@ -39,10 +48,10 @@ class AuthController(
     }
 
     @GetMapping("/profile")
-    fun getProfile(authentication: Authentication): ResponseEntity<UserResponse> {
+    fun getProfile(authentication: Authentication): ResponseEntity<Optional<User>> {
         val userId = authentication.name
         logger.info("Requisição de perfil para usuário: $userId")
-        val response = getUserProfileUseCase.execute(userId)
+        val response = getUserProfileUseCase.execute(userId as UUID)
         return ResponseEntity.ok(response)
     }
 
@@ -54,11 +63,11 @@ class AuthController(
     @PutMapping("/profile")
     fun updateProfile(
         authentication: Authentication,
-        @Valid @RequestBody request: UpdateProfileRequest
+        @Valid @RequestBody request: UpdateProfileDto
     ): ResponseEntity<UserResponse> {
         val userId = authentication.name
         logger.info("Requisição de atualização de perfil para usuário: $userId")
-        val response = updateProfileUseCase.execute(userId, request)
+        val response = updateProfileUseCase.execute(userId as UUID, request)
         return ResponseEntity.ok(response)
     }
 
@@ -81,7 +90,7 @@ class AuthController(
      * 🔒 SEGURANÇA: Sempre retorna mesma mensagem (não revela se email existe)
      */
     @PostMapping("/forgot-password")
-    fun forgotPassword(@Valid @RequestBody request: ForgotPasswordRequest): ResponseEntity<MessageResponse> {
+    fun forgotPassword(@Valid @RequestBody request: ForgotPasswordDto): ResponseEntity<MessageResponse> {
         logger.info("Requisição de forgot password recebida")
         val response = forgotPasswordUseCase.execute(request)
         return ResponseEntity.ok(response)
@@ -93,7 +102,7 @@ class AuthController(
      * Valida token e atualiza senha do usuário
      */
     @PostMapping("/reset-password")
-    fun resetPassword(@Valid @RequestBody request: ResetPasswordRequest): ResponseEntity<MessageResponse> {
+    fun resetPassword(@Valid @RequestBody request: ResetPasswordDto): ResponseEntity<MessageResponse> {
         logger.info("Requisição de reset password recebida")
         val response = resetPasswordUseCase.execute(request)
         return ResponseEntity.ok(response)

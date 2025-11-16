@@ -1,6 +1,14 @@
 package edu.fatec.petwise.domain.valueobject
 
-data class Email(val value: String) {
+import jakarta.persistence.Embeddable
+
+@Embeddable
+data class Email(
+    @jakarta.persistence.Column(name = "email")
+    val value: String
+) {
+    // Default constructor for JPA
+    constructor(): this("")
     init {
         require(value.isNotBlank()) { "Email não pode estar vazio" }
         require(validateFormat(value)) { "Formato de email inválido" }

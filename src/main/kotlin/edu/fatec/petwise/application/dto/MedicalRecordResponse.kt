@@ -2,13 +2,12 @@ package edu.fatec.petwise.application.dto
 
 import com.fasterxml.jackson.annotation.JsonFormat
 import java.time.LocalDateTime
-import java.util.*
 
 data class MedicalRecordResponse(
-    val id: UUID,
-    val petId: UUID,
+    val id: String,
+    val petId: String,
     val veterinarian: String,
-    val appointmentId: UUID?,
+    val appointmentId: String?,
 
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
     val recordDate: LocalDateTime,

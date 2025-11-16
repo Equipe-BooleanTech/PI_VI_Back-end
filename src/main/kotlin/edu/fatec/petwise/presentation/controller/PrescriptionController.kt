@@ -1,7 +1,7 @@
 package edu.fatec.petwise.presentation.controller
 
 
-import com.petwise.dto.PrescriptionRequest
+import edu.fatec.petwise.application.dto.PrescriptionRequest
 import edu.fatec.petwise.application.dto.PrescriptionResponse
 import edu.fatec.petwise.application.usecase.CreatePrescriptionUseCase
 import edu.fatec.petwise.application.usecase.ListPrescriptionsUseCase

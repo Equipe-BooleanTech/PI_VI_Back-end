@@ -3,47 +3,83 @@ package edu.fatec.petwise.application.usecase
 
 import edu.fatec.petwise.application.dto.PrescriptionResponse
 import edu.fatec.petwise.domain.entity.Prescription
+import edu.fatec.petwise.domain.enums.UserType
 import edu.fatec.petwise.domain.repository.PrescriptionRepository
+import edu.fatec.petwise.domain.repository.UserRepository
 import org.springframework.stereotype.Service
 import org.springframework.security.core.Authentication
 import java.util.UUID
 
 @Service
 class ListPrescriptionsUseCase(
-    private val prescriptionRepository: PrescriptionRepository
+    private val prescriptionRepository: PrescriptionRepository,
+    private val userRepository: UserRepository
 ) {
     fun execute(authentication: Authentication, petId: UUID?, status: String?): List<PrescriptionResponse> {
         val userId = UUID.fromString(authentication.principal.toString())
-        
-        val prescriptions = when {
-            petId != null && status != null -> {
-                // Filtro por pet e status
-                val prescriptionStatus = try {
-                    Prescription.PrescriptionStatus.valueOf(status.uppercase())
-                } catch (e: IllegalArgumentException) {
-                    throw IllegalArgumentException("Status inválido: $status")
+        val user = userRepository.findById(userId).orElseThrow { IllegalArgumentException("Usuário não encontrado") }
+
+        val prescriptions = when (user.userType) {
+            UserType.PHARMACY -> {
+                // PHARMACY users can see all prescriptions from VETERINARY users
+                when {
+                    petId != null && status != null -> {
+                        val allPrescriptions = prescriptionRepository.findByPetId(petId)
+                        val prescriptionStatus = try {
+                            Prescription.PrescriptionStatus.valueOf(status.uppercase())
+                        } catch (e: IllegalArgumentException) {
+                            throw IllegalArgumentException("Status inválido: $status")
+                        }
+                        allPrescriptions.filter { it.status == prescriptionStatus.name }
+                    }
+                    petId != null -> {
+                        prescriptionRepository.findByPetId(petId)
+                    }
+                    status != null -> {
+                        val allPrescriptions = prescriptionRepository.findAll()
+                        val prescriptionStatus = try {
+                            Prescription.PrescriptionStatus.valueOf(status.uppercase())
+                        } catch (e: IllegalArgumentException) {
+                            throw IllegalArgumentException("Status inválido: $status")
+                        }
+                        allPrescriptions.filter { it.status == prescriptionStatus.name }
+                    }
+                    else -> {
+                        prescriptionRepository.findAll()
+                    }
                 }
-                prescriptionRepository.findByPetIdAndStatusAndActiveTrue(petId, prescriptionStatus)
-            }
-            petId != null -> {
-                // Filtro apenas por pet
-                prescriptionRepository.findByPetIdAndActiveTrueOrderByPrescriptionDateDesc(petId)
-            }
-            status != null -> {
-                // Filtro apenas por status
-                val prescriptionStatus = try {
-                    Prescription.PrescriptionStatus.valueOf(status.uppercase())
-                } catch (e: IllegalArgumentException) {
-                    throw IllegalArgumentException("Status inválido: $status")
-                }
-                prescriptionRepository.findByUserIdAndStatus(userId, prescriptionStatus)
             }
             else -> {
-                // Sem filtros - todas as prescrições do usuário
-                prescriptionRepository.findByUserIdAndActiveTrue(userId)
+                // Other users (VETERINARY, OWNER, ADMIN) see their own prescriptions
+                when {
+                    petId != null && status != null -> {
+                        val allPrescriptions = prescriptionRepository.findByPetId(petId)
+                        val prescriptionStatus = try {
+                            Prescription.PrescriptionStatus.valueOf(status.uppercase())
+                        } catch (e: IllegalArgumentException) {
+                            throw IllegalArgumentException("Status inválido: $status")
+                        }
+                        allPrescriptions.filter { it.status == prescriptionStatus.name }
+                    }
+                    petId != null -> {
+                        prescriptionRepository.findByPetId(petId)
+                    }
+                    status != null -> {
+                        val allPrescriptions = prescriptionRepository.findByUserId(userId)
+                        val prescriptionStatus = try {
+                            Prescription.PrescriptionStatus.valueOf(status.uppercase())
+                        } catch (e: IllegalArgumentException) {
+                            throw IllegalArgumentException("Status inválido: $status")
+                        }
+                        allPrescriptions.filter { it.status == prescriptionStatus.name }
+                    }
+                    else -> {
+                        prescriptionRepository.findByUserId(userId)
+                    }
+                }
             }
         }
         
-        return prescriptions.map { it.toPrescriptionResponse() }
+        return prescriptions.map { PrescriptionResponse.fromEntity(it) }
     }
 }

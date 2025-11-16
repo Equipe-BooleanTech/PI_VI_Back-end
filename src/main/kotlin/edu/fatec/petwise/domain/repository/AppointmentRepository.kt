@@ -1,68 +1,17 @@
 package edu.fatec.petwise.domain.repository
 
 import edu.fatec.petwise.domain.entity.Appointment
-import edu.fatec.petwise.domain.entity.AppointmentStatus
-import org.springframework.data.jpa.repository.JpaRepository
-import org.springframework.data.jpa.repository.Query
-import org.springframework.data.repository.query.Param
-import org.springframework.stereotype.Repository
-import java.time.LocalDateTime
+import edu.fatec.petwise.domain.enums.ConsultaStatus
+import java.util.Optional
 import java.util.UUID
 
-@Repository
-interface AppointmentRepository : JpaRepository<Appointment, UUID> {
-
-    fun findByOwnerIdOrderByAppointmentDatetimeDesc(ownerId: UUID): List<Appointment>
-    fun findByOwnerIdAndStatus(ownerId: UUID, status: AppointmentStatus): List<Appointment>
-    fun findByVeterinaryIdOrderByAppointmentDatetimeDesc(veterinaryId: UUID): List<Appointment>
-    fun findByPetIdOrderByAppointmentDatetimeDesc(petId: UUID): List<Appointment>
+interface AppointmentRepository {
+    fun findAll(): List<Appointment>
+    fun findById(id: UUID): Optional<Appointment>
+    fun findByPetId(petId: UUID): List<Appointment>
+    fun findByOwnerId(ownerId: UUID): List<Appointment>
+    fun findByStatus(status: ConsultaStatus): List<Appointment>
     fun findByIdAndOwnerId(id: UUID, ownerId: UUID): Appointment?
-    @Query("""
-        SELECT a FROM Appointment a 
-        WHERE a.ownerId = :ownerId 
-        AND a.appointmentDatetime > :now 
-        AND a.status IN ('AGENDADA', 'CONFIRMADA')
-        ORDER BY a.appointmentDatetime ASC
-    """)
-    fun findUpcomingAppointments(ownerId: UUID, now: LocalDateTime): List<Appointment>
-    @Query("""
-        SELECT a FROM Appointment a 
-        WHERE a.ownerId = :ownerId 
-        AND a.appointmentDatetime < :now 
-        ORDER BY a.appointmentDatetime DESC
-    """)
-    fun findPastAppointments(ownerId: UUID, now: LocalDateTime): List<Appointment>
-
-    fun countByOwnerIdAndStatus(ownerId: UUID, status: AppointmentStatus): Long
-
-    @Query("""
-        SELECT COUNT(a) > 0 FROM Appointment a 
-        WHERE a.veterinaryId = :veterinaryId 
-        AND a.status NOT IN ('CANCELADA', 'NAO_COMPARECEU')
-        AND a.appointmentDatetime >= :startTime 
-        AND a.appointmentDatetime < :endTime
-    """)
-    fun existsConflictingAppointment(
-        veterinaryId: UUID, 
-        startTime: LocalDateTime, 
-        endTime: LocalDateTime
-    ): Boolean
-
-    @Query("""
-    SELECT a FROM Appointment a
-    WHERE a.veterinaryId = :veterinaryId
-      AND a.appointmentDatetime BETWEEN :start AND :end
-    ORDER BY a.appointmentDatetime ASC
-""")
-    fun findByVeterinaryIdAndAppointmentDatetimeBetweenOrderByAppointmentDatetimeAsc(
-        veterinaryId: UUID,
-        start: LocalDateTime,
-        end: LocalDateTime
-    ): List<Appointment>
-
-    @Query("SELECT DISTINCT a.petId FROM Appointment a WHERE a.veterinaryId = :veterinaryId")
-    fun findDistinctPetIdsByVeterinaryId(@Param("veterinaryId") veterinaryId: UUID): List<UUID>
-    @Query("SELECT DISTINCT mr.petId FROM MedicalRecord mr WHERE mr.veterinarian = :veterinarian AND mr.active = true")
-    fun findDistinctPetIdsByVeterinarian(@Param("veterinarian") veterinarian: String): List<UUID>
-
+    fun save(appointment: Appointment): Appointment
+    fun deleteById(id: UUID)
 }

@@ -5,6 +5,7 @@ import edu.fatec.petwise.application.dto.UserResponse
 import edu.fatec.petwise.domain.repository.UserRepository
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
+import java.util.UUID
 
 @Service
 class UpdateUserProfileUseCase(
@@ -12,9 +13,8 @@ class UpdateUserProfileUseCase(
 ) {
     private val logger = LoggerFactory.getLogger(javaClass)
 
-    fun execute(userId: String, request: UpdateProfileDto): UserResponse {
-        val user = userRepository.findById(java.util.UUID.fromString(userId))
-            ?: throw IllegalArgumentException("Usuário não encontrado")
+    fun execute(userId: UUID, request: UpdateProfileDto): UserResponse {
+        val user = userRepository.findById(userId).orElseThrow { IllegalArgumentException("Usuário não encontrado") }
 
         if (request.fullName != null) user.fullName = request.fullName
         if (request.phone != null) user.phone = user.phone.copy(value = request.phone)

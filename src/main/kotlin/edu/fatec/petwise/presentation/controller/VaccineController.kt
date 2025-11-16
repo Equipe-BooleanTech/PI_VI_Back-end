@@ -3,10 +3,10 @@ package edu.fatec.petwise.presentation.controller
 
 import edu.fatec.petwise.application.dto.VaccineRequest
 import edu.fatec.petwise.application.dto.VaccineResponse
-import edu.fatec.petwise.application.dto.VaccineTypeResponse
 import edu.fatec.petwise.application.usecase.CreateVaccineUseCase
-import edu.fatec.petwise.application.usecase.ListVaccineTypesUseCase
+import edu.fatec.petwise.application.usecase.DeleteVaccineUseCase
 import edu.fatec.petwise.application.usecase.ListVaccinesUseCase
+import edu.fatec.petwise.application.usecase.UpdateVaccineUseCase
 import jakarta.validation.Valid
 import org.springframework.http.ResponseEntity
 import org.springframework.security.core.Authentication
@@ -19,9 +19,10 @@ import java.util.UUID
 class VaccineController(
     private val createVaccineUseCase: CreateVaccineUseCase,
     private val listVaccinesUseCase: ListVaccinesUseCase,
-    private val listVaccineTypesUseCase: ListVaccineTypesUseCase
+    private val updateVaccineUseCase: UpdateVaccineUseCase,
+    private val deleteVaccineUseCase: DeleteVaccineUseCase,
 ) {
-    
+
 
     @GetMapping
     fun listVaccines(
@@ -46,14 +47,24 @@ class VaccineController(
         )
         return ResponseEntity.ok(vaccine)
     }
-    
 
-    @GetMapping("/types")
-    fun listVaccineTypes(
-        authentication: Authentication,
-        @RequestParam(required = false) species: String?
-    ): ResponseEntity<List<VaccineTypeResponse>> {
-        val vaccineTypes = listVaccineTypesUseCase.execute(authentication, species)
-        return ResponseEntity.ok(vaccineTypes)
+    @PutMapping("/{id}")
+    fun updateVaccine(
+        @PathVariable id: UUID,
+        @Valid @RequestBody request: VaccineRequest,
+        authentication: Authentication
+    ): ResponseEntity<VaccineResponse> {
+        val vaccine = updateVaccineUseCase.execute(id, request, authentication)
+        return ResponseEntity.ok(vaccine)
     }
+
+    @DeleteMapping("/{id}")
+    fun deleteVaccine(
+        @PathVariable id: UUID,
+        authentication: Authentication
+    ): ResponseEntity<Void> {
+        deleteVaccineUseCase.execute(id, authentication)
+        return ResponseEntity.noContent().build()
+    }
+
 }

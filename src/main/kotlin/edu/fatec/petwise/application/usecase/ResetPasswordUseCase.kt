@@ -1,10 +1,10 @@
 package edu.fatec.petwise.application.usecase
 
+import edu.fatec.petwise.domain.repository.PasswordResetTokenRepository
 import edu.fatec.petwise.application.dto.MessageResponse
 import edu.fatec.petwise.application.dto.ResetPasswordDto
 import edu.fatec.petwise.domain.exception.BusinessRuleException
 import edu.fatec.petwise.domain.exception.EntityNotFoundException
-import edu.fatec.petwise.domain.repository.PasswordResetTokenRepository
 import edu.fatec.petwise.domain.repository.UserRepository
 import edu.fatec.petwise.infrastructure.security.JwtService
 import org.slf4j.LoggerFactory
@@ -38,16 +38,19 @@ class ResetPasswordUseCase(
                 logger.warn("Token não encontrado ou já usado: userId=$userId")
                 throw BusinessRuleException("Token de reset inválido ou já utilizado")
             }
-        if (resetToken.expiresAt.isBefore(LocalDateTime.now())) {
-            logger.warn("Token expirado: userId=$userId, expirou em ${resetToken.expiresAt}")
-            throw BusinessRuleException("Token de reset expirado. Solicite um novo reset de senha.")
+        resetToken.expiresAt?.let {
+            if (it.isBefore(LocalDateTime.now())) {
+                logger.warn("Token expirado: userId=$userId, expirou em ${resetToken.expiresAt}")
+                throw BusinessRuleException("Token de reset expirado. Solicite um novo reset de senha.")
+            }
         }
-        if (resetToken.userId != userId) {
-            logger.error("Token não pertence ao usuário: tokenUserId=${resetToken.userId}, requestUserId=$userId")
-            throw BusinessRuleException("Token inválido")
+        resetToken.userId?.let {
+            if ((it).equals(userId)) {
+                logger.error("Token não pertence ao usuário: tokenUserId=${resetToken.userId}, requestUserId=$userId")
+                throw BusinessRuleException("Token inválido")
+            }
         }
-        val user = userRepository.findById(userId)
-            ?: throw EntityNotFoundException("Usuário", userId.toString())
+        val user = userRepository.findById(userId).orElseThrow { EntityNotFoundException("Usuário", userId.toString()) }
 
         if (!user.active) {
             throw BusinessRuleException("Usuário inativo")

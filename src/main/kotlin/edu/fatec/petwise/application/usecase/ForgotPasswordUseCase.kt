@@ -1,9 +1,9 @@
 package edu.fatec.petwise.application.usecase
 
+import edu.fatec.petwise.domain.repository.PasswordResetTokenRepository
 import edu.fatec.petwise.application.dto.ForgotPasswordDto
 import edu.fatec.petwise.application.dto.MessageResponse
 import edu.fatec.petwise.domain.entity.PasswordResetToken
-import edu.fatec.petwise.domain.repository.PasswordResetTokenRepository
 import edu.fatec.petwise.domain.repository.UserRepository
 import edu.fatec.petwise.infrastructure.security.JwtService
 import org.slf4j.LoggerFactory
@@ -35,10 +35,12 @@ class ForgotPasswordUseCase(
             val expiresAt = LocalDateTime.now().plusSeconds(resetTokenExpiration / 1000)
             
             val passwordResetToken = PasswordResetToken(
+                id = null,
                 userId = user.id!!,
                 token = resetToken,
                 expiresAt = expiresAt,
-                used = false
+                used = false,
+                createdAt = LocalDateTime.now()
             )
 
             passwordResetTokenRepository.save(passwordResetToken)
