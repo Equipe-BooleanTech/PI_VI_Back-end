@@ -24,7 +24,8 @@ class VaccineRepositoryAdapter(
     }
 
     override fun findByPetIdOrderByVaccinationDateDesc(petId: UUID?): List<Vaccine> {
-        return repository.findByPetIdOrderByVaccinationDateDesc(petId as UUID).map { it.toDomain() }
+        if (petId == null) return emptyList()
+        return repository.findByPetIdOrderByVaccinationDateDesc(petId).map { it.toDomain() }
     }
 
     override fun findByVeterinarianIdOrderByVaccinationDateDesc(veterinarianId: UUID): List<Vaccine> {

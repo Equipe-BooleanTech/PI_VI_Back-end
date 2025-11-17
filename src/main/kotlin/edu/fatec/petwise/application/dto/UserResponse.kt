@@ -23,7 +23,7 @@ data class UserResponse(
     companion object {
         fun fromEntity(user: User): UserResponse =
             UserResponse(
-                id = (user.id ?: "") as UUID,
+                id = user.id!!,
                 fullName = user.fullName,
                 email = user.email.value,
                 phone = user.phone.value,

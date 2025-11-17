@@ -62,8 +62,8 @@ class PetController(
         @PathVariable id: UUID,
         @Valid @RequestBody request: UpdatePetRequest
     ): ResponseEntity<PetResponse> {
-        val userId = authentication.name
-        val pet = updatePetUseCase.execute(userId as UUID, id, request)
+        val userId = UUID.fromString(authentication.name)
+        val pet = updatePetUseCase.execute(userId, id, request)
         return ResponseEntity.ok(pet)
     }
 
@@ -72,8 +72,8 @@ class PetController(
         authentication: Authentication,
         @PathVariable id: UUID
     ): ResponseEntity<MessageResponse> {
-        val userId = authentication.name
-        val response = deletePetUseCase.execute(userId as UUID, id)
+        val userId = UUID.fromString(authentication.name)
+        val response = deletePetUseCase.execute(userId, id)
         return ResponseEntity.ok(response)
     }
 
@@ -113,8 +113,8 @@ class PetController(
         @RequestParam(defaultValue = "1") page: Int,
         @RequestParam(defaultValue = "20") pageSize: Int
     ): ResponseEntity<PetListResponse> {
-        val userId = authentication.name
-        val result = getFavoritePetsUseCase.execute(userId as UUID, page, pageSize)
+        val userId = UUID.fromString(authentication.name)
+        val result = getFavoritePetsUseCase.execute(userId, page, pageSize)
         return ResponseEntity.ok(result)
     }
 }

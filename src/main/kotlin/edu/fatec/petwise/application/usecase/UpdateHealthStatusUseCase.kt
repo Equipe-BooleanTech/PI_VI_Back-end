@@ -18,7 +18,7 @@ class UpdateHealthStatusUseCase(
     private val logger = LoggerFactory.getLogger(javaClass)
 
     fun execute(petId: UUID, request: UpdateHealthStatusRequest, authentication: Authentication): PetResponse {
-        val userId = authentication.name as UUID
+        val userId = UUID.fromString(authentication.name)
         
         val pet = petRepository.findById(petId).orElseThrow { Exception("Pet não encontrado") }
 

@@ -5,6 +5,8 @@ import edu.fatec.petwise.domain.repository.AppointmentRepository
 import edu.fatec.petwise.infrastructure.persistence.entity.AppointmentEntity
 import edu.fatec.petwise.infrastructure.persistence.repository.jpa.JpaAppointmentRepository
 import edu.fatec.petwise.domain.enums.ConsultaStatus
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Repository
 import java.util.Optional
 import java.util.UUID
@@ -17,10 +19,19 @@ class AppointmentRepositoryAdapter(
         return repository.findAll().map { it.toDomain() }
     }
 
+    override fun findAll(pageable: Pageable): Page<Appointment> {
+        return repository.findAll(pageable).map { it.toDomain() }
+    }
+
     override fun findById(id: UUID): Optional<Appointment> = repository.findById(id).map { it.toDomain() }
     override fun findByPetId(petId: UUID): List<Appointment> = repository.findByPetId(petId).map { it.toDomain() }
     override fun findByOwnerId(ownerId: UUID): List<Appointment> = repository.findByOwnerId(ownerId).map { it.toDomain() }
     override fun findByStatus(status: ConsultaStatus): List<Appointment> = repository.findByStatus(status).map { it.toDomain() }
+
+    override fun findByStatus(status: ConsultaStatus, pageable: Pageable): Page<Appointment> {
+        return repository.findByStatus(status, pageable).map { it.toDomain() }
+    }
+
     override fun findByIdAndOwnerId(id: UUID, ownerId: UUID): Appointment? = repository.findByIdAndOwnerId(id, ownerId)?.toDomain()
     override fun save(appointment: Appointment): Appointment {
         val entity = AppointmentEntity(

@@ -49,9 +49,9 @@ class AuthController(
 
     @GetMapping("/profile")
     fun getProfile(authentication: Authentication): ResponseEntity<Optional<User>> {
-        val userId = authentication.name
+        val userId = UUID.fromString(authentication.name)
         logger.info("Requisição de perfil para usuário: $userId")
-        val response = getUserProfileUseCase.execute(userId as UUID)
+        val response = getUserProfileUseCase.execute(userId)
         return ResponseEntity.ok(response)
     }
 
@@ -65,9 +65,9 @@ class AuthController(
         authentication: Authentication,
         @Valid @RequestBody request: UpdateProfileDto
     ): ResponseEntity<UserResponse> {
-        val userId = authentication.name
+        val userId = UUID.fromString(authentication.name)
         logger.info("Requisição de atualização de perfil para usuário: $userId")
-        val response = updateProfileUseCase.execute(userId as UUID, request)
+        val response = updateProfileUseCase.execute(userId, request)
         return ResponseEntity.ok(response)
     }
 

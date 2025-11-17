@@ -14,10 +14,10 @@ class UpdateAppointmentStatusUseCase(
     private val appointmentRepository: AppointmentRepository
 ) {
     fun execute(id: UUID, newStatus: String, authentication: Authentication): AppointmentResponse {
-        val userId = authentication.principal
+        val userId = UUID.fromString(authentication.principal.toString())
         
         // Buscar consulta
-        val appointment = appointmentRepository.findByIdAndOwnerId(id, userId as UUID)
+        val appointment = appointmentRepository.findByIdAndOwnerId(id, userId)
             ?: throw IllegalArgumentException("Consulta não encontrada ou não pertence ao usuário")
         
         // Parse status

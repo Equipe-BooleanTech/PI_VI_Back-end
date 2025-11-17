@@ -16,8 +16,8 @@ class SearchExamsUseCase(
     private val userRepository: UserRepository
 ) {
     fun execute(authentication: Authentication, query: String): List<ExamResponse> {
-        val userId = authentication.principal
-        val user = userRepository.findById(userId as UUID).orElseThrow { IllegalArgumentException("Usuário não encontrado") }
+        val userId = UUID.fromString(authentication.principal.toString())
+        val user = userRepository.findById(userId).orElseThrow { IllegalArgumentException("Usuário não encontrado") }
 
         val exams = when (user.userType) {
             UserType.VETERINARY -> {

@@ -26,10 +26,12 @@ class AppointmentController(
 
     @GetMapping
     fun listAppointments(
-        @RequestParam(required = false) status: ConsultaStatus?
-    ): ResponseEntity<List<AppointmentResponse>> {
-        val appointments = listAppointmentsUseCase.execute(status)
-        return ResponseEntity.ok(appointments)
+        @RequestParam(required = false) status: ConsultaStatus?,
+        @RequestParam(defaultValue = "1") page: Int,
+        @RequestParam(defaultValue = "20") pageSize: Int
+    ): ResponseEntity<AppointmentListResponse> {
+        val result = listAppointmentsUseCase.execute(status, page, pageSize)
+        return ResponseEntity.ok(result)
     }
 
     @PostMapping
@@ -54,8 +56,8 @@ class AppointmentController(
         @PathVariable id: UUID,
         @Valid @RequestBody request: UpdateAppointmentRequest
     ): ResponseEntity<AppointmentResponse> {
-        val userId = authentication.name
-        val appointment = updateAppointmentUseCase.execute(userId as UUID, id, request)
+        val userId = UUID.fromString(authentication.name)
+        val appointment = updateAppointmentUseCase.execute(userId, id, request)
         return ResponseEntity.ok(appointment)
     }
 
@@ -64,8 +66,8 @@ class AppointmentController(
         authentication: Authentication,
         @PathVariable id: UUID
     ): ResponseEntity<MessageResponse> {
-        val userId = authentication.name
-        val response = cancelAppointmentUseCase.execute(userId as UUID, id)
+        val userId = UUID.fromString(authentication.name)
+        val response = cancelAppointmentUseCase.execute(userId, id)
         return ResponseEntity.ok(response)
     }
 }
