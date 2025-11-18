@@ -41,6 +41,10 @@ class PrescriptionRepositoryAdapter(
         repository.deleteById(id)
     }
 
+    override fun deleteByPetId(petId: UUID) {
+        repository.deleteByPetId(petId)
+    }
+
     private fun PrescriptionEntity.toDomain(): Prescription {
         return Prescription(
             id = this.id,

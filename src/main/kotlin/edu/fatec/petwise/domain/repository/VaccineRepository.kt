@@ -18,4 +18,5 @@ interface VaccineRepository {
     fun countByPetIdAndVaccineType(petId: UUID, vaccineType: VaccineType): Long
     fun save(vaccine: Vaccine): Vaccine
     fun deleteById(id: UUID)
+    fun deleteByPetId(petId: UUID)
 }

@@ -1,6 +1,7 @@
 package edu.fatec.petwise.infrastructure.security
 
 import edu.fatec.petwise.domain.enums.UserType
+import edu.fatec.petwise.domain.repository.TokenBlacklistRepository
 import io.jsonwebtoken.Claims
 import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.SignatureAlgorithm
@@ -10,10 +11,13 @@ import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
 import java.util.*
+import java.util.UUID
 import javax.crypto.SecretKey
 
 @Service
-class JwtService {
+class JwtService(
+    private val tokenBlacklistRepository: TokenBlacklistRepository
+) {
 
     private val logger = LoggerFactory.getLogger(javaClass)
 
@@ -113,10 +117,40 @@ class JwtService {
             val now = Date()
             val expiration = claims.expiration ?: return false
             val type = claims["type"] as? String ?: return false
+
+            // Check if token is blacklisted
+            if (tokenBlacklistRepository.isTokenBlacklisted(token)) {
+                logger.warn("Token blacklisted: $token")
+                return false
+            }
+
             !expiration.before(now) && type == expectedType
         } catch (e: Exception) {
             logger.warn("Token inválido: ${e.message}")
             false
+        }
+    }
+
+    fun blacklistToken(token: String, userId: String, reason: String? = null) {
+        try {
+            val claims = extractAllClaims(token)
+            val expiresAt = claims.expiration?.toInstant()?.atZone(java.time.ZoneId.systemDefault())?.toLocalDateTime()
+                ?: throw IllegalArgumentException("Token sem data de expiração")
+
+            val tokenBlacklist = edu.fatec.petwise.domain.entity.TokenBlacklist(
+                id = null,
+                token = token,
+                userId = UUID.fromString(userId),
+                expiresAt = expiresAt,
+                blacklistedAt = java.time.LocalDateTime.now(),
+                reason = reason ?: "Logout"
+            )
+
+            tokenBlacklistRepository.save(tokenBlacklist)
+            logger.info("Token blacklisted for user: $userId")
+        } catch (e: Exception) {
+            logger.error("Erro ao fazer blacklist do token: ${e.message}")
+            throw e
         }
     }
 

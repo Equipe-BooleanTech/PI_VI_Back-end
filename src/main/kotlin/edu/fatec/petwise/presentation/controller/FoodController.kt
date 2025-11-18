@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*
 import java.util.UUID
 
 @RestController
-@RequestMapping("/foods")
+@RequestMapping("/api/foods")
 @CrossOrigin(origins = ["*"])
 class FoodController(
     private val createFoodUseCase: CreateFoodUseCase,

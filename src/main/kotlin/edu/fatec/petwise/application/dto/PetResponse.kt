@@ -6,6 +6,7 @@ import java.util.UUID
 
 data class PetResponse(
     val id: UUID?,
+    val ownerId: UUID,
     val name: String,
     val breed: String,
     val species: String,
@@ -28,6 +29,7 @@ data class PetResponse(
         fun fromEntity(pet: Pet): PetResponse {
             return PetResponse(
                 id = pet.id,
+                ownerId = pet.ownerId,
                 name = pet.name,
                 breed = pet.breed,
                 species = pet.species.name,

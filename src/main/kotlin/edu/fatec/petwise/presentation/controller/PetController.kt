@@ -33,10 +33,12 @@ class PetController(
 
     @GetMapping
     fun getAllPets(
+        authentication: Authentication,
         @RequestParam(defaultValue = "1") page: Int,
         @RequestParam(defaultValue = "20") pageSize: Int
     ): ResponseEntity<PetListResponse> {
-        val result = getAllPetsUseCase.execute(page, pageSize)
+        val userId = UUID.fromString(authentication.name)
+        val result = getAllPetsUseCase.execute(userId, page, pageSize)
         return ResponseEntity.ok(result)
     }
 
@@ -99,11 +101,13 @@ class PetController(
 
     @GetMapping("/search")
     fun searchPets(
+        authentication: Authentication,
         @RequestParam q: String,
         @RequestParam(defaultValue = "1") page: Int,
         @RequestParam(defaultValue = "20") pageSize: Int
     ): ResponseEntity<PetListResponse> {
-        val result = searchPetsUseCase.execute(q, page, pageSize)
+        val userId = UUID.fromString(authentication.name)
+        val result = searchPetsUseCase.execute(userId, q, page, pageSize)
         return ResponseEntity.ok(result)
     }
 

@@ -8,6 +8,7 @@ import edu.fatec.petwise.domain.enums.UserType
 import edu.fatec.petwise.domain.exception.BusinessRuleException
 import edu.fatec.petwise.domain.exception.DuplicateEntityException
 import edu.fatec.petwise.domain.exception.EntityNotFoundException
+import edu.fatec.petwise.domain.repository.TokenBlacklistRepository
 import edu.fatec.petwise.domain.repository.UserRepository
 import edu.fatec.petwise.domain.valueobject.Email
 import edu.fatec.petwise.domain.valueobject.Telefone
@@ -192,6 +193,39 @@ class LoginUserUseCase(
             userType = user.userType.name,
             expiresIn = jwtExpiration
         )
+    }
+
+    // 🔒 SEGURANÇA: Função para mascarar email nos logs
+    private fun maskEmail(email: String): String {
+        val parts = email.split("@")
+        if (parts.size != 2) return "***@***"
+
+        val localPart = parts[0]
+        val domain = parts[1]
+
+        val maskedLocal = if (localPart.length <= 2) {
+            "***"
+        } else {
+            localPart.take(2) + "***"
+        }
+
+        return "$maskedLocal@$domain"
+    }
+}
+
+@Service
+class LogoutUserUseCase(
+    private val jwtService: JwtService
+) {
+    private val logger = LoggerFactory.getLogger(javaClass)
+
+    fun execute(token: String, userId: String) {
+        logger.info("Logout solicitado para usuário: $userId")
+
+        // Blacklist the token to prevent further use
+        jwtService.blacklistToken(token, userId, "User logout")
+
+        logger.info("Token blacklisted com sucesso para usuário: $userId")
     }
 
     // 🔒 SEGURANÇA: Função para mascarar email nos logs

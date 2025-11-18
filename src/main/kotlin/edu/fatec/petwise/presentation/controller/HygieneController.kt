@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*
 import java.util.UUID
 
 @RestController
-@RequestMapping("/hygiene")
+@RequestMapping("/api/hygiene")
 @CrossOrigin(origins = ["*"])
 class HygieneController(
     private val createHygieneUseCase: CreateHygieneUseCase,

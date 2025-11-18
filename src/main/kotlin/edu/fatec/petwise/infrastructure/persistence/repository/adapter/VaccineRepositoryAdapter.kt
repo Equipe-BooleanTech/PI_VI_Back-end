@@ -57,6 +57,10 @@ class VaccineRepositoryAdapter(
         repository.deleteById(id)
     }
 
+    override fun deleteByPetId(petId: UUID) {
+        repository.deleteByPetId(petId)
+    }
+
     private fun VaccineEntity.toDomain(): Vaccine {
         return Vaccine(
             id = this.id,

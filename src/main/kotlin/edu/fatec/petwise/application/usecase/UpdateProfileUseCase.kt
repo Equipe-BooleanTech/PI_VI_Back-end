@@ -1,6 +1,7 @@
 package edu.fatec.petwise.application.usecase
 
 import edu.fatec.petwise.application.dto.UpdateProfileDto
+import edu.fatec.petwise.application.dto.UpdateProfileResponse
 import edu.fatec.petwise.application.dto.UserResponse
 import edu.fatec.petwise.domain.enums.UserType
 import edu.fatec.petwise.domain.exception.BusinessRuleException
@@ -19,7 +20,7 @@ class UpdateProfileUseCase(
 ) {
     private val logger = LoggerFactory.getLogger(javaClass)
 
-    fun execute(userId: UUID, request: UpdateProfileDto): UserResponse {
+    fun execute(userId: UUID, request: UpdateProfileDto): UpdateProfileResponse {
         logger.info("Atualizando perfil do usuário: $userId")
 
         val user = userRepository.findById(userId).orElseThrow { EntityNotFoundException("Usuário", userId) }
@@ -27,6 +28,8 @@ class UpdateProfileUseCase(
         if (!user.active) {
             throw BusinessRuleException("Usuário inativo não pode atualizar perfil")
         }
+
+        var requiresLogout = false
 
         request.fullName?.let { newName ->
             if (newName.isBlank()) {
@@ -42,6 +45,7 @@ class UpdateProfileUseCase(
                     throw DuplicateEntityException("Já existe um usuário cadastrado com este email")
                 }
                 user.email = Email(newEmail)
+                requiresLogout = true // Email change requires logout
                 logger.info("Email atualizado para usuário: $userId")
             }
         }
@@ -136,7 +140,7 @@ class UpdateProfileUseCase(
         val updatedUser = userRepository.save(user)
         logger.info("Perfil atualizado com sucesso para usuário: $userId")
 
-        return updatedUser.toResponse()
+        return UpdateProfileResponse.fromEntity(updatedUser, requiresLogout)
     }
 
     private fun maskEmail(email: String): String {

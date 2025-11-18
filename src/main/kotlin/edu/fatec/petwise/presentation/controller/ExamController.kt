@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.*
 import java.util.UUID
 
 @RestController
-@RequestMapping("/exams")
+@RequestMapping("/api/exams")
 @CrossOrigin(origins = ["*"])
 class ExamController(
     private val createExamUseCase: CreateExamUseCase,

@@ -10,4 +10,5 @@ interface JpaPrescriptionRepository: JpaRepository<PrescriptionEntity, UUID> {
     fun findByPetId(petId: UUID): List<PrescriptionEntity>
     fun findByUserId(userId: UUID): List<PrescriptionEntity>
     fun findByIdAndUserId(id: UUID, userId: UUID): PrescriptionEntity?
+    fun deleteByPetId(petId: UUID)
 }

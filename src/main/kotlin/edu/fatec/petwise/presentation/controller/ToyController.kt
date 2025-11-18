@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*
 import java.util.UUID
 
 @RestController
-@RequestMapping("/toys")
+@RequestMapping("/api/toys")
 @CrossOrigin(origins = ["*"])
 class ToyController(
     private val createToyUseCase: CreateToyUseCase,

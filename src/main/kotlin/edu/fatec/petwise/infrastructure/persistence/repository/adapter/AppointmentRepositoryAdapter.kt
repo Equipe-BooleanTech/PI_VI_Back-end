@@ -58,6 +58,7 @@ class AppointmentRepositoryAdapter(
         return saved.toDomain()
     }
     override fun deleteById(id: UUID) = repository.deleteById(id)
+    override fun deleteByPetId(petId: UUID) = repository.deleteByPetId(petId)
 
     private fun AppointmentEntity.toDomain(): Appointment = Appointment(
         id = this.id,

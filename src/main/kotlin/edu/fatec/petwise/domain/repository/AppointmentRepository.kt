@@ -18,4 +18,5 @@ interface AppointmentRepository {
     fun findByIdAndOwnerId(id: UUID, ownerId: UUID): Appointment?
     fun save(appointment: Appointment): Appointment
     fun deleteById(id: UUID)
+    fun deleteByPetId(petId: UUID)
 }

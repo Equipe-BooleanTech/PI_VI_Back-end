@@ -16,4 +16,5 @@ interface JpaVaccineRepository : JpaRepository<VaccineEntity, UUID> {
     fun findByVaccineType(vaccineType: VaccineType): List<VaccineEntity>
     fun findByPetIdAndVaccinationDateBetween(petId: UUID, startDate: LocalDateTime, endDate: LocalDateTime): List<VaccineEntity>
     fun countByPetIdAndVaccineType(petId: UUID, vaccineType: VaccineType): Long
+    fun deleteByPetId(petId: UUID)
 }

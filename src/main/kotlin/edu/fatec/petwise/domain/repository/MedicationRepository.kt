@@ -13,4 +13,5 @@ interface MedicationRepository {
     fun save(medication: Medication): Medication
     fun filterMedications(options: MedicationFilterOptions): List<Medication>
     fun deleteById(id: UUID)
+    fun deleteByPrescriptionId(prescriptionId: UUID)
 }

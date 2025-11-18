@@ -18,4 +18,5 @@ interface JpaExamRepository : JpaRepository<ExamEntity, UUID> {
         results: String,
         notes: String
     ): List<ExamEntity>
+    fun deleteByPetId(petId: UUID)
 }

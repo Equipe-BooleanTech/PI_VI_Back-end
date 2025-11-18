@@ -27,6 +27,7 @@ class ExamRepositoryAdapter(
     }
 
     override fun deleteById(id: UUID) = repository.deleteById(id)
+    override fun deleteByPetId(petId: UUID) = repository.deleteByPetId(petId)
 
     private fun ExamEntity.toDomain(): Exam = Exam(
         id = this.id,

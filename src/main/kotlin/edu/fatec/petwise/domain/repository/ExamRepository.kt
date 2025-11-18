@@ -19,4 +19,5 @@ interface ExamRepository {
     ): List<Exam>
     fun save(exam: Exam): Exam
     fun deleteById(id: UUID)
+    fun deleteByPetId(petId: UUID)
 }

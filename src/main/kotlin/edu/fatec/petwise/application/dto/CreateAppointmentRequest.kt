@@ -5,7 +5,7 @@ import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.NotNull
 import jakarta.validation.constraints.Size
 import java.time.LocalDateTime
-import com.fasterxml.jackson.annotation.JsonFormat
+import java.util.UUID
 
 data class CreateAppointmentRequest(
     @field:NotNull(message = "ID do pet é obrigatório")
@@ -23,7 +23,6 @@ data class CreateAppointmentRequest(
     val consultaType: ConsultaType,
 
     @field:NotNull(message = "Data da consulta é obrigatória")
-    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
     val consultaDate: LocalDateTime,
 
     @field:NotBlank(message = "Horário da consulta é obrigatório")

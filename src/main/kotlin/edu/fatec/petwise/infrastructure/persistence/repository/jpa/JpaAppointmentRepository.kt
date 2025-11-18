@@ -15,4 +15,5 @@ interface JpaAppointmentRepository : JpaRepository<AppointmentEntity, UUID> {
     fun findByStatus(status: ConsultaStatus): List<AppointmentEntity>
     fun findByStatus(status: ConsultaStatus, pageable: Pageable): Page<AppointmentEntity>
     fun findByIdAndOwnerId(id: UUID, ownerId: UUID): AppointmentEntity?
+    fun deleteByPetId(petId: UUID)
 }

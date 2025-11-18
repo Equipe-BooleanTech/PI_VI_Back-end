@@ -9,4 +9,5 @@ import java.util.UUID
 interface JpaMedicationRepository: JpaRepository<MedicationEntity, UUID> {
     fun findByUserId(userId: UUID): List<MedicationEntity>
     fun findByPrescriptionId(prescriptionId: UUID): List<MedicationEntity>
+    fun deleteByPrescriptionId(prescriptionId: UUID)
 }

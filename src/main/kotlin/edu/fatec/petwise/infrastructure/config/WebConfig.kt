@@ -9,6 +9,7 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import org.springframework.context.annotation.Configuration
 import org.springframework.http.converter.HttpMessageConverter
 import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder
+import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter
 import org.springframework.web.servlet.config.annotation.CorsRegistry
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
 import java.time.LocalDateTime
@@ -27,14 +28,9 @@ class WebConfig : WebMvcConfigurer {
     }
 
     override fun configureMessageConverters(converters: MutableList<HttpMessageConverter<*>>) {
-        val module = SimpleModule()
-        module.addDeserializer(LocalDateTime::class.java, LocalDateTimeDeserializer())
-
-        val objectMapper = Jackson2ObjectMapperBuilder.json()
-            .modules(JavaTimeModule(), module)
-            .build()
-
-        converters.add(0, org.springframework.http.converter.json.MappingJackson2HttpMessageConverter(objectMapper))
+        val builder = Jackson2ObjectMapperBuilder()
+            .modules(JavaTimeModule(), SimpleModule().addDeserializer(LocalDateTime::class.java, LocalDateTimeDeserializer()))
+        converters.add(MappingJackson2HttpMessageConverter(builder.build()))
     }
 }
 

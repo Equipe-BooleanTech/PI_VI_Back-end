@@ -12,4 +12,5 @@ interface PrescriptionRepository {
     fun findById(id: UUID): Optional<Prescription>
     fun save(prescription: Prescription): Prescription
     fun deleteById(id: UUID)
+    fun deleteByPetId(petId: UUID)
 }

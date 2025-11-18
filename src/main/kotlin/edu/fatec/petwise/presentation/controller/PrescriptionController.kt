@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*
 import java.util.UUID
 
 @RestController
-@RequestMapping("/vet")
+@RequestMapping("/api/vet")
 @CrossOrigin(origins = ["*"])
 class PrescriptionController(
     private val createPrescriptionUseCase: CreatePrescriptionUseCase,
