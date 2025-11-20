@@ -1,10 +1,10 @@
 package edu.fatec.petwise.presentation.controller
 
-
 import edu.fatec.petwise.application.dto.VaccineRequest
 import edu.fatec.petwise.application.dto.VaccineResponse
 import edu.fatec.petwise.application.usecase.CreateVaccineUseCase
 import edu.fatec.petwise.application.usecase.DeleteVaccineUseCase
+import edu.fatec.petwise.application.usecase.GetVaccinesByPetUseCase
 import edu.fatec.petwise.application.usecase.ListVaccinesUseCase
 import edu.fatec.petwise.application.usecase.UpdateVaccineUseCase
 import jakarta.validation.Valid
@@ -19,6 +19,7 @@ import java.util.UUID
 class VaccineController(
     private val createVaccineUseCase: CreateVaccineUseCase,
     private val listVaccinesUseCase: ListVaccinesUseCase,
+    private val getVaccinesByPetUseCase: GetVaccinesByPetUseCase,
     private val updateVaccineUseCase: UpdateVaccineUseCase,
     private val deleteVaccineUseCase: DeleteVaccineUseCase,
 ) {
@@ -67,4 +68,12 @@ class VaccineController(
         return ResponseEntity.noContent().build()
     }
 
+    @GetMapping("/pet/{petId}")
+    fun getVaccinesByPet(
+        authentication: Authentication,
+        @PathVariable petId: UUID
+    ): ResponseEntity<List<VaccineResponse>> {
+        val vaccines = getVaccinesByPetUseCase.execute(authentication, petId)
+        return ResponseEntity.ok(vaccines)
+    }
 }

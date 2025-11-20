@@ -9,6 +9,7 @@ interface MedicationRepository {
     fun existsById(id: UUID): Boolean
     fun findByUserId(userId: UUID): List<Medication>
     fun findByPrescriptionId(prescriptionId: UUID): List<Medication>
+    fun findByPetId(petId: UUID): List<Medication>
     fun findById(id: UUID): Optional<Medication>
     fun save(medication: Medication): Medication
     fun filterMedications(options: MedicationFilterOptions): List<Medication>

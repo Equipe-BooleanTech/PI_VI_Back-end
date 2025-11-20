@@ -1,3 +1,5 @@
+package edu.fatec.petwise.presentation.controller
+
 import edu.fatec.petwise.application.dto.HygieneResponse
 import edu.fatec.petwise.application.dto.HygieneRequest
 import edu.fatec.petwise.application.usecase.CreateHygieneUseCase
@@ -13,7 +15,6 @@ import java.util.UUID
 
 @RestController
 @RequestMapping("/api/hygiene")
-@CrossOrigin(origins = ["*"])
 class HygieneController(
     private val createHygieneUseCase: CreateHygieneUseCase,
     private val listHygieneUseCase: ListHygieneUseCase,
@@ -24,12 +25,11 @@ class HygieneController(
 
     @GetMapping
     fun listHygiene(
-        authentication: Authentication,
         @RequestParam(required = false) category: String?,
         @RequestParam(required = false) searchQuery: String?,
         @RequestParam(required = false, defaultValue = "true") activeOnly: Boolean
     ): ResponseEntity<List<HygieneResponse>> {
-        val hygiene = listHygieneUseCase.execute(authentication, category, searchQuery, activeOnly)
+        val hygiene = listHygieneUseCase.execute(category, searchQuery, activeOnly)
         return ResponseEntity.ok(hygiene)
     }
 
@@ -44,8 +44,7 @@ class HygieneController(
 
     @GetMapping("/{id}")
     fun getHygieneDetails(
-        @PathVariable id: UUID,
-        authentication: Authentication
+        @PathVariable id: UUID
     ): ResponseEntity<HygieneResponse> {
         val hygiene = getHygieneByIdUseCase.execute(id)
             ?: throw IllegalArgumentException("Produto de higiene não encontrado")

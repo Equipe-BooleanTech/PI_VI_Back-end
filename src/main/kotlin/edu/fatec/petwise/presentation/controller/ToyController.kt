@@ -1,3 +1,5 @@
+package edu.fatec.petwise.presentation.controller
+
 import edu.fatec.petwise.application.dto.ToyResponse
 import edu.fatec.petwise.application.dto.ToyRequest
 import edu.fatec.petwise.application.usecase.CreateToyUseCase
@@ -13,7 +15,6 @@ import java.util.UUID
 
 @RestController
 @RequestMapping("/api/toys")
-@CrossOrigin(origins = ["*"])
 class ToyController(
     private val createToyUseCase: CreateToyUseCase,
     private val listToyUseCase: ListToyUseCase,
@@ -24,12 +25,11 @@ class ToyController(
 
     @GetMapping
     fun listToys(
-        authentication: Authentication,
         @RequestParam(required = false) category: String?,
         @RequestParam(required = false) searchQuery: String?,
         @RequestParam(required = false, defaultValue = "true") activeOnly: Boolean
     ): ResponseEntity<List<ToyResponse>> {
-        val toys = listToyUseCase.execute(authentication, category, searchQuery, activeOnly)
+        val toys = listToyUseCase.execute(category, searchQuery, activeOnly)
         return ResponseEntity.ok(toys)
     }
 
@@ -44,8 +44,7 @@ class ToyController(
 
     @GetMapping("/{id}")
     fun getToyDetails(
-        @PathVariable id: UUID,
-        authentication: Authentication
+        @PathVariable id: UUID
     ): ResponseEntity<ToyResponse> {
         val toy = getToyByIdUseCase.execute(id)
             ?: throw IllegalArgumentException("Brinquedo não encontrado")

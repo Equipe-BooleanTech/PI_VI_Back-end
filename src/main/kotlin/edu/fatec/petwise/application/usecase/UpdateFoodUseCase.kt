@@ -1,3 +1,4 @@
+package edu.fatec.petwise.application.usecase
 import edu.fatec.petwise.application.dto.FoodResponse
 import edu.fatec.petwise.application.dto.FoodRequest
 import edu.fatec.petwise.domain.enums.UserType
@@ -6,7 +7,6 @@ import edu.fatec.petwise.domain.repository.UserRepository
 import org.springframework.security.core.Authentication
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
 import java.util.*
 
 @Service

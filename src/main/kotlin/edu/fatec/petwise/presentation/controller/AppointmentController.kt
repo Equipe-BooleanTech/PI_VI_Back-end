@@ -3,6 +3,7 @@ package edu.fatec.petwise.presentation.controller
 import edu.fatec.petwise.application.usecase.CancelAppointmentUseCase
 import edu.fatec.petwise.application.usecase.CreateAppointmentUseCase
 import edu.fatec.petwise.application.usecase.GetAppointmentDetailsUseCase
+import edu.fatec.petwise.application.usecase.GetAppointmentsByPetUseCase
 import edu.fatec.petwise.application.usecase.ListAppointmentsUseCase
 import edu.fatec.petwise.application.usecase.UpdateAppointmentUseCase
 import edu.fatec.petwise.application.dto.*
@@ -20,6 +21,7 @@ class AppointmentController(
     private val listAppointmentsUseCase: ListAppointmentsUseCase,
     private val createAppointmentUseCase: CreateAppointmentUseCase,
     private val getAppointmentDetailsUseCase: GetAppointmentDetailsUseCase,
+    private val getAppointmentsByPetUseCase: GetAppointmentsByPetUseCase,
     private val updateAppointmentUseCase: UpdateAppointmentUseCase,
     private val cancelAppointmentUseCase: CancelAppointmentUseCase
 ) {
@@ -69,5 +71,14 @@ class AppointmentController(
         val userId = UUID.fromString(authentication.name)
         val response = cancelAppointmentUseCase.execute(userId, id)
         return ResponseEntity.ok(response)
+    }
+
+    @GetMapping("/pet/{petId}")
+    fun getAppointmentsByPet(
+        authentication: Authentication,
+        @PathVariable petId: UUID
+    ): ResponseEntity<List<AppointmentResponse>> {
+        val appointments = getAppointmentsByPetUseCase.execute(authentication, petId)
+        return ResponseEntity.ok(appointments)
     }
 }

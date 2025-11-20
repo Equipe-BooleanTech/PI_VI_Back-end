@@ -4,6 +4,7 @@ import edu.fatec.petwise.application.dto.MedicationRequest
 import edu.fatec.petwise.application.dto.MedicationResponse
 import edu.fatec.petwise.application.usecase.CreateMedicationUseCase
 import edu.fatec.petwise.application.usecase.DeleteMedicationUseCase
+import edu.fatec.petwise.application.usecase.GetMedicationsByPetUseCase
 import edu.fatec.petwise.application.usecase.ListMedicationsUseCase
 import edu.fatec.petwise.application.usecase.UpdateMedicationUseCase
 import jakarta.validation.Valid
@@ -18,6 +19,7 @@ import java.util.UUID
 class MedicationController(
     private val createMedicationUseCase: CreateMedicationUseCase,
     private val listMedicationsUseCase: ListMedicationsUseCase,
+    private val getMedicationsByPetUseCase: GetMedicationsByPetUseCase,
     private val updateMedicationUseCase: UpdateMedicationUseCase,
     private val deleteMedicationUseCase: DeleteMedicationUseCase
 ) {
@@ -75,5 +77,14 @@ class MedicationController(
     ): ResponseEntity<Void> {
         deleteMedicationUseCase.execute(id)
         return ResponseEntity.noContent().build()
+    }
+
+    @GetMapping("/pet/{petId}")
+    fun getMedicationsByPet(
+        authentication: Authentication,
+        @PathVariable petId: UUID
+    ): ResponseEntity<List<MedicationResponse>> {
+        val medications = getMedicationsByPetUseCase.execute(authentication, petId)
+        return ResponseEntity.ok(medications)
     }
 }

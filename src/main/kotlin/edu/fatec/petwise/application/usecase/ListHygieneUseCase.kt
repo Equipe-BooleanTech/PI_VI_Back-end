@@ -3,7 +3,6 @@ package edu.fatec.petwise.application.usecase
 import edu.fatec.petwise.application.dto.HygieneResponse
 import edu.fatec.petwise.domain.repository.HygieneRepository
 import org.slf4j.LoggerFactory
-import org.springframework.security.core.Authentication
 import org.springframework.stereotype.Service
 
 @Service
@@ -12,7 +11,7 @@ class ListHygieneUseCase(
 ) {
     private val logger = LoggerFactory.getLogger(javaClass)
 
-    fun execute(authentication: Authentication, category: String?, searchQuery: String?, activeOnly: Boolean = true): List<HygieneResponse> {
+    fun execute(category: String?, searchQuery: String?, activeOnly: Boolean = true): List<HygieneResponse> {
         val hygiene = when {
             category != null && searchQuery != null -> {
                 hygieneRepository.findAll()

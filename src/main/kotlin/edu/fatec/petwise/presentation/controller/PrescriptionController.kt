@@ -4,6 +4,7 @@ package edu.fatec.petwise.presentation.controller
 import edu.fatec.petwise.application.dto.PrescriptionRequest
 import edu.fatec.petwise.application.dto.PrescriptionResponse
 import edu.fatec.petwise.application.usecase.CreatePrescriptionUseCase
+import edu.fatec.petwise.application.usecase.GetPrescriptionsByPetUseCase
 import edu.fatec.petwise.application.usecase.ListPrescriptionsUseCase
 import jakarta.validation.Valid
 import org.springframework.http.ResponseEntity
@@ -16,7 +17,8 @@ import java.util.UUID
 @CrossOrigin(origins = ["*"])
 class PrescriptionController(
     private val createPrescriptionUseCase: CreatePrescriptionUseCase,
-    private val listPrescriptionsUseCase: ListPrescriptionsUseCase
+    private val listPrescriptionsUseCase: ListPrescriptionsUseCase,
+    private val getPrescriptionsByPetUseCase: GetPrescriptionsByPetUseCase
 ) {
 
     @GetMapping("/prescriptions")
@@ -37,5 +39,14 @@ class PrescriptionController(
     ): ResponseEntity<PrescriptionResponse> {
         val prescription = createPrescriptionUseCase.execute(request, authentication)
         return ResponseEntity.ok(prescription)
+    }
+
+    @GetMapping("/prescriptions/pet/{petId}")
+    fun getPrescriptionsByPet(
+        authentication: Authentication,
+        @PathVariable petId: UUID
+    ): ResponseEntity<List<PrescriptionResponse>> {
+        val prescriptions = getPrescriptionsByPetUseCase.execute(authentication, petId)
+        return ResponseEntity.ok(prescriptions)
     }
 }

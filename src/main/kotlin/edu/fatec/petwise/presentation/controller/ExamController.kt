@@ -4,6 +4,7 @@ import edu.fatec.petwise.application.dto.ExamRequest
 import edu.fatec.petwise.application.dto.ExamResponse
 import edu.fatec.petwise.application.usecase.CreateExamUseCase
 import edu.fatec.petwise.application.usecase.DeleteExamUseCase
+import edu.fatec.petwise.application.usecase.GetExamsByPetUseCase
 import edu.fatec.petwise.application.usecase.ListExamsUseCase
 import edu.fatec.petwise.application.usecase.UpdateExamUseCase
 import edu.fatec.petwise.application.usecase.SearchExamsUseCase
@@ -11,6 +12,7 @@ import edu.fatec.petwise.domain.enums.UserType
 import edu.fatec.petwise.domain.repository.ExamRepository
 import edu.fatec.petwise.domain.repository.PetRepository
 import edu.fatec.petwise.domain.repository.UserRepository
+import io.swagger.v3.oas.annotations.Operation
 import jakarta.validation.Valid
 import org.springframework.http.ResponseEntity
 import org.springframework.security.core.Authentication
@@ -23,6 +25,7 @@ import java.util.UUID
 class ExamController(
     private val createExamUseCase: CreateExamUseCase,
     private val listExamsUseCase: ListExamsUseCase,
+    private val getExamsByPetUseCase: GetExamsByPetUseCase,
     private val updateExamUseCase: UpdateExamUseCase,
     private val deleteExamUseCase: DeleteExamUseCase,
     private val searchExamsUseCase: SearchExamsUseCase,
@@ -99,5 +102,15 @@ class ExamController(
     ): ResponseEntity<Void> {
         deleteExamUseCase.execute(id, authentication)
         return ResponseEntity.noContent().build()
+    }
+
+    @GetMapping("/pet/{petId}")
+    @Operation(summary = "Get exams by pet", description = "Retrieve all exams for a specific pet")
+    fun getExamsByPet(
+        authentication: Authentication,
+        @PathVariable petId: UUID
+    ): ResponseEntity<List<ExamResponse>> {
+        val exams = getExamsByPetUseCase.execute(authentication, petId)
+        return ResponseEntity.ok(exams)
     }
 }

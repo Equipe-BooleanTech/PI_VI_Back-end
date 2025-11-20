@@ -3,7 +3,6 @@ package edu.fatec.petwise.application.usecase
 import edu.fatec.petwise.application.dto.ToyResponse
 import edu.fatec.petwise.domain.repository.ToyRepository
 import org.slf4j.LoggerFactory
-import org.springframework.security.core.Authentication
 import org.springframework.stereotype.Service
 
 @Service
@@ -12,7 +11,7 @@ class ListToyUseCase(
 ) {
     private val logger = LoggerFactory.getLogger(javaClass)
 
-    fun execute(authentication: Authentication, category: String?, searchQuery: String?, activeOnly: Boolean = true): List<ToyResponse> {
+    fun execute(category: String?, searchQuery: String?, activeOnly: Boolean = true): List<ToyResponse> {
         val toys = when {
             category != null && searchQuery != null -> {
                 toyRepository.findAll()

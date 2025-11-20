@@ -30,6 +30,10 @@ class MedicationRepositoryAdapter(
         return repository.findByPrescriptionId(prescriptionId).map { it.toDomain() }
     }
 
+    override fun findByPetId(petId: UUID): List<Medication> {
+        return repository.findByPetId(petId).map { it.toDomain() }
+    }
+
     override fun save(medication: Medication): Medication {
         val entity = medication.toEntity()
         return repository.save(entity).toDomain()

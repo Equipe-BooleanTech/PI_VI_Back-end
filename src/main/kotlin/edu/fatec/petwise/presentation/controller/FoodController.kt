@@ -1,3 +1,6 @@
+package edu.fatec.petwise.presentation.controller
+
+import edu.fatec.petwise.application.usecase.UpdateFoodUseCase
 import edu.fatec.petwise.application.dto.FoodRequest
 import edu.fatec.petwise.application.dto.FoodResponse
 import edu.fatec.petwise.application.usecase.CreateFoodUseCase
@@ -12,7 +15,6 @@ import java.util.UUID
 
 @RestController
 @RequestMapping("/api/foods")
-@CrossOrigin(origins = ["*"])
 class FoodController(
     private val createFoodUseCase: CreateFoodUseCase,
     private val listFoodsUseCase: ListFoodsUseCase,
@@ -23,12 +25,11 @@ class FoodController(
 
     @GetMapping
     fun listFoods(
-        authentication: Authentication,
         @RequestParam(required = false) category: String?,
         @RequestParam(required = false) searchQuery: String?,
         @RequestParam(required = false, defaultValue = "true") activeOnly: Boolean
     ): ResponseEntity<List<FoodResponse>> {
-        val foods = listFoodsUseCase.execute(authentication, category, searchQuery, activeOnly)
+        val foods = listFoodsUseCase.execute(category, searchQuery, activeOnly)
         return ResponseEntity.ok(foods)
     }
 
@@ -43,8 +44,7 @@ class FoodController(
 
     @GetMapping("/{id}")
     fun getFoodDetails(
-        @PathVariable id: UUID,
-        authentication: Authentication
+        @PathVariable id: UUID
     ): ResponseEntity<FoodResponse> {
         val food = getFoodByIdUseCase.execute(id)
             ?: throw IllegalArgumentException("Alimento não encontrado")
