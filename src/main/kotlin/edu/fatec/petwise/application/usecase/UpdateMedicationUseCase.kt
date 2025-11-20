@@ -2,19 +2,30 @@ package edu.fatec.petwise.application.usecase
 
 import edu.fatec.petwise.application.dto.MedicationRequest
 import edu.fatec.petwise.application.dto.MedicationResponse
+import edu.fatec.petwise.domain.enums.UserType
 import edu.fatec.petwise.domain.repository.MedicationRepository
+import edu.fatec.petwise.domain.repository.UserRepository
 import org.springframework.stereotype.Service
+import org.springframework.security.core.Authentication
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.UUID
 
 @Service
 class UpdateMedicationUseCase(
-    private val medicationRepository: MedicationRepository
+    private val medicationRepository: MedicationRepository,
+    private val userRepository: UserRepository
 ) {
     private val formatter = DateTimeFormatter.ISO_LOCAL_DATE_TIME
 
-    fun execute(id: UUID, request: MedicationRequest): MedicationResponse {
+    fun execute(id: UUID, request: MedicationRequest, authentication: Authentication): MedicationResponse {
+        val userId = UUID.fromString(authentication.principal.toString())
+        val user = userRepository.findById(userId).orElseThrow { IllegalArgumentException("Usuário não encontrado") }
+
+        if (user.userType != UserType.PHARMACY) {
+            throw IllegalArgumentException("Apenas farmácias podem atualizar medicações")
+        }
+
         val existingMedication = medicationRepository.findById(id).orElseThrow { IllegalArgumentException("Medicação não encontrada") }
 
         if (request.endDate != null && request.startDate != null && request.endDate.isBefore(request.startDate)) {

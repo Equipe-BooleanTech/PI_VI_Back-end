@@ -30,8 +30,7 @@ class MedicationController(
         @RequestParam(required = false) petId: UUID?,
         @RequestParam(required = false) searchQuery: String?
     ): ResponseEntity<List<MedicationResponse>> {
-        val userId = UUID.fromString(authentication.principal.toString())
-        val medications = listMedicationsUseCase.execute(userId, petId, searchQuery)
+        val medications = listMedicationsUseCase.execute(authentication, petId, searchQuery)
         return ResponseEntity.ok(medications)
     }
 
@@ -40,8 +39,7 @@ class MedicationController(
         @Valid @RequestBody request: MedicationRequest,
         authentication: Authentication
     ): ResponseEntity<MedicationResponse> {
-        val userId = UUID.fromString(authentication.principal.toString())
-        val medication = createMedicationUseCase.execute(request, userId)
+        val medication = createMedicationUseCase.execute(request, authentication)
         return ResponseEntity.ok(medication)
     }
 
@@ -51,9 +49,8 @@ class MedicationController(
         @PathVariable id: UUID,
         authentication: Authentication
     ): ResponseEntity<MedicationResponse> {
-        val userId = UUID.fromString(authentication.principal.toString())
-        val medication = listMedicationsUseCase.execute(userId, null, null)
-            .firstOrNull { it.id == id }
+        val medications = listMedicationsUseCase.execute(authentication, null, null)
+        val medication = medications.firstOrNull { it.id == id }
             ?: throw IllegalArgumentException("Medicação não encontrada")
 
         return ResponseEntity.ok(medication)
@@ -66,7 +63,7 @@ class MedicationController(
         @Valid @RequestBody request: MedicationRequest,
         authentication: Authentication
     ): ResponseEntity<MedicationResponse> {
-        val medication = updateMedicationUseCase.execute(id, request)
+        val medication = updateMedicationUseCase.execute(id, request, authentication)
         return ResponseEntity.ok(medication)
     }
 
@@ -75,7 +72,7 @@ class MedicationController(
         @PathVariable id: UUID,
         authentication: Authentication
     ): ResponseEntity<Void> {
-        deleteMedicationUseCase.execute(id)
+        deleteMedicationUseCase.execute(id, authentication)
         return ResponseEntity.noContent().build()
     }
 

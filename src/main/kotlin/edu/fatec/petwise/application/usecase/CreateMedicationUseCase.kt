@@ -4,10 +4,13 @@ import edu.fatec.petwise.application.dto.MedicationRequest
 import edu.fatec.petwise.application.dto.MedicationResponse
 import edu.fatec.petwise.domain.entity.Medication
 import edu.fatec.petwise.domain.enums.MedicationStatus
+import edu.fatec.petwise.domain.enums.UserType
 import edu.fatec.petwise.domain.repository.MedicationRepository
 import edu.fatec.petwise.domain.repository.PrescriptionRepository
+import edu.fatec.petwise.domain.repository.UserRepository
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
+import org.springframework.security.core.Authentication
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.UUID
@@ -15,12 +18,20 @@ import java.util.UUID
 @Service
 class CreateMedicationUseCase(
     private val medicationRepository: MedicationRepository,
-    private val prescriptionRepository: PrescriptionRepository
+    private val prescriptionRepository: PrescriptionRepository,
+    private val userRepository: UserRepository
 ) {
     private val logger = LoggerFactory.getLogger(javaClass)
     private val formatter = DateTimeFormatter.ISO_LOCAL_DATE_TIME
 
-    fun execute(request: MedicationRequest, userId: UUID): MedicationResponse {
+    fun execute(request: MedicationRequest, authentication: Authentication): MedicationResponse {
+        val userId = UUID.fromString(authentication.principal.toString())
+        val user = userRepository.findById(userId).orElseThrow { IllegalArgumentException("Usuário não encontrado") }
+
+        if (user.userType != UserType.PHARMACY) {
+            throw IllegalArgumentException("Apenas farmácias podem criar medicações")
+        }
+
         val prescription = prescriptionRepository.findById(request.prescriptionId)
             ?: throw IllegalArgumentException("Prescrição não encontrada")
 
