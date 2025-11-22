@@ -18,7 +18,7 @@ class Prescription(
     var observations: String,
     var active: Boolean = true,
     val createdAt: LocalDateTime,
-    val updatedAt: LocalDateTime
+    var updatedAt: LocalDateTime
 ) {
     enum class PrescriptionStatus {
         ATIVA, EXPIRADA, CANCELADA

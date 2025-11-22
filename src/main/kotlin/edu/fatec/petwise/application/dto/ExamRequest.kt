@@ -5,6 +5,9 @@ import jakarta.validation.constraints.NotNull
 import java.time.LocalDateTime
 
 data class ExamRequest(
+    @field:NotBlank(message = "ID do pet é obrigatório")
+    val petId: String,
+
     @field:NotBlank(message = "Tipo de exame é obrigatório")
     val examType: String,
 

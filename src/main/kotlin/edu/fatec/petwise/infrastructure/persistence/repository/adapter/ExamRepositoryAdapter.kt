@@ -54,5 +54,10 @@ class ExamRepositoryAdapter(
         attachmentUrl = this.attachmentUrl,
         createdAt = this.createdAt,
         updatedAt = this.updatedAt
-    ).apply { id = this@toEntity.id }
+    ).apply { 
+        // Only set ID if it exists (for updates), otherwise let database generate it
+        if (this@toEntity.id != null) {
+            id = this@toEntity.id
+        }
+    }
 }

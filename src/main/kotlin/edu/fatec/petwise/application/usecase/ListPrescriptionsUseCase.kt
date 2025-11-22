@@ -49,8 +49,66 @@ class ListPrescriptionsUseCase(
                     }
                 }
             }
+            UserType.VETERINARY -> {
+                // VETERINARY users can see prescriptions they created or for any pet
+                when {
+                    petId != null && status != null -> {
+                        val allPrescriptions = prescriptionRepository.findByPetId(petId)
+                        val prescriptionStatus = try {
+                            Prescription.PrescriptionStatus.valueOf(status.uppercase())
+                        } catch (e: IllegalArgumentException) {
+                            throw IllegalArgumentException("Status inválido: $status")
+                        }
+                        allPrescriptions.filter { it.status == prescriptionStatus.name }
+                    }
+                    petId != null -> {
+                        prescriptionRepository.findByPetId(petId)
+                    }
+                    status != null -> {
+                        val allPrescriptions = prescriptionRepository.findAll()
+                        val prescriptionStatus = try {
+                            Prescription.PrescriptionStatus.valueOf(status.uppercase())
+                        } catch (e: IllegalArgumentException) {
+                            throw IllegalArgumentException("Status inválido: $status")
+                        }
+                        allPrescriptions.filter { it.status == prescriptionStatus.name }
+                    }
+                    else -> {
+                        prescriptionRepository.findAll()
+                    }
+                }
+            }
+            UserType.ADMIN -> {
+                // ADMIN users can see all prescriptions
+                when {
+                    petId != null && status != null -> {
+                        val allPrescriptions = prescriptionRepository.findByPetId(petId)
+                        val prescriptionStatus = try {
+                            Prescription.PrescriptionStatus.valueOf(status.uppercase())
+                        } catch (e: IllegalArgumentException) {
+                            throw IllegalArgumentException("Status inválido: $status")
+                        }
+                        allPrescriptions.filter { it.status == prescriptionStatus.name }
+                    }
+                    petId != null -> {
+                        prescriptionRepository.findByPetId(petId)
+                    }
+                    status != null -> {
+                        val allPrescriptions = prescriptionRepository.findAll()
+                        val prescriptionStatus = try {
+                            Prescription.PrescriptionStatus.valueOf(status.uppercase())
+                        } catch (e: IllegalArgumentException) {
+                            throw IllegalArgumentException("Status inválido: $status")
+                        }
+                        allPrescriptions.filter { it.status == prescriptionStatus.name }
+                    }
+                    else -> {
+                        prescriptionRepository.findAll()
+                    }
+                }
+            }
             else -> {
-                // Other users (VETERINARY, OWNER, ADMIN) see their own prescriptions
+                // Other users (OWNER) see prescriptions for their own pets
                 when {
                     petId != null && status != null -> {
                         val allPrescriptions = prescriptionRepository.findByPetId(petId)

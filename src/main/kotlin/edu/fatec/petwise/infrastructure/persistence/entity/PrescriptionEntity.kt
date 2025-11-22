@@ -9,6 +9,7 @@ import java.util.*
 @Table(name = "prescriptions")
 class PrescriptionEntity(
     @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
     var id: UUID? = null,
 
     @Column(name = "user_id", nullable = false)

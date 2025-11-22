@@ -18,7 +18,7 @@ class CreateExamUseCase(
     private val petRepository: PetRepository,
     private val userRepository: UserRepository
 ) {
-    fun execute(request: ExamRequest, authentication: Authentication, petId: UUID): ExamResponse {
+    fun execute(request: ExamRequest, authentication: Authentication): ExamResponse {
         val userId = UUID.fromString(authentication.principal.toString())
         val user = userRepository.findById(userId).orElseThrow { IllegalArgumentException("Usuário não encontrado") }
 
@@ -28,11 +28,12 @@ class CreateExamUseCase(
         }
 
         // Verifica se o pet existe
+        val petId = UUID.fromString(request.petId)
         val pet = petRepository.findById(petId).orElseThrow { IllegalArgumentException("Pet não encontrado") }
 
         // Cria o exame
         val exam = Exam(
-            id = UUID.randomUUID(),
+            id = null,
             petId = petId,
             veterinaryId = userId,
             examType = request.examType,

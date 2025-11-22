@@ -53,13 +53,10 @@ class ExamController(
 
         val exam = examRepository.findById(id).orElseThrow { IllegalArgumentException("Exame não encontrado") }
 
-        // Check permissions
         when (user.userType) {
             UserType.VETERINARY -> {
-                // Veterinarians can access any exam
             }
             UserType.OWNER -> {
-                // Owners can only access exams for their pets
                 val pet = petRepository.findById(exam.petId).orElseThrow { IllegalArgumentException("Pet não encontrado") }
                 if (pet.ownerId != userId) {
                     throw IllegalArgumentException("Acesso negado")
@@ -74,13 +71,11 @@ class ExamController(
     @PostMapping
     fun createExam(
         @Valid @RequestBody request: ExamRequest,
-        @RequestParam petId: UUID,
         authentication: Authentication
     ): ResponseEntity<ExamResponse> {
         val exam = createExamUseCase.execute(
             request = request,
-            authentication = authentication,
-            petId = petId
+            authentication = authentication
         )
         return ResponseEntity.ok(exam)
     }

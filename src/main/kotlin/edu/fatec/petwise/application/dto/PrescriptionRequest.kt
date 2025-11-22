@@ -28,3 +28,19 @@ data class PrescriptionRequest(
 
     val observations: String? = null
 )
+
+data class UpdatePrescriptionRequest(
+    val instructions: String? = null,
+
+    val diagnosis: String? = null,
+
+    val validUntil: LocalDateTime? = null,
+
+    val status: String? = null,
+
+    val medications: String? = null,
+
+    val observations: String? = null,
+
+    val active: Boolean? = null
+)
