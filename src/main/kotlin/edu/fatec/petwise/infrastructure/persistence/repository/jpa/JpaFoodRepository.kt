@@ -6,4 +6,6 @@ import org.springframework.stereotype.Repository
 import java.util.UUID
 
 @Repository
-interface JpaFoodRepository : JpaRepository<FoodEntity, UUID>
+interface JpaFoodRepository : JpaRepository<FoodEntity, UUID> {
+    fun findByUserId(userId: UUID): List<FoodEntity>
+}

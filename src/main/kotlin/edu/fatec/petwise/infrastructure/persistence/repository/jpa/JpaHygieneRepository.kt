@@ -6,4 +6,6 @@ import org.springframework.stereotype.Repository
 import java.util.UUID
 
 @Repository
-interface JpaHygieneRepository : JpaRepository<HygieneEntity, UUID>
+interface JpaHygieneRepository : JpaRepository<HygieneEntity, UUID> {
+    fun findByUserId(userId: UUID): List<HygieneEntity>
+}

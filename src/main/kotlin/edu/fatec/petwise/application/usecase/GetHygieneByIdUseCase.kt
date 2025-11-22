@@ -9,8 +9,8 @@ import java.util.UUID
 class GetHygieneByIdUseCase(
     private val hygieneRepository: HygieneRepository
 ) {
-    fun execute(id: UUID): HygieneResponse? {
+    fun execute(userId: UUID, id: UUID): HygieneResponse? {
         val hygiene = hygieneRepository.findById(id)
-        return if (hygiene.isPresent) HygieneResponse.fromEntity(hygiene.get()) else null
+        return if (hygiene.isPresent && hygiene.get().userId == userId) HygieneResponse.fromEntity(hygiene.get()) else null
     }
 }

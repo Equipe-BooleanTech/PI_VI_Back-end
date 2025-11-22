@@ -22,6 +22,10 @@ class DeleteHygieneUseCase(
 
         val hygiene = hygieneRepository.findById(id).orElseThrow { IllegalArgumentException("Produto de higiene não encontrado") }
 
+        if (hygiene.userId != userId) {
+            throw IllegalArgumentException("Produto de higiene não pertence ao usuário")
+        }
+
         hygieneRepository.deleteById(id)
     }
 }

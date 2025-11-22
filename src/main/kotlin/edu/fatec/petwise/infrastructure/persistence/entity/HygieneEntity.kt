@@ -11,6 +11,9 @@ class HygieneEntity(
     @GeneratedValue(strategy = GenerationType.UUID)
     var id: UUID? = null,
 
+    @Column(name = "user_id", nullable = false)
+    var userId: UUID,
+
     @Column(name = "name", nullable = false, length = 100)
     var name: String,
 

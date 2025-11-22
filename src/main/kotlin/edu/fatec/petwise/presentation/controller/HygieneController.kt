@@ -27,9 +27,11 @@ class HygieneController(
     fun listHygiene(
         @RequestParam(required = false) category: String?,
         @RequestParam(required = false) searchQuery: String?,
-        @RequestParam(required = false, defaultValue = "true") activeOnly: Boolean
+        @RequestParam(required = false, defaultValue = "true") activeOnly: Boolean,
+        authentication: Authentication
     ): ResponseEntity<List<HygieneResponse>> {
-        val hygiene = listHygieneUseCase.execute(category, searchQuery, activeOnly)
+        val userId = UUID.fromString(authentication.principal.toString())
+        val hygiene = listHygieneUseCase.execute(userId, category, searchQuery, activeOnly)
         return ResponseEntity.ok(hygiene)
     }
 
@@ -38,15 +40,18 @@ class HygieneController(
         @Valid @RequestBody request: HygieneRequest,
         authentication: Authentication
     ): ResponseEntity<HygieneResponse> {
-        val hygiene = createHygieneUseCase.execute(request)
+        val userId = UUID.fromString(authentication.principal.toString())
+        val hygiene = createHygieneUseCase.execute(userId, request)
         return ResponseEntity.ok(hygiene)
     }
 
     @GetMapping("/{id}")
     fun getHygieneDetails(
-        @PathVariable id: UUID
+        @PathVariable id: UUID,
+        authentication: Authentication
     ): ResponseEntity<HygieneResponse> {
-        val hygiene = getHygieneByIdUseCase.execute(id)
+        val userId = UUID.fromString(authentication.principal.toString())
+        val hygiene = getHygieneByIdUseCase.execute(userId, id)
             ?: throw IllegalArgumentException("Produto de higiene não encontrado")
 
         return ResponseEntity.ok(hygiene)

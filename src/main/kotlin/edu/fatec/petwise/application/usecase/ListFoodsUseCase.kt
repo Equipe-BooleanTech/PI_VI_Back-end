@@ -4,6 +4,7 @@ import edu.fatec.petwise.application.dto.FoodResponse
 import edu.fatec.petwise.domain.repository.FoodRepository
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
+import java.util.UUID
 
 @Service
 class ListFoodsUseCase(
@@ -11,24 +12,24 @@ class ListFoodsUseCase(
 ) {
     private val logger = LoggerFactory.getLogger(javaClass)
 
-    fun execute(category: String?, searchQuery: String?, activeOnly: Boolean = true): List<FoodResponse> {
+    fun execute(userId: UUID, category: String?, searchQuery: String?, activeOnly: Boolean = true): List<FoodResponse> {
         val foods = when {
             category != null && searchQuery != null -> {
-                foodRepository.findAll()
+                foodRepository.findByUserId(userId)
                     .filter { it.category == category && (!activeOnly || it.active) }
                     .filter { it.name.contains(searchQuery, ignoreCase = true) || it.brand.contains(searchQuery, ignoreCase = true) }
             }
             category != null -> {
-                foodRepository.findAll()
+                foodRepository.findByUserId(userId)
                     .filter { it.category == category && (!activeOnly || it.active) }
             }
             searchQuery != null -> {
-                foodRepository.findAll()
+                foodRepository.findByUserId(userId)
                     .filter { (!activeOnly || it.active) }
                     .filter { it.name.contains(searchQuery, ignoreCase = true) || it.brand.contains(searchQuery, ignoreCase = true) }
             }
             else -> {
-                foodRepository.findAll()
+                foodRepository.findByUserId(userId)
                     .filter { !activeOnly || it.active }
             }
         }

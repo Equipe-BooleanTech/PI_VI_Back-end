@@ -6,4 +6,6 @@ import org.springframework.stereotype.Repository
 import java.util.UUID
 
 @Repository
-interface JpaToyRepository: JpaRepository<ToyEntity, UUID>
+interface JpaToyRepository: JpaRepository<ToyEntity, UUID> {
+    fun findByUserId(userId: UUID): List<ToyEntity>
+}

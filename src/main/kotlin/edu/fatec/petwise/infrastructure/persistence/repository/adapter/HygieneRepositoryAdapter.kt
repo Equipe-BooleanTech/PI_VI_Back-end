@@ -21,8 +21,8 @@ class HygieneRepositoryAdapter(
         return repository.save(entity).toDomain()
     }
 
-    override fun findAll(): List<Hygiene> {
-        return repository.findAll().map { it.toDomain() }
+    override fun findByUserId(userId: UUID): List<Hygiene> {
+        return repository.findByUserId(userId).map { it.toDomain() }
     }
 
     override fun deleteById(id: UUID) {
@@ -32,6 +32,7 @@ class HygieneRepositoryAdapter(
     private fun HygieneEntity.toDomain(): Hygiene {
         return Hygiene(
             id = this.id,
+            userId = this.userId,
             name = this.name,
             brand = this.brand,
             category = this.category,
@@ -50,6 +51,7 @@ class HygieneRepositoryAdapter(
     private fun Hygiene.toEntity(): HygieneEntity {
         return HygieneEntity(
             id = this.id,
+            userId = this.userId,
             name = this.name,
             brand = this.brand,
             category = this.category,

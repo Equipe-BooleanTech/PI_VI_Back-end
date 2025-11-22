@@ -25,6 +25,10 @@ class UpdateToyUseCase(
 
         val existingToy = toyRepository.findById(id).orElseThrow { IllegalArgumentException("Brinquedo não encontrado") }
 
+        if (existingToy.userId != userId) {
+            throw IllegalArgumentException("Brinquedo não pertence ao usuário")
+        }
+
         existingToy.name = request.name
         existingToy.brand = request.brand
         existingToy.category = request.category

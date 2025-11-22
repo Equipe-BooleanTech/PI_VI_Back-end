@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
+import java.util.UUID
 
 @Service
 class CreateToyUseCase(
@@ -16,8 +17,8 @@ class CreateToyUseCase(
     private val logger = LoggerFactory.getLogger(javaClass)
     private val formatter = DateTimeFormatter.ISO_LOCAL_DATE_TIME
 
-    fun execute(request: ToyRequest): ToyResponse {
-        val existingToy = toyRepository.findAll()
+    fun execute(userId: UUID, request: ToyRequest): ToyResponse {
+        val existingToy = toyRepository.findByUserId(userId)
             .firstOrNull { it.name.equals(request.name, ignoreCase = true) && it.brand.equals(request.brand, ignoreCase = true) }
 
         if (existingToy != null) {
@@ -27,6 +28,7 @@ class CreateToyUseCase(
         val now = LocalDateTime.now()
         val toy = Toy(
             id = null,
+            userId = userId,
             name = request.name,
             brand = request.brand,
             category = request.category,

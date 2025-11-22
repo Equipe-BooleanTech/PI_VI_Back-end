@@ -9,8 +9,8 @@ import java.util.UUID
 class GetFoodByIdUseCase(
     private val foodRepository: FoodRepository
 ) {
-    fun execute(id: UUID): FoodResponse? {
+    fun execute(userId: UUID, id: UUID): FoodResponse? {
         val food = foodRepository.findById(id)
-        return if (food.isPresent) FoodResponse.fromEntity(food.get()) else null
+        return if (food.isPresent && food.get().userId == userId) FoodResponse.fromEntity(food.get()) else null
     }
 }

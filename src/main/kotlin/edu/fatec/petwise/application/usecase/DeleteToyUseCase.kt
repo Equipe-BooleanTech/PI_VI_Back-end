@@ -22,6 +22,10 @@ class DeleteToyUseCase(
 
         val toy = toyRepository.findById(id).orElseThrow { IllegalArgumentException("Brinquedo não encontrado") }
 
+        if (toy.userId != userId) {
+            throw IllegalArgumentException("Brinquedo não pertence ao usuário")
+        }
+
         toyRepository.deleteById(id)
     }
 }

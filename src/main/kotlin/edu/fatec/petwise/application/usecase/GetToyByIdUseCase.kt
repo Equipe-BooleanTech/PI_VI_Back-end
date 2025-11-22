@@ -9,8 +9,8 @@ import java.util.UUID
 class GetToyByIdUseCase(
     private val toyRepository: ToyRepository
 ) {
-    fun execute(id: UUID): ToyResponse? {
+    fun execute(userId: UUID, id: UUID): ToyResponse? {
         val toy = toyRepository.findById(id)
-        return if (toy.isPresent) ToyResponse.fromEntity(toy.get()) else null
+        return if (toy.isPresent && toy.get().userId == userId) ToyResponse.fromEntity(toy.get()) else null
     }
 }

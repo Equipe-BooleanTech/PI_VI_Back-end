@@ -7,6 +7,6 @@ import java.util.UUID
 interface ToyRepository {
     fun findById(id: UUID): Optional<Toy>
     fun save(toy: Toy): Toy
-    fun findAll(): List<Toy>
+    fun findByUserId(userId: UUID): List<Toy>
     fun deleteById(id: UUID)
 }

@@ -21,8 +21,8 @@ class ToyRepositoryAdapter(
         return repository.save(entity).toDomain()
     }
 
-    override fun findAll(): List<Toy> {
-        return repository.findAll().map { it.toDomain() }
+    override fun findByUserId(userId: UUID): List<Toy> {
+        return repository.findByUserId(userId).map { it.toDomain() }
     }
 
     override fun deleteById(id: UUID) {
@@ -32,6 +32,7 @@ class ToyRepositoryAdapter(
     private fun ToyEntity.toDomain(): Toy {
         return Toy(
             id = this.id,
+            userId = this.userId,
             name = this.name,
             brand = this.brand,
             category = this.category,
@@ -51,6 +52,7 @@ class ToyRepositoryAdapter(
     private fun Toy.toEntity(): ToyEntity {
         return ToyEntity(
             id = this.id,
+            userId = this.userId,
             name = this.name,
             brand = this.brand,
             category = this.category,

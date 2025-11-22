@@ -22,6 +22,10 @@ class DeleteFoodUseCase(
 
         val food = foodRepository.findById(id).orElseThrow { IllegalArgumentException("Alimento não encontrado") }
 
+        if (food.userId != userId) {
+            throw IllegalArgumentException("Alimento não pertence ao usuário")
+        }
+
         foodRepository.deleteById(id)
     }
 }

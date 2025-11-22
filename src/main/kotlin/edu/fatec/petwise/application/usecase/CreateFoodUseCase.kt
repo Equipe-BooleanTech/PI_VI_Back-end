@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
+import java.util.UUID
 
 @Service
 class CreateFoodUseCase(
@@ -16,8 +17,8 @@ class CreateFoodUseCase(
     private val logger = LoggerFactory.getLogger(javaClass)
     private val formatter = DateTimeFormatter.ISO_LOCAL_DATE_TIME
 
-    fun execute(request: FoodRequest): FoodResponse {
-        val existingFood = foodRepository.findAll()
+    fun execute(userId: UUID, request: FoodRequest): FoodResponse {
+        val existingFood = foodRepository.findByUserId(userId)
             .firstOrNull { it.name.equals(request.name, ignoreCase = true) && it.brand.equals(request.brand, ignoreCase = true) }
 
         if (existingFood != null) {
@@ -27,6 +28,7 @@ class CreateFoodUseCase(
         val now = LocalDateTime.now()
         val food = Food(
             id = null,
+            userId = userId,
             name = request.name,
             brand = request.brand,
             category = request.category,

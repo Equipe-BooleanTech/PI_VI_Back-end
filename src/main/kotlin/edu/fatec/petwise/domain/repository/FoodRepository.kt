@@ -7,6 +7,6 @@ import java.util.UUID
 interface FoodRepository {
     fun findById(id: UUID): Optional<Food>
     fun save(food: Food): Food
-    fun findAll(): List<Food>
+    fun findByUserId(userId: UUID): List<Food>
     fun deleteById(id: UUID)
 }

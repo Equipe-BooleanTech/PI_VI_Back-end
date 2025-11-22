@@ -25,6 +25,10 @@ class UpdateHygieneUseCase(
 
         val existingHygiene = hygieneRepository.findById(id).orElseThrow { IllegalArgumentException("Produto de higiene não encontrado") }
 
+        if (existingHygiene.userId != userId) {
+            throw IllegalArgumentException("Produto de higiene não pertence ao usuário")
+        }
+
         existingHygiene.name = request.name
         existingHygiene.brand = request.brand
         existingHygiene.category = request.category

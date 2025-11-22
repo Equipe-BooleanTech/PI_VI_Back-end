@@ -24,6 +24,10 @@ class UpdateFoodUseCase(
 
         val existingFood = foodRepository.findById(id).orElseThrow { IllegalArgumentException("Alimento não encontrado") }
 
+        if (existingFood.userId != userId) {
+            throw IllegalArgumentException("Alimento não pertence ao usuário")
+        }
+
         existingFood.name = request.name
         existingFood.brand = request.brand
         existingFood.category = request.category

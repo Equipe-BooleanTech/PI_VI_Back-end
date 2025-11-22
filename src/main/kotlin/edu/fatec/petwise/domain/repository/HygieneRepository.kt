@@ -7,6 +7,6 @@ import java.util.UUID
 interface HygieneRepository {
 	fun findById(id: UUID): Optional<Hygiene>
 	fun save(hygiene: Hygiene): Hygiene
-	fun findAll(): List<Hygiene>
+	fun findByUserId(userId: UUID): List<Hygiene>
 	fun deleteById(id: UUID)
 }

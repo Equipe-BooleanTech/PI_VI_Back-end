@@ -5,6 +5,7 @@ import java.util.UUID
 
 class Toy(
     var id: UUID? = null,
+    var userId: UUID,
     var name: String,
     var brand: String,
     var category: String,

@@ -27,9 +27,11 @@ class FoodController(
     fun listFoods(
         @RequestParam(required = false) category: String?,
         @RequestParam(required = false) searchQuery: String?,
-        @RequestParam(required = false, defaultValue = "true") activeOnly: Boolean
+        @RequestParam(required = false, defaultValue = "true") activeOnly: Boolean,
+        authentication: Authentication
     ): ResponseEntity<List<FoodResponse>> {
-        val foods = listFoodsUseCase.execute(category, searchQuery, activeOnly)
+        val userId = UUID.fromString(authentication.principal.toString())
+        val foods = listFoodsUseCase.execute(userId, category, searchQuery, activeOnly)
         return ResponseEntity.ok(foods)
     }
 
@@ -38,15 +40,18 @@ class FoodController(
         @Valid @RequestBody request: FoodRequest,
         authentication: Authentication
     ): ResponseEntity<FoodResponse> {
-        val food = createFoodUseCase.execute(request)
+        val userId = UUID.fromString(authentication.principal.toString())
+        val food = createFoodUseCase.execute(userId, request)
         return ResponseEntity.ok(food)
     }
 
     @GetMapping("/{id}")
     fun getFoodDetails(
-        @PathVariable id: UUID
+        @PathVariable id: UUID,
+        authentication: Authentication
     ): ResponseEntity<FoodResponse> {
-        val food = getFoodByIdUseCase.execute(id)
+        val userId = UUID.fromString(authentication.principal.toString())
+        val food = getFoodByIdUseCase.execute(userId, id)
             ?: throw IllegalArgumentException("Alimento não encontrado")
 
         return ResponseEntity.ok(food)

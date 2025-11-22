@@ -22,8 +22,8 @@ class FoodRepositoryAdapter(
         return repository.save(entity).toDomain()
     }
 
-    override fun findAll(): List<Food> {
-        return repository.findAll().map { it.toDomain() }
+    override fun findByUserId(userId: UUID): List<Food> {
+        return repository.findByUserId(userId).map { it.toDomain() }
     }
 
     override fun deleteById(id: UUID) {
@@ -33,6 +33,7 @@ class FoodRepositoryAdapter(
     private fun FoodEntity.toDomain(): Food {
         return Food(
             id = this.id,
+            userId = this.userId,
             name = this.name,
             brand = this.brand,
             category = this.category,
@@ -51,6 +52,7 @@ class FoodRepositoryAdapter(
     private fun Food.toEntity(): FoodEntity {
         return FoodEntity(
             id = this.id,
+            userId = this.userId,
             name = this.name,
             brand = this.brand,
             category = this.category,

@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
+import java.util.UUID
 
 @Service
 class CreateHygieneUseCase(
@@ -16,8 +17,8 @@ class CreateHygieneUseCase(
     private val logger = LoggerFactory.getLogger(javaClass)
     private val formatter = DateTimeFormatter.ISO_LOCAL_DATE_TIME
 
-    fun execute(request: HygieneRequest): HygieneResponse {
-        val existingHygiene = hygieneRepository.findAll()
+    fun execute(userId: UUID, request: HygieneRequest): HygieneResponse {
+        val existingHygiene = hygieneRepository.findByUserId(userId)
             .firstOrNull { it.name.equals(request.name, ignoreCase = true) && it.brand.equals(request.brand, ignoreCase = true) }
 
         if (existingHygiene != null) {
@@ -27,6 +28,7 @@ class CreateHygieneUseCase(
         val now = LocalDateTime.now()
         val hygiene = Hygiene(
             id = null,
+            userId = userId,
             name = request.name,
             brand = request.brand,
             category = request.category,

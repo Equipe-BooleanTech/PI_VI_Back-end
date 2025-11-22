@@ -27,9 +27,11 @@ class ToyController(
     fun listToys(
         @RequestParam(required = false) category: String?,
         @RequestParam(required = false) searchQuery: String?,
-        @RequestParam(required = false, defaultValue = "true") activeOnly: Boolean
+        @RequestParam(required = false, defaultValue = "true") activeOnly: Boolean,
+        authentication: Authentication
     ): ResponseEntity<List<ToyResponse>> {
-        val toys = listToyUseCase.execute(category, searchQuery, activeOnly)
+        val userId = UUID.fromString(authentication.principal.toString())
+        val toys = listToyUseCase.execute(userId, category, searchQuery, activeOnly)
         return ResponseEntity.ok(toys)
     }
 
@@ -38,15 +40,18 @@ class ToyController(
         @Valid @RequestBody request: ToyRequest,
         authentication: Authentication
     ): ResponseEntity<ToyResponse> {
-        val toy = createToyUseCase.execute(request)
+        val userId = UUID.fromString(authentication.principal.toString())
+        val toy = createToyUseCase.execute(userId, request)
         return ResponseEntity.ok(toy)
     }
 
     @GetMapping("/{id}")
     fun getToyDetails(
-        @PathVariable id: UUID
+        @PathVariable id: UUID,
+        authentication: Authentication
     ): ResponseEntity<ToyResponse> {
-        val toy = getToyByIdUseCase.execute(id)
+        val userId = UUID.fromString(authentication.principal.toString())
+        val toy = getToyByIdUseCase.execute(userId, id)
             ?: throw IllegalArgumentException("Brinquedo não encontrado")
 
         return ResponseEntity.ok(toy)
