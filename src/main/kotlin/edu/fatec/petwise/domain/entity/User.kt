@@ -6,57 +6,72 @@ import edu.fatec.petwise.domain.valueobject.Telefone
 import java.time.LocalDateTime
 import java.util.UUID
 
-data class User(
+class User(
     val id: UUID? = null,
-    var fullName: String,
-    var email: Email,
-    var phone: Telefone,
-    var passwordHash: String,
-    val userType: UserType,
-    var cpf: String? = null,
-    var crmv: String? = null,
-    var specialization: String? = null,
-    var cnpj: String? = null,
-    var companyName: String? = null,
-    val active: Boolean = true,
-    val createdAt: LocalDateTime = LocalDateTime.now(),
-    val updatedAt: LocalDateTime = LocalDateTime.now()
-) {
-    init {
-        require(fullName.isNotBlank()) { "Nome completo não pode estar vazio" }
-        
-        when (userType) {
-            UserType.OWNER -> {
-                require(!cpf.isNullOrBlank()) { "CPF é obrigatório para tutores" }
-                require(validateCpf(cpf!!)) { "CPF inválido" }
-            }
-            UserType.VETERINARY -> {
-                require(!crmv.isNullOrBlank()) { "CRMV é obrigatório para veterinários" }
-                require(!specialization.isNullOrBlank()) { "Especialização é obrigatória para veterinários" }
-            }
-            UserType.PHARMACY -> {
-                require(!cnpj.isNullOrBlank()) { "CNPJ é obrigatório para farmácias" }
-                require(!companyName.isNullOrBlank()) { "Nome da empresa é obrigatório para farmácias" }
-                require(validateCnpj(cnpj!!)) { "CNPJ inválido" }
-            }
-            UserType.ADMIN -> {}
-        }
-    }
 
-    fun deactivate(): User = this.copy(active = false, updatedAt = LocalDateTime.now())
+    var fullName: String,
+
+    var email: Email,
+
+    var phone: Telefone,
+
+    var passwordHash: String,
+
+    val userType: UserType,
+
+    var cpf: String? = null,
+
+    var crmv: String? = null,
+
+    var specialization: String? = null,
+
+    var cnpj: String? = null,
+
+    var companyName: String? = null,
+
+    var active: Boolean = true,
+
+    val createdAt: LocalDateTime = LocalDateTime.now(),
+
+    var updatedAt: LocalDateTime = LocalDateTime.now()
+) {
+    // Default constructor for JPA
+    constructor(): this(
+        id = null,
+        fullName = "",
+        email = edu.fatec.petwise.domain.valueobject.Email(""),
+        phone = edu.fatec.petwise.domain.valueobject.Telefone(""),
+        passwordHash = "",
+        userType = UserType.OWNER,
+        cpf = null,
+        crmv = null,
+        specialization = null,
+        cnpj = null,
+        companyName = null,
+        active = true,
+        createdAt = LocalDateTime.now(),
+        updatedAt = LocalDateTime.now()
+    )
+
+    fun deactivate(): User {
+        this.active = false
+        this.updatedAt = LocalDateTime.now()
+        return this
+    }
 
     fun update(
         fullName: String? = null,
         phone: Telefone? = null,
         specialization: String? = null,
         companyName: String? = null
-    ): User = this.copy(
-        fullName = fullName ?: this.fullName,
-        phone = phone ?: this.phone,
-        specialization = specialization ?: this.specialization,
-        companyName = companyName ?: this.companyName,
-        updatedAt = LocalDateTime.now()
-    )
+    ): User {
+        fullName?.let { this.fullName = it }
+        phone?.let { this.phone = it }
+        specialization?.let { this.specialization = it }
+        companyName?.let { this.companyName = it }
+        this.updatedAt = LocalDateTime.now()
+        return this
+    }
 
     fun isOwner() = userType == UserType.OWNER
     fun isVeterinary() = userType == UserType.VETERINARY
@@ -109,4 +124,6 @@ data class User(
             return if (remainder < 2) 0 else 11 - remainder
         }
     }
+
+    fun toResponse(): edu.fatec.petwise.application.dto.UserResponse = edu.fatec.petwise.application.dto.UserResponse.fromEntity(this)
 }

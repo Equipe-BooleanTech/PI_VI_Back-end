@@ -1,50 +1,54 @@
 package edu.fatec.petwise.application.dto
 
 import edu.fatec.petwise.domain.entity.Appointment
-import edu.fatec.petwise.domain.entity.AppointmentStatus
+import edu.fatec.petwise.domain.enums.ConsultaStatus
+import edu.fatec.petwise.domain.enums.ConsultaType
 import java.time.LocalDateTime
+import java.util.Optional
 import java.util.UUID
 
 data class AppointmentResponse(
-    val id: UUID,
+    val id: UUID?,
     val petId: UUID,
-    val petNome: String?,
-    val ownerId: UUID,
-    val veterinaryId: UUID,
-    val veterinaryNome: String?,
-    val appointmentDatetime: LocalDateTime,
-    val durationMinutes: Int,
-    val motivo: String,
-    val status: AppointmentStatus,
-    val observacoesCliente: String?,
-    val observacoesVeterinario: String?,
-    val valor: Double?,
+    val petName: String,
+    val veterinarianName: String,
+    val consultaType: ConsultaType,
+    val consultaDate: LocalDateTime,
+    val consultaTime: String,
+    val status: ConsultaStatus,
+    val symptoms: String = "",
+    val diagnosis: String = "",
+    val treatment: String = "",
+    val prescriptions: String = "",
+    val notes: String = "",
+    val nextAppointment: LocalDateTime? = null,
+    val price: Double = 0.0,
+    val isPaid: Boolean = false,
     val createdAt: LocalDateTime,
     val updatedAt: LocalDateTime
 ) {
     companion object {
-
-        fun fromEntity(
-            appointment: Appointment,
-            petNome: String? = null,
-            veterinaryNome: String? = null
-        ): AppointmentResponse {
+        fun fromEntity(appointment: Optional<Appointment>): AppointmentResponse {
+            val app = appointment.get()
             return AppointmentResponse(
-                id = UUID.fromString(appointment.id.toString()),
-                petId =  UUID.fromString(appointment.petId.toString()),
-                petNome = petNome,
-                ownerId = appointment.ownerId,
-                veterinaryId = appointment.veterinaryId,
-                veterinaryNome = veterinaryNome,
-                appointmentDatetime = appointment.appointmentDatetime,
-                durationMinutes = appointment.durationMinutes,
-                motivo = appointment.motivo,
-                status = appointment.status,
-                observacoesCliente = appointment.observacoesCliente,
-                observacoesVeterinario = appointment.observacoesVeterinario,
-                valor = appointment.valor,
-                createdAt = appointment.createdAt,
-                updatedAt = appointment.updatedAt
+                id = app.id,
+                petId = app.petId,
+                petName = app.petName,
+                veterinarianName = app.veterinarianName,
+                consultaType = app.consultaType,
+                consultaDate = app.consultaDate,
+                consultaTime = app.consultaTime,
+                status = app.status,
+                symptoms = app.symptoms,
+                diagnosis = app.diagnosis,
+                treatment = app.treatment,
+                prescriptions = app.prescriptions,
+                notes = app.notes,
+                nextAppointment = app.nextAppointment,
+                price = app.price,
+                isPaid = app.isPaid,
+                createdAt = app.createdAt,
+                updatedAt = app.updatedAt
             )
         }
     }

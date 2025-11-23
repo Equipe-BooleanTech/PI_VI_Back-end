@@ -1,59 +1,55 @@
 package edu.fatec.petwise.domain.entity
 
-import jakarta.persistence.*
-import java.time.LocalDate
+import edu.fatec.petwise.domain.enums.HealthStatus
+import edu.fatec.petwise.domain.enums.PetGender
+import edu.fatec.petwise.domain.enums.PetSpecies
+import kotlinx.serialization.Serializable
 import java.time.LocalDateTime
 import java.util.UUID
 
-@Entity
-@Table(name = "pets")
-data class Pet(
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    val id: UUID,
+class Pet(
+    var id: UUID? = null,
 
-    @Column(name = "owner_id", nullable = false)
     val ownerId: UUID,
 
-    @Column(nullable = false, length = 100)
-    var nome: String,
+    var name: String,
 
-    @Column(nullable = false, length = 50)
-    var especie: String,
+    var breed: String,
 
-    @Column(length = 100)
-    var raca: String? = null,
+    var species: PetSpecies,
 
-    @Column(length = 1)
-    var sexo: String? = null,
+    var gender: PetGender,
 
-    @Column(name = "data_nascimento")
-    var dataNascimento: LocalDate? = null,
+    var age: Int,
 
-    @Column
-    var peso: Double? = null,
+    var weight: Double,
 
-    @Column(length = 50)
-    var cor: String? = null,
+    var healthStatus: HealthStatus,
 
-    @Column(columnDefinition = "TEXT")
-    var observacoes: String? = null,
+    var ownerName: String,
 
-    @Column(name = "foto_url", length = 500)
-    var fotoUrl: String? = null,
+    var ownerPhone: String,
 
-    @Column(nullable = false)
-    var ativo: Boolean = true,
+    var birthDate: LocalDateTime? = null,
 
-    @Column(name = "created_at", nullable = false, updatable = false)
-    val createdAt: LocalDateTime = LocalDateTime.now(),
+    var healthHistory: String = "",
 
-    @Column(name = "updated_at", nullable = false)
-    var updatedAt: LocalDateTime = LocalDateTime.now()
-) {
+    var profileImageUrl: String? = null,
 
-    @PreUpdate
-    fun onUpdate() {
-        updatedAt = LocalDateTime.now()
-    }
-}
+    var isFavorite: Boolean = false,
+
+    var nextAppointment: LocalDateTime? = null,
+
+    var active: Boolean = true,
+
+    val createdAt: LocalDateTime,
+
+    var updatedAt: LocalDateTime
+)
+
+data class PetFilterOptions(
+    val species: PetSpecies? = null,
+    val healthStatus: HealthStatus? = null,
+    val favoritesOnly: Boolean = false,
+    val searchQuery: String = ""
+)

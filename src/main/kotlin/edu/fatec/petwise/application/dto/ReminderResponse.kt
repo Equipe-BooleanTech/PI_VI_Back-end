@@ -1,7 +1,6 @@
 package edu.fatec.petwise.application.dto
 
 import java.time.LocalDateTime
-import java.util.UUID
 
 enum class ReminderType {
     CONSULTA_PROXIMA,      // Consulta se aproximando
@@ -17,13 +16,13 @@ enum class ReminderPriority {
     URGENTE
 }
 data class ReminderResponse(
-    val id: UUID,
+    val id: String,
     val tipo: ReminderType,
     val titulo: String,
     val mensagem: String,
     val dataHora: LocalDateTime,
     val prioridade: ReminderPriority,
-    val petId: UUID? = null,
+    val petId: String? = null,
     val petNome: String? = null,
     val icone: String,
     val cor: String,

@@ -1,0 +1,38 @@
+package edu.fatec.petwise.application.usecase
+
+import edu.fatec.petwise.application.dto.PetListResponse
+import edu.fatec.petwise.application.dto.PetResponse
+import edu.fatec.petwise.domain.repository.PetRepository
+import edu.fatec.petwise.domain.repository.UserRepository
+import org.slf4j.LoggerFactory
+import org.springframework.stereotype.Service
+import java.util.UUID
+
+@Service
+class SearchPetsUseCase(
+    private val petRepository: PetRepository,
+    private val userRepository: UserRepository
+) {
+    private val logger = LoggerFactory.getLogger(javaClass)
+
+    fun execute(userId: UUID, query: String, page: Int, pageSize: Int): PetListResponse {
+        val user = userRepository.findById(userId).orElseThrow { Exception("User not found") }
+        
+        val pets = if (user.userType.name == "OWNER") {
+            // For owners, search only their own pets
+            petRepository.searchByNameAndOwnerId(query, userId)
+        } else {
+            // For other user types, search all pets
+            petRepository.searchByName(query)
+        }
+
+        logger.info("Busca por '$query' retornou ${pets.size} pets para usuário $userId (tipo: ${user.userType})")
+
+        return PetListResponse(
+            pets = pets.map { PetResponse.fromEntity(it) },
+            total = pets.size,
+            page = 1,
+            pageSize = pets.size
+        )
+    }
+}

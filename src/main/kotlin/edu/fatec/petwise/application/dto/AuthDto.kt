@@ -60,18 +60,4 @@ data class AuthResponse(
 )
 
 
-data class UserResponse(
-    val id: String,
-    val fullName: String,
-    val email: String,
-    val phone: String,
-    val userType: String,
-    val cpf: String? = null,
-    val crmv: String? = null,
-    val specialization: String? = null,
-    val cnpj: String? = null,
-    val companyName: String? = null,
-    val active: Boolean,
-    val createdAt: String,
-    val updatedAt: String
-)
+// `UserResponse` is declared in its own file `UserResponse.kt` to be shared across DTOs

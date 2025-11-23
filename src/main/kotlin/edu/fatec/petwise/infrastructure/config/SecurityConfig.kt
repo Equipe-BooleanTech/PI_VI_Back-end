@@ -47,19 +47,26 @@ class SecurityConfig(
                 auth
                     .requestMatchers("/api/auth/register",
                         "/api/auth/login",
+                        "/api/auth/forgot-password",
+                        "/api/auth/reset-password",
                         "/v3/api-docs/**",
                         "/swagger-ui/**",
                         "/swagger-ui.html"
                     ).permitAll()
+                    .requestMatchers("/api/auth/profile").hasAnyRole(
+                        "OWNER", "VETERINARY", "PETSHOP", "PHARMACY"
+                    )
                     .requestMatchers(
                         HttpMethod.GET,
                         "/api/pets/**"
-                    ).permitAll()
+                    ).hasAnyRole(
+                        "OWNER", "VETERINARY", "PETSHOP", "PHARMACY"
+                    )
                     .requestMatchers(
                         HttpMethod.POST,
                         "/api/pets/**"
                     ).hasAnyRole(
-                        "OWNER", "ADMIN"
+                        "OWNER"
                     )
                     .requestMatchers(
                         HttpMethod.PUT,
@@ -71,22 +78,82 @@ class SecurityConfig(
                         HttpMethod.DELETE,
                         "/api/pets/**"
                     ).hasAnyRole(
-                        "OWNER", "ADMIN"
+                        "OWNER",
+                    )
+                    .requestMatchers(
+                        HttpMethod.GET,
+                        "/api/appointments/pet/**"
+                    ).hasAnyRole(
+                        "OWNER"
                     )
                     .requestMatchers(
                         "/api/appointments/**"
                     ).hasAnyRole(
-                        "OWNER", "ADMIN", "VETERINARY"
+                        "VETERINARY"
+                    )
+                    .requestMatchers(
+                        HttpMethod.GET,
+                        "/api/medications/pet/**"
+                    ).hasAnyRole(
+                        "OWNER"
                     )
                     .requestMatchers(
                         "/api/medications/**"
                     ).hasAnyRole(
-                        "OWNER", "ADMIN", "VETERINARY"
+                        "VETERINARY"
+                    )
+                    .requestMatchers(
+                        HttpMethod.GET,
+                        "/api/vaccines/pet/**"
+                    ).hasAnyRole(
+                        "OWNER"
                     )
                     .requestMatchers(
                         "/api/vaccines/**"
                     ).hasAnyRole(
-                        "OWNER", "ADMIN", "VETERINARY"
+                        "VETERINARY"
+                    )
+                    .requestMatchers(
+                        HttpMethod.GET,
+                        "/api/exams/pet/**"
+                    ).hasAnyRole(
+                        "OWNER"
+                    )
+                    .requestMatchers(
+                        "/api/exams/**"
+                    ).hasAnyRole(
+                        "VETERINARY"
+                    )
+                    .requestMatchers(
+                        HttpMethod.GET,
+                        "/api/vet/prescriptions/pet/**"
+                    ).hasAnyRole(
+                        "OWNER"
+                    )
+                    .requestMatchers(
+                        "/api/vet/prescriptions/**"
+                    ).hasAnyRole(
+                        "VETERINARY"
+                    )
+                    .requestMatchers(
+                        "/api/foods/**"
+                    ).hasAnyRole(
+                       "PETSHOP"
+                    )
+                    .requestMatchers(
+                        "/api/hygiene/**"
+                    ).hasAnyRole(
+                        "PETSHOP"
+                    )
+                    .requestMatchers(
+                        "/api/toys/**"
+                    ).hasAnyRole(
+                        "PETSHOP"
+                    )
+                    .requestMatchers(
+                        "/api/labs/**"
+                    ).hasAnyRole(
+                        "VETERINARY"
                     )
                     .anyRequest().authenticated()
             }

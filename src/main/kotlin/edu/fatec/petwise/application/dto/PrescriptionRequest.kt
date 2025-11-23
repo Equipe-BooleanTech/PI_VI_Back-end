@@ -1,30 +1,46 @@
-package com.petwise.dto
+package edu.fatec.petwise.application.dto
 
-import com.fasterxml.jackson.annotation.JsonFormat
 import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.NotNull
-import jakarta.validation.constraints.Future
 import java.time.LocalDateTime
+import java.util.UUID
 
 data class PrescriptionRequest(
     @field:NotNull(message = "Pet ID é obrigatório")
-    val petId: Long,
-    
-    @field:NotBlank(message = "Veterinário é obrigatório")
-    val veterinarian: String,
-    
-    val medicalRecordId: Long? = null,
-    
+    val petId: UUID,
+
+    @field:NotNull(message = "Veterinário é obrigatório")
+    val veterinarian: UUID,
+
+    val medicalRecordId: UUID? = null,
+
     @field:NotNull(message = "Data da prescrição é obrigatória")
-    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
-    val prescriptionDate: LocalDateTime = LocalDateTime.now(),
-    
+    val prescriptionDate: LocalDateTime,
+
     @field:NotBlank(message = "Instruções são obrigatórias")
     val instructions: String,
-    
+
     val diagnosis: String? = null,
-    
-    @field:Future(message = "Data de validade deve ser futura")
-    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
-    val validUntil: LocalDateTime? = null
+
+    val validUntil: LocalDateTime? = null,
+
+    val medications: String? = null,
+
+    val observations: String? = null
+)
+
+data class UpdatePrescriptionRequest(
+    val instructions: String? = null,
+
+    val diagnosis: String? = null,
+
+    val validUntil: LocalDateTime? = null,
+
+    val status: String? = null,
+
+    val medications: String? = null,
+
+    val observations: String? = null,
+
+    val active: Boolean? = null
 )

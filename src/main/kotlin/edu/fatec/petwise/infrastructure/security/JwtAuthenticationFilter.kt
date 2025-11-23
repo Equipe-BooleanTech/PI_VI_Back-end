@@ -22,7 +22,11 @@ class JwtAuthenticationFilter(
         val path = request.requestURI
 
         // 🔒 Ignora rotas públicas e do Swagger/OpenAPI
-        if (path.startsWith("/api/auth/") ||
+        if (path == "/api/auth/register" ||
+            path == "/api/auth/login" ||
+            path == "/api/auth/forgot-password" ||
+            path == "/api/auth/reset-password" ||
+            path == "/api/auth/refresh-token" ||
             path.startsWith("/v3/api-docs") ||
             path.startsWith("/swagger-ui") ||
             path.startsWith("/swagger-ui.html") ||

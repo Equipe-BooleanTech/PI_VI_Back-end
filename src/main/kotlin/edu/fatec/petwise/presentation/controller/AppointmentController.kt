@@ -1,35 +1,39 @@
 package edu.fatec.petwise.presentation.controller
 
-import edu.fatec.petwise.application.dto.AppointmentResponse
-import edu.fatec.petwise.application.dto.CreateAppointmentRequest
-import edu.fatec.petwise.application.dto.MessageResponse
-import edu.fatec.petwise.application.dto.UpdateAppointmentRequest
-import edu.fatec.petwise.application.usecase.*
-import edu.fatec.petwise.domain.entity.AppointmentStatus
+import edu.fatec.petwise.application.usecase.CancelAppointmentUseCase
+import edu.fatec.petwise.application.usecase.CreateAppointmentUseCase
+import edu.fatec.petwise.application.usecase.GetAppointmentDetailsUseCase
+import edu.fatec.petwise.application.usecase.GetAppointmentsByPetUseCase
+import edu.fatec.petwise.application.usecase.ListAppointmentsUseCase
+import edu.fatec.petwise.application.usecase.UpdateAppointmentUseCase
+import edu.fatec.petwise.application.dto.*
+import edu.fatec.petwise.domain.enums.ConsultaStatus
 import jakarta.validation.Valid
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.security.core.Authentication
 import org.springframework.web.bind.annotation.*
+import java.util.UUID
 
 @RestController
 @RequestMapping("/api/appointments")
 class AppointmentController(
-    private val listUserAppointmentsUseCase: ListUserAppointmentsUseCase,
+    private val listAppointmentsUseCase: ListAppointmentsUseCase,
     private val createAppointmentUseCase: CreateAppointmentUseCase,
     private val getAppointmentDetailsUseCase: GetAppointmentDetailsUseCase,
+    private val getAppointmentsByPetUseCase: GetAppointmentsByPetUseCase,
     private val updateAppointmentUseCase: UpdateAppointmentUseCase,
     private val cancelAppointmentUseCase: CancelAppointmentUseCase
 ) {
 
     @GetMapping
     fun listAppointments(
-        authentication: Authentication,
-        @RequestParam(required = false) status: AppointmentStatus?
-    ): ResponseEntity<List<AppointmentResponse>> {
-        val userId = authentication.name
-        val appointments = listUserAppointmentsUseCase.execute(userId, status)
-        return ResponseEntity.ok(appointments)
+        @RequestParam(required = false) status: ConsultaStatus?,
+        @RequestParam(defaultValue = "1") page: Int,
+        @RequestParam(defaultValue = "20") pageSize: Int
+    ): ResponseEntity<AppointmentListResponse> {
+        val result = listAppointmentsUseCase.execute(status, page, pageSize)
+        return ResponseEntity.ok(result)
     }
 
     @PostMapping
@@ -37,29 +41,24 @@ class AppointmentController(
         authentication: Authentication,
         @Valid @RequestBody request: CreateAppointmentRequest
     ): ResponseEntity<AppointmentResponse> {
-        val userId = authentication.name
+        val userId = UUID.fromString(authentication.name)
         val appointment = createAppointmentUseCase.execute(userId, request)
         return ResponseEntity.status(HttpStatus.CREATED).body(appointment)
     }
 
     @GetMapping("/{id}")
-    fun getAppointmentDetails(
-        authentication: Authentication,
-        @PathVariable id: String
-    ): ResponseEntity<AppointmentResponse> {
-        val userId = authentication.name
-        val appointment = getAppointmentDetailsUseCase.execute(userId, id)
+    fun getAppointmentDetails(@PathVariable id: UUID): ResponseEntity<AppointmentResponse> {
+        val appointment = getAppointmentDetailsUseCase.execute(id)
         return ResponseEntity.ok(appointment)
     }
-    
 
     @PutMapping("/{id}")
     fun updateAppointment(
         authentication: Authentication,
-        @PathVariable id: String,
+        @PathVariable id: UUID,
         @Valid @RequestBody request: UpdateAppointmentRequest
     ): ResponseEntity<AppointmentResponse> {
-        val userId = authentication.name
+        val userId = UUID.fromString(authentication.name)
         val appointment = updateAppointmentUseCase.execute(userId, id, request)
         return ResponseEntity.ok(appointment)
     }
@@ -67,10 +66,19 @@ class AppointmentController(
     @DeleteMapping("/{id}")
     fun cancelAppointment(
         authentication: Authentication,
-        @PathVariable id: String
+        @PathVariable id: UUID
     ): ResponseEntity<MessageResponse> {
-        val userId = authentication.name
+        val userId = UUID.fromString(authentication.name)
         val response = cancelAppointmentUseCase.execute(userId, id)
         return ResponseEntity.ok(response)
+    }
+
+    @GetMapping("/pet/{petId}")
+    fun getAppointmentsByPet(
+        authentication: Authentication,
+        @PathVariable petId: UUID
+    ): ResponseEntity<List<AppointmentResponse>> {
+        val appointments = getAppointmentsByPetUseCase.execute(authentication, petId)
+        return ResponseEntity.ok(appointments)
     }
 }

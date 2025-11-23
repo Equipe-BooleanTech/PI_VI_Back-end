@@ -1,6 +1,7 @@
 package edu.fatec.petwise.application.usecase
 
 import edu.fatec.petwise.application.dto.UpdateProfileDto
+import edu.fatec.petwise.application.dto.UpdateProfileResponse
 import edu.fatec.petwise.application.dto.UserResponse
 import edu.fatec.petwise.domain.enums.UserType
 import edu.fatec.petwise.domain.exception.BusinessRuleException
@@ -19,15 +20,16 @@ class UpdateProfileUseCase(
 ) {
     private val logger = LoggerFactory.getLogger(javaClass)
 
-    fun execute(userId: String, request: UpdateProfileDto): UserResponse {
+    fun execute(userId: UUID, request: UpdateProfileDto): UpdateProfileResponse {
         logger.info("Atualizando perfil do usuário: $userId")
 
-        val user = userRepository.findById(UUID.fromString(userId))
-            ?: throw EntityNotFoundException("Usuário", userId)
+        val user = userRepository.findById(userId).orElseThrow { EntityNotFoundException("Usuário", userId) }
 
         if (!user.active) {
             throw BusinessRuleException("Usuário inativo não pode atualizar perfil")
         }
+
+        var requiresLogout = false
 
         request.fullName?.let { newName ->
             if (newName.isBlank()) {
@@ -43,6 +45,7 @@ class UpdateProfileUseCase(
                     throw DuplicateEntityException("Já existe um usuário cadastrado com este email")
                 }
                 user.email = Email(newEmail)
+                requiresLogout = true // Email change requires logout
                 logger.info("Email atualizado para usuário: $userId")
             }
         }
@@ -105,9 +108,29 @@ class UpdateProfileUseCase(
                 }
             }
 
+            UserType.PETSHOP -> {
+                request.cnpj?.let { newCnpj ->
+                    val cleanCnpj = newCnpj.replace(Regex("[^0-9]"), "")
+                    if (cleanCnpj != user.cnpj) {
+                        if (userRepository.existsByCnpj(cleanCnpj)) {
+                            throw DuplicateEntityException("Já existe um petshop cadastrado com este CNPJ")
+                        }
+                        user.cnpj = cleanCnpj
+                        logger.info("CNPJ atualizado para usuário: $userId")
+                    }
+                }
+
+                request.companyName?.let { newCompanyName ->
+                    if (newCompanyName.isBlank()) {
+                        throw BusinessRuleException("Nome da empresa não pode ser vazio")
+                    }
+                    user.companyName = newCompanyName.trim()
+                }
+            }
+
             UserType.ADMIN -> {
                 if (request.cpf != null || request.crmv != null ||
-                    request.cnpj != null || request.companyName != null || 
+                    request.cnpj != null || request.companyName != null ||
                     request.specialization != null) {
                     throw BusinessRuleException("Admin não pode atualizar campos específicos de outros tipos")
                 }
@@ -117,7 +140,7 @@ class UpdateProfileUseCase(
         val updatedUser = userRepository.save(user)
         logger.info("Perfil atualizado com sucesso para usuário: $userId")
 
-        return updatedUser.toResponse()
+        return UpdateProfileResponse.fromEntity(updatedUser, requiresLogout)
     }
 
     private fun maskEmail(email: String): String {

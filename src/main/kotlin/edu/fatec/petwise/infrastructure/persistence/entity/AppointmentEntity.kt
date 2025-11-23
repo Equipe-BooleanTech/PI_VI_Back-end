@@ -19,12 +19,18 @@ class AppointmentEntity(
     @Column(nullable = false, name = "owner_id")
     var ownerId: UUID,
     
+    @Column(nullable = false, name = "pet_name", length = 100)
+    var petName: String,
+    
+    @Column(nullable = false, name = "veterinarian_name", length = 100)
+    var veterinarianName: String,
+    
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, name = "consulta_type")
     var consultaType: ConsultaType,
     
     @Column(nullable = false, name = "consulta_date")
-    var consultaDate: String,
+    var consultaDate: LocalDateTime,
     
     @Column(nullable = false, name = "consulta_time")
     var consultaTime: String,
@@ -49,10 +55,10 @@ class AppointmentEntity(
     var notes: String = "",
     
     @Column(name = "next_appointment")
-    var nextAppointment: String? = null,
+    var nextAppointment: LocalDateTime? = null,
     
     @Column(nullable = false)
-    var price: Float = 0f,
+    var price: Double = 0.0,
     
     @Column(nullable = false, name = "is_paid")
     var isPaid: Boolean = false,

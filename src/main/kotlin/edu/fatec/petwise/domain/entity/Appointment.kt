@@ -1,66 +1,51 @@
 package edu.fatec.petwise.domain.entity
 
-import edu.fatec.petwise.domain.enums.AppointmentStatus
-import jakarta.persistence.*
+import edu.fatec.petwise.domain.enums.ConsultaStatus
+import edu.fatec.petwise.domain.enums.ConsultaType
 import java.time.LocalDateTime
 import java.util.UUID
 
 
-
-@Entity
-@Table(name = "appointments")
-data class Appointment(
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    val id: UUID = UUID.randomUUID(),
-    @Column(name = "pet_id", nullable = false)
+class Appointment(
+    var id: UUID? = null,
     val petId: UUID,
-
-    @Column(name = "owner_id", nullable = false)
     val ownerId: UUID,
-
-    @Column(name = "veterinary_id", nullable = false)
-    var veterinaryId: UUID,
-
-    @Column(name = "appointment_datetime", nullable = false)
-    var appointmentDatetime: LocalDateTime,
-
-    @Column(name = "duration_minutes", nullable = false)
-    var durationMinutes: Int = 30,
-
-    @Column(nullable = false, length = 200)
-    var motivo: String,
-
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false, length = 20)
-    var status: AppointmentStatus = AppointmentStatus.AGENDADA,
-
-    @Column(name = "observacoes_cliente", columnDefinition = "TEXT")
-    var observacoesCliente: String? = null,
-
-    @Column(name = "observacoes_veterinario", columnDefinition = "TEXT")
-    var observacoesVeterinario: String? = null,
-
-    @Column
-    var valor: Double? = null,
-
-    @Column(name = "created_at", nullable = false, updatable = false)
-    val createdAt: LocalDateTime = LocalDateTime.now(),
-
-    @Column(name = "updated_at", nullable = false)
-    var updatedAt: LocalDateTime = LocalDateTime.now()
+    var petName: String,
+    var veterinarianName: String,
+    var consultaType: ConsultaType,
+    var consultaDate: LocalDateTime,
+    var consultaTime: String,
+    var status: ConsultaStatus = ConsultaStatus.SCHEDULED,
+    var symptoms: String = "",
+    var diagnosis: String = "",
+    var treatment: String = "",
+    var prescriptions: String = "",
+    var notes: String = "",
+    var nextAppointment: LocalDateTime? = null,
+    var price: Double = 0.0,
+    var isPaid: Boolean = false,
+    val createdAt: LocalDateTime,
+    var updatedAt: LocalDateTime
 ) {
 
-    @PreUpdate
-    fun onUpdate() {
-        updatedAt = LocalDateTime.now()
+    fun canCancel(): Boolean {
+        return status in listOf(ConsultaStatus.SCHEDULED, ConsultaStatus.IN_PROGRESS)
     }
 
-    fun podeCancelar(): Boolean {
-        return status in listOf(AppointmentStatus.AGENDADA, AppointmentStatus.CONFIRMADA)
-    }
-
-    fun podeAtualizar(): Boolean {
-        return status in listOf(AppointmentStatus.AGENDADA, AppointmentStatus.CONFIRMADA)
+    fun canUpdate(): Boolean {
+        return status in listOf(ConsultaStatus.SCHEDULED, ConsultaStatus.IN_PROGRESS)
     }
 }
+
+data class ConsultaFilterOptions(
+    val consultaType: ConsultaType? = null,
+    val status: ConsultaStatus? = null,
+    val petId: UUID? = null,
+    val dateRange: DateRange? = null,
+    val searchQuery: String = ""
+)
+
+data class DateRange(
+    val startDate: LocalDateTime,
+    val endDate: LocalDateTime
+)

@@ -1,9 +1,7 @@
 package edu.fatec.petwise.application.dto
 
-import java.util.*
-
 data class VaccineTypeResponse(
-    val id: UUID,
+    val id: String,
     val species: String,
     val vaccineName: String,
     val description: String? = null,

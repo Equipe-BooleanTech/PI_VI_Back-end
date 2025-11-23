@@ -1,31 +1,45 @@
 package edu.fatec.petwise.application.dto
 
-import com.fasterxml.jackson.annotation.JsonFormat
 import edu.fatec.petwise.domain.entity.Prescription
 import java.time.LocalDateTime
-import java.util.*
+import java.util.UUID
 
 data class PrescriptionResponse(
-    val id: UUID,
+    val id: UUID?,
     val petId: UUID,
-    val veterinarian: String,
+    val userId: UUID,
+    val veterinaryId: UUID,
     val medicalRecordId: UUID?,
-
-    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
     val prescriptionDate: LocalDateTime,
-
     val instructions: String,
-    val diagnosis: String? = null,
-
-    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
+    val diagnosis: String?,
     val validUntil: LocalDateTime?,
-
-    val status: Prescription.PrescriptionStatus,
+    val status: String,
+    val medications: String,
+    val observations: String,
     val active: Boolean,
-
-    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
     val createdAt: LocalDateTime,
-
-    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
     val updatedAt: LocalDateTime
-)
+) {
+    companion object {
+        fun fromEntity(prescription: Prescription): PrescriptionResponse {
+            return PrescriptionResponse(
+                id = prescription.id,
+                petId = prescription.petId,
+                userId = prescription.userId,
+                veterinaryId = prescription.veterinaryId,
+                medicalRecordId = prescription.medicalRecordId,
+                prescriptionDate = prescription.prescriptionDate,
+                instructions = prescription.instructions,
+                diagnosis = prescription.diagnosis,
+                validUntil = prescription.validUntil,
+                status = prescription.status,
+                medications = prescription.medications,
+                observations = prescription.observations,
+                active = prescription.active,
+                createdAt = prescription.createdAt,
+                updatedAt = prescription.updatedAt
+            )
+        }
+    }
+}

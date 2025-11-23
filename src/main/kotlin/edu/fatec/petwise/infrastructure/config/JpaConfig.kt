@@ -4,5 +4,5 @@ import org.springframework.context.annotation.Configuration
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories
 
 @Configuration
-@EnableJpaRepositories(basePackages = ["edu.fatec.petwise.infrastructure.persistence.jpa"])
+@EnableJpaRepositories(basePackages = ["edu.fatec.petwise.infrastructure.persistence.repository.jpa"])
 class JpaConfig

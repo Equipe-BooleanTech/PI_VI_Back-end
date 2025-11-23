@@ -1,84 +1,47 @@
 package edu.fatec.petwise.domain.entity
 
 import edu.fatec.petwise.application.dto.VaccineResponse
-import jakarta.persistence.*
-import java.time.LocalDate
+import edu.fatec.petwise.domain.enums.VaccinationStatus
+import edu.fatec.petwise.domain.enums.VaccineType
 import java.time.LocalDateTime
-import java.util.*
+import java.util.UUID
 
-@Entity
-@Table(name = "vaccines")
-data class Vaccine(
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    val id: UUID,
-
-    @Column(name = "user_id", nullable = false)
-    val userId: UUID,
-
-    @Column(name = "pet_id", nullable = false)
+class Vaccine(
+    var id: UUID? = null,
     val petId: UUID,
-    
-    @Column(name = "vaccine_type_id", nullable = false)
-    val vaccineTypeId: UUID,
-    
-    @Column(name = "veterinarian", nullable = false, length = 100)
-    val veterinarian: String,
-    
-    @Column(name = "vaccination_date", nullable = false)
-    val vaccinationDate: LocalDate,
-    
-    @Column(name = "batch_number", length = 50)
-    val batchNumber: String? = null,
-    
-    @Column(name = "manufacturer", length = 100)
-    val manufacturer: String? = null,
-    
-    @Column(name = "dose_number", nullable = false)
-    val doseNumber: Int = 1,
-    
-    @Column(name = "total_doses")
-    val totalDoses: Int? = null,
-    
-    @Column(name = "valid_until")
-    val validUntil: LocalDate? = null,
-    
-    @Column(name = "site_of_injection", length = 100)
-    val siteOfInjection: String? = null,
-    
-    @Column(name = "reactions", columnDefinition = "TEXT")
-    val reactions: String? = null,
-    
-    @Column(name = "observations", columnDefinition = "TEXT")
-    val observations: String? = null,
-    
-    @Column(name = "active", nullable = false)
-    val active: Boolean = true,
-    
-    @Column(name = "created_at", nullable = false)
-    val createdAt: LocalDateTime = LocalDateTime.now(),
-    
-    @Column(name = "updated_at", nullable = false)
-    val updatedAt: LocalDateTime = LocalDateTime.now()
+    val veterinarianId: UUID,
+    var vaccineType: VaccineType,
+    var vaccinationDate: LocalDateTime,
+    var nextDoseDate: LocalDateTime? = null,
+    var totalDoses: Int,
+    var manufacturer: String? = null,
+    var observations: String = "",
+    var status: VaccinationStatus,
+    val createdAt: LocalDateTime,
+    var updatedAt: LocalDateTime
 ) {
     fun toVaccineResponse(): VaccineResponse {
         return VaccineResponse(
             id = id,
             petId = petId,
-            vaccineTypeId = vaccineTypeId,
-            veterinarian = veterinarian,
+            veterinarianId = veterinarianId,
+            vaccineType = vaccineType,
             vaccinationDate = vaccinationDate,
-            batchNumber = batchNumber,
-            manufacturer = manufacturer,
-            doseNumber = doseNumber,
+            nextDoseDate = nextDoseDate,
             totalDoses = totalDoses,
-            validUntil = validUntil,
-            siteOfInjection = siteOfInjection,
-            reactions = reactions,
+            manufacturer = manufacturer,
             observations = observations,
-            active = active,
+            status = status,
             createdAt = createdAt,
             updatedAt = updatedAt
         )
     }
+    data class VaccineFilterOptions(
+        val petId: UUID? = null,
+        val vaccineType: VaccineType? = null,
+        val status: VaccinationStatus? = null,
+        val startDate: LocalDateTime? = null,
+        val endDate: LocalDateTime? = null,
+        val searchQuery: String = ""
+    )
 }

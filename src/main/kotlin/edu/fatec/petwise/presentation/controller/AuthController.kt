@@ -1,7 +1,23 @@
 package edu.fatec.petwise.presentation.controller
 
-import edu.fatec.petwise.application.dto.*
-import edu.fatec.petwise.application.usecase.*
+import edu.fatec.petwise.application.dto.AuthResponse
+import edu.fatec.petwise.application.dto.ForgotPasswordDto
+import edu.fatec.petwise.application.dto.LoginRequest
+import edu.fatec.petwise.application.dto.MessageResponse
+import edu.fatec.petwise.application.dto.RegisterRequest
+import edu.fatec.petwise.application.dto.ResetPasswordDto
+import edu.fatec.petwise.application.dto.UpdateProfileDto
+import edu.fatec.petwise.application.usecase.ForgotPasswordUseCase
+import edu.fatec.petwise.application.usecase.GetUserProfileUseCase
+import edu.fatec.petwise.application.usecase.LoginUserUseCase
+import edu.fatec.petwise.application.usecase.LogoutUserUseCase
+import edu.fatec.petwise.application.usecase.RefreshTokenUseCase
+import edu.fatec.petwise.application.usecase.RegisterUserUseCase
+import edu.fatec.petwise.application.usecase.ResetPasswordUseCase
+import edu.fatec.petwise.application.usecase.UpdateProfileUseCase
+import edu.fatec.petwise.application.usecase.DeleteUserUseCase
+import edu.fatec.petwise.application.dto.UpdateProfileResponse
+import edu.fatec.petwise.domain.entity.User
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
 import jakarta.validation.Valid
@@ -10,6 +26,8 @@ import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.security.core.Authentication
 import org.springframework.web.bind.annotation.*
+import java.util.Optional
+import java.util.UUID
 
 @RestController
 @RequestMapping("/api/auth")
@@ -18,9 +36,11 @@ class AuthController(
     private val loginUserUseCase: LoginUserUseCase,
     private val getUserProfileUseCase: GetUserProfileUseCase,
     private val updateProfileUseCase: UpdateProfileUseCase, // NOVO
+    private val deleteUserUseCase: DeleteUserUseCase, // NOVO
     private val refreshTokenUseCase: RefreshTokenUseCase,
     private val forgotPasswordUseCase: ForgotPasswordUseCase, // NOVO
-    private val resetPasswordUseCase: ResetPasswordUseCase // NOVO
+    private val resetPasswordUseCase: ResetPasswordUseCase, // NOVO
+    private val logoutUserUseCase: LogoutUserUseCase // NOVO
 ) {
     private val logger = LoggerFactory.getLogger(javaClass)
 
@@ -39,8 +59,8 @@ class AuthController(
     }
 
     @GetMapping("/profile")
-    fun getProfile(authentication: Authentication): ResponseEntity<UserResponse> {
-        val userId = authentication.name
+    fun getProfile(authentication: Authentication): ResponseEntity<Optional<User>> {
+        val userId = UUID.fromString(authentication.name)
         logger.info("Requisição de perfil para usuário: $userId")
         val response = getUserProfileUseCase.execute(userId)
         return ResponseEntity.ok(response)
@@ -54,11 +74,24 @@ class AuthController(
     @PutMapping("/profile")
     fun updateProfile(
         authentication: Authentication,
-        @Valid @RequestBody request: UpdateProfileRequest
-    ): ResponseEntity<UserResponse> {
-        val userId = authentication.name
+        @Valid @RequestBody request: UpdateProfileDto
+    ): ResponseEntity<UpdateProfileResponse> {
+        val userId = UUID.fromString(authentication.name)
         logger.info("Requisição de atualização de perfil para usuário: $userId")
         val response = updateProfileUseCase.execute(userId, request)
+        return ResponseEntity.ok(response)
+    }
+
+    /**
+     * ✨ NOVO - Sprint 1
+     * Exclui perfil do usuário autenticado
+     * Requer confirmação para evitar exclusões acidentais
+     */
+    @DeleteMapping("/profile")
+    fun deleteProfile(authentication: Authentication): ResponseEntity<MessageResponse> {
+        val userId = UUID.fromString(authentication.name)
+        logger.info("Requisição de exclusão de perfil para usuário: $userId")
+        val response = deleteUserUseCase.execute(userId)
         return ResponseEntity.ok(response)
     }
 
@@ -81,7 +114,7 @@ class AuthController(
      * 🔒 SEGURANÇA: Sempre retorna mesma mensagem (não revela se email existe)
      */
     @PostMapping("/forgot-password")
-    fun forgotPassword(@Valid @RequestBody request: ForgotPasswordRequest): ResponseEntity<MessageResponse> {
+    fun forgotPassword(@Valid @RequestBody request: ForgotPasswordDto): ResponseEntity<MessageResponse> {
         logger.info("Requisição de forgot password recebida")
         val response = forgotPasswordUseCase.execute(request)
         return ResponseEntity.ok(response)
@@ -93,14 +126,18 @@ class AuthController(
      * Valida token e atualiza senha do usuário
      */
     @PostMapping("/reset-password")
-    fun resetPassword(@Valid @RequestBody request: ResetPasswordRequest): ResponseEntity<MessageResponse> {
+    fun resetPassword(@Valid @RequestBody request: ResetPasswordDto): ResponseEntity<MessageResponse> {
         logger.info("Requisição de reset password recebida")
         val response = resetPasswordUseCase.execute(request)
         return ResponseEntity.ok(response)
     }
 
     @PostMapping("/logout")
-    fun logout(request: HttpServletRequest, response: HttpServletResponse): ResponseEntity<Map<String, String>> {
+    fun logout(
+        request: HttpServletRequest,
+        response: HttpServletResponse,
+        authentication: Authentication
+    ): ResponseEntity<Map<String, String>> {
         val authHeader = request.getHeader("Authorization")
 
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
@@ -108,15 +145,25 @@ class AuthController(
                 .body(mapOf("message" to "Token ausente ou inválido"))
         }
 
+        val token = authHeader.substring(7)
+        val userId = authentication.name
 
-        response.setHeader("Authorization", "")
-        response.setHeader("Clear-Site-Data", "\"cookies\"")
+        try {
+            logoutUserUseCase.execute(token, userId)
 
-        logger.info("Logout realizado - token invalidado no cliente")
+            response.setHeader("Authorization", "")
+            response.setHeader("Clear-Site-Data", "\"cookies\"")
 
-        return ResponseEntity.ok(mapOf(
-            "message" to "Logout realizado com sucesso",
-            "note" to "Token será válido até expiração. Para revogação imediata, implemente blacklist."
-        ))
+            logger.info("Logout realizado com sucesso - token invalidado no servidor")
+
+            return ResponseEntity.ok(mapOf(
+                "message" to "Logout realizado com sucesso",
+                "note" to "Token foi invalidado permanentemente no servidor"
+            ))
+        } catch (e: Exception) {
+            logger.error("Erro durante logout: ${e.message}")
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(mapOf("message" to "Erro durante logout"))
+        }
     }
 }

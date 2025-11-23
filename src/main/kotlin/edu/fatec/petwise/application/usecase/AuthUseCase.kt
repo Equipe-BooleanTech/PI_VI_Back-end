@@ -3,12 +3,12 @@ package edu.fatec.petwise.application.usecase
 import edu.fatec.petwise.application.dto.AuthResponse
 import edu.fatec.petwise.application.dto.LoginRequest
 import edu.fatec.petwise.application.dto.RegisterRequest
-import edu.fatec.petwise.application.dto.UserResponse
 import edu.fatec.petwise.domain.entity.User
 import edu.fatec.petwise.domain.enums.UserType
 import edu.fatec.petwise.domain.exception.BusinessRuleException
 import edu.fatec.petwise.domain.exception.DuplicateEntityException
 import edu.fatec.petwise.domain.exception.EntityNotFoundException
+import edu.fatec.petwise.domain.repository.TokenBlacklistRepository
 import edu.fatec.petwise.domain.repository.UserRepository
 import edu.fatec.petwise.domain.valueobject.Email
 import edu.fatec.petwise.domain.valueobject.Telefone
@@ -111,6 +111,18 @@ class RegisterUserUseCase(
                     throw DuplicateEntityException("Já existe uma farmácia cadastrada com este CNPJ")
                 }
             }
+            UserType.PETSHOP -> {
+                if (request.cnpj.isNullOrBlank()) {
+                    throw BusinessRuleException("CNPJ é obrigatório para petshops")
+                }
+                if (request.companyName.isNullOrBlank()) {
+                    throw BusinessRuleException("Nome da empresa é obrigatório para petshops")
+                }
+                val cleanCnpj = request.cnpj.replace(Regex("[^0-9]"), "")
+                if (userRepository.existsByCnpj(cleanCnpj)) {
+                    throw DuplicateEntityException("Já existe um petshop cadastrado com este CNPJ")
+                }
+            }
             UserType.ADMIN -> {}
         }
     }
@@ -202,33 +214,34 @@ class LoginUserUseCase(
 }
 
 @Service
-class GetUserProfileUseCase(
-    private val userRepository: UserRepository
+class LogoutUserUseCase(
+    private val jwtService: JwtService
 ) {
     private val logger = LoggerFactory.getLogger(javaClass)
 
-    fun execute(userId: String): UserResponse {
-        logger.info("Buscando perfil do usuário: $userId")
+    fun execute(token: String, userId: String) {
+        logger.info("Logout solicitado para usuário: $userId")
 
-        val user = userRepository.findById(UUID.fromString(userId))
-            ?: throw EntityNotFoundException("Usuário", userId)
+        // Blacklist the token to prevent further use
+        jwtService.blacklistToken(token, userId, "User logout")
 
-        return user.toResponse()
+        logger.info("Token blacklisted com sucesso para usuário: $userId")
+    }
+
+    // 🔒 SEGURANÇA: Função para mascarar email nos logs
+    private fun maskEmail(email: String): String {
+        val parts = email.split("@")
+        if (parts.size != 2) return "***@***"
+
+        val localPart = parts[0]
+        val domain = parts[1]
+
+        val maskedLocal = if (localPart.length <= 2) {
+            "***"
+        } else {
+            localPart.take(2) + "***"
+        }
+
+        return "$maskedLocal@$domain"
     }
 }
-
-fun User.toResponse() = UserResponse(
-    id = this.id.toString(),
-    fullName = this.fullName,
-    email = this.email.value,
-    phone = this.phone.value,
-    userType = this.userType.name,
-    cpf = this.cpf,
-    crmv = this.crmv,
-    specialization = this.specialization,
-    cnpj = this.cnpj,
-    companyName = this.companyName,
-    active = this.active,
-    createdAt = this.createdAt.toString(),
-    updatedAt = this.updatedAt.toString()
-)

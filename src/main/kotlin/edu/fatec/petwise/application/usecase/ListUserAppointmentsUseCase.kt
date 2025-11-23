@@ -1,39 +1,42 @@
 package edu.fatec.petwise.application.usecase
 
+import edu.fatec.petwise.application.dto.AppointmentListResponse
 import edu.fatec.petwise.application.dto.AppointmentResponse
-import edu.fatec.petwise.domain.entity.AppointmentStatus
+import edu.fatec.petwise.domain.enums.ConsultaStatus
 import edu.fatec.petwise.domain.repository.AppointmentRepository
-import edu.fatec.petwise.domain.repository.PetRepository
-import edu.fatec.petwise.domain.repository.UserRepository
 import org.slf4j.LoggerFactory
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.PageRequest
+import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
-import java.util.UUID
+import java.util.Optional
 
 @Service
-class ListUserAppointmentsUseCase(
-    private val appointmentRepository: AppointmentRepository,
-    private val petRepository: PetRepository,
-    private val userRepository: UserRepository
+class ListAppointmentsUseCase(
+    private val appointmentRepository: AppointmentRepository
 ) {
     private val logger = LoggerFactory.getLogger(javaClass)
 
-    fun execute(userId: String, status: AppointmentStatus? = null): List<AppointmentResponse> {
-        val ownerId = UUID.fromString(userId)
-        
-        val appointments = if (status != null) {
-            appointmentRepository.findByOwnerIdAndStatus(ownerId, status)
+    fun execute(status: ConsultaStatus? = null, page: Int = 1, pageSize: Int = 20): AppointmentListResponse {
+        val pageable: Pageable = PageRequest.of(page - 1, pageSize) // PageRequest is 0-based
+
+        val appointmentsPage: Page<edu.fatec.petwise.domain.entity.Appointment> = if (status != null) {
+            appointmentRepository.findByStatus(status, pageable)
         } else {
-            appointmentRepository.findByOwnerIdOrderByAppointmentDatetimeDesc(ownerId)
+            appointmentRepository.findAll(pageable)
         }
-        
-        logger.info("Listadas ${appointments.size} consultas para o usuário $userId")
-        
-        // Enriquecer com nomes de pets e veterinários
-        return appointments.map { appointment ->
-            val petNome = petRepository.findById(appointment.petId).orElse(null)?.nome
-            val veterinaryNome = userRepository.findById(appointment.veterinaryId)?.fullName
-            
-            AppointmentResponse.fromEntity(appointment, petNome, veterinaryNome)
+
+        val appointmentResponses = appointmentsPage.content.map { appointment ->
+            AppointmentResponse.fromEntity(Optional.of(appointment))
         }
+
+        logger.info("Listadas ${appointmentResponses.size} consultas (página $page de ${appointmentsPage.totalPages})")
+
+        return AppointmentListResponse(
+            consultas = appointmentResponses,
+            total = appointmentsPage.totalElements.toInt(),
+            page = page,
+            pageSize = pageSize
+        )
     }
 }

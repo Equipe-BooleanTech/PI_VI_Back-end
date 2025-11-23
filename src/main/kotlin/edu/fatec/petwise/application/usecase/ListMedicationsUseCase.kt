@@ -1,49 +1,37 @@
 package edu.fatec.petwise.application.usecase
 
-import com.petwise.dto.MedicationResponse
+import edu.fatec.petwise.application.dto.MedicationResponse
+import edu.fatec.petwise.domain.entity.MedicationFilterOptions
+import edu.fatec.petwise.domain.enums.UserType
 import edu.fatec.petwise.domain.repository.MedicationRepository
-import edu.fatec.petwise.domain.repository.PetRepository
-import org.springframework.security.core.Authentication
+import edu.fatec.petwise.domain.repository.UserRepository
+import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
+import org.springframework.security.core.Authentication
 import java.util.UUID
 
 @Service
 class ListMedicationsUseCase(
     private val medicationRepository: MedicationRepository,
-    private val petRepository: PetRepository
+    private val userRepository: UserRepository
 ) {
-    fun execute(authentication: Authentication, petId: UUID?, administered: Boolean?): List<MedicationResponse> {
+    private val logger = LoggerFactory.getLogger(javaClass)
+
+    fun execute(authentication: Authentication, petId: UUID?, searchQuery: String?): List<MedicationResponse> {
         val userId = UUID.fromString(authentication.principal.toString())
+        val user = userRepository.findById(userId).orElseThrow { IllegalArgumentException("Usuário não encontrado") }
 
-        val medications = when {
-            // Caso: filtro por pet + administered
-            petId != null && administered != null -> {
-                val pet = petRepository.findByIdAndOwnerId(petId, userId)
-                    ?: throw IllegalArgumentException("Pet não encontrado ou não pertence ao usuário")
-
-                medicationRepository.findByPetIdAndAdministered(pet.id, administered)
-            }
-
-            // Caso: filtro por pet apenas
-            petId != null -> {
-                val pet = petRepository.findByIdAndOwnerId(petId, userId)
-                    ?: throw IllegalArgumentException("Pet não encontrado ou não pertence ao usuário")
-
-                medicationRepository.findByPetIdAndActiveTrueOrderByCreatedAtDesc(pet.id)
-            }
-
-            // Caso: filtro apenas por administered
-            administered != null -> {
-                medicationRepository.findByUserIdAndActiveTrue(userId)
-                    .filter { it.administered == administered }
-            }
-
-            // Caso: listar tudo do usuário
-            else -> {
-                medicationRepository.findByUserIdAndActiveTrue(userId)
-            }
+        if (user.userType != UserType.PHARMACY) {
+            throw IllegalArgumentException("Apenas farmácias podem listar medicações")
         }
 
-        return medications.map { it.toMedicationResponse() }
+        val filterOptions = MedicationFilterOptions(
+            petId = petId,
+            searchQuery = searchQuery ?: ""
+        )
+
+        val medications = medicationRepository.filterMedications(filterOptions)
+
+        return medications.map { MedicationResponse.fromEntity(it) }
     }
 }

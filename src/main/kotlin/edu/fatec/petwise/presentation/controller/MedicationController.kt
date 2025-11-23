@@ -1,10 +1,10 @@
 package edu.fatec.petwise.presentation.controller
 
-
-import com.petwise.dto.MedicationResponse
 import edu.fatec.petwise.application.dto.MedicationRequest
+import edu.fatec.petwise.application.dto.MedicationResponse
 import edu.fatec.petwise.application.usecase.CreateMedicationUseCase
 import edu.fatec.petwise.application.usecase.DeleteMedicationUseCase
+import edu.fatec.petwise.application.usecase.GetMedicationsByPetUseCase
 import edu.fatec.petwise.application.usecase.ListMedicationsUseCase
 import edu.fatec.petwise.application.usecase.UpdateMedicationUseCase
 import jakarta.validation.Valid
@@ -14,11 +14,12 @@ import org.springframework.web.bind.annotation.*
 import java.util.UUID
 
 @RestController
-@RequestMapping("/medications")
+@RequestMapping("/api/medications")
 @CrossOrigin(origins = ["*"])
 class MedicationController(
     private val createMedicationUseCase: CreateMedicationUseCase,
     private val listMedicationsUseCase: ListMedicationsUseCase,
+    private val getMedicationsByPetUseCase: GetMedicationsByPetUseCase,
     private val updateMedicationUseCase: UpdateMedicationUseCase,
     private val deleteMedicationUseCase: DeleteMedicationUseCase
 ) {
@@ -27,9 +28,9 @@ class MedicationController(
     fun listMedications(
         authentication: Authentication,
         @RequestParam(required = false) petId: UUID?,
-        @RequestParam(required = false) administered: Boolean?
+        @RequestParam(required = false) searchQuery: String?
     ): ResponseEntity<List<MedicationResponse>> {
-        val medications = listMedicationsUseCase.execute(authentication, petId, administered)
+        val medications = listMedicationsUseCase.execute(authentication, petId, searchQuery)
         return ResponseEntity.ok(medications)
     }
 
@@ -41,29 +42,28 @@ class MedicationController(
         val medication = createMedicationUseCase.execute(request, authentication)
         return ResponseEntity.ok(medication)
     }
-    
+
 
     @GetMapping("/{id}")
     fun getMedicationDetails(
         @PathVariable id: UUID,
         authentication: Authentication
     ): ResponseEntity<MedicationResponse> {
-        val medication = listMedicationsUseCase.execute(authentication, null, null)
-            .firstOrNull { it.id == id }
+        val medications = listMedicationsUseCase.execute(authentication, null, null)
+        val medication = medications.firstOrNull { it.id == id }
             ?: throw IllegalArgumentException("Medicação não encontrada")
-        
+
         return ResponseEntity.ok(medication)
     }
-    
+
 
     @PutMapping("/{id}")
     fun updateMedication(
         @PathVariable id: UUID,
-        @RequestParam(required = false) administered: Boolean?,
-        @RequestParam(required = false) administrationNotes: String?,
+        @Valid @RequestBody request: MedicationRequest,
         authentication: Authentication
     ): ResponseEntity<MedicationResponse> {
-        val medication = updateMedicationUseCase.execute(id, authentication, administered, administrationNotes)
+        val medication = updateMedicationUseCase.execute(id, request, authentication)
         return ResponseEntity.ok(medication)
     }
 
@@ -74,5 +74,14 @@ class MedicationController(
     ): ResponseEntity<Void> {
         deleteMedicationUseCase.execute(id, authentication)
         return ResponseEntity.noContent().build()
+    }
+
+    @GetMapping("/pet/{petId}")
+    fun getMedicationsByPet(
+        authentication: Authentication,
+        @PathVariable petId: UUID
+    ): ResponseEntity<List<MedicationResponse>> {
+        val medications = getMedicationsByPetUseCase.execute(authentication, petId)
+        return ResponseEntity.ok(medications)
     }
 }
