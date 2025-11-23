@@ -32,11 +32,13 @@ class CreateMedicationUseCase(
             throw IllegalArgumentException("Apenas farmácias podem criar medicações")
         }
 
-        val prescription = prescriptionRepository.findById(request.prescriptionId)
+        val prescriptionId = request.prescriptionId ?: throw IllegalArgumentException("Prescrição é obrigatória")
+
+        val prescription = prescriptionRepository.findById(prescriptionId)
             ?: throw IllegalArgumentException("Prescrição não encontrada")
 
         val existingMedication = medicationRepository
-            .findByPrescriptionId(request.prescriptionId)
+            .findByPrescriptionId(prescriptionId)
             .firstOrNull { it.medicationName.equals(request.medicationName, ignoreCase = true) }
 
         if (existingMedication != null) {
@@ -45,9 +47,9 @@ class CreateMedicationUseCase(
 
         val now = LocalDateTime.now()
         val medication = Medication(
-            id = UUID.randomUUID(),
+            id = null,
             userId = userId,
-            prescriptionId = request.prescriptionId,
+            prescriptionId = prescriptionId,
             medicationName = request.medicationName,
             dosage = request.dosage,
             frequency = request.frequency,

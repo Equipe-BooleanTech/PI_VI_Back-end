@@ -32,7 +32,7 @@ class UpdateMedicationUseCase(
             throw IllegalArgumentException("Data final deve ser posterior à data inicial")
         }
 
-        existingMedication.prescriptionId = request.prescriptionId
+        existingMedication.prescriptionId = request.prescriptionId ?: existingMedication.prescriptionId
         existingMedication.medicationName = request.medicationName
         existingMedication.dosage = request.dosage
         existingMedication.frequency = request.frequency

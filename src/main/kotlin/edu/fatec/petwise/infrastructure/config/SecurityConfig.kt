@@ -100,7 +100,7 @@ class SecurityConfig(
                     .requestMatchers(
                         "/api/medications/**"
                     ).hasAnyRole(
-                        "VETERINARY"
+                        "PHARMACY", "VETERINARY"
                     )
                     .requestMatchers(
                         HttpMethod.GET,
@@ -126,12 +126,25 @@ class SecurityConfig(
                     )
                     .requestMatchers(
                         HttpMethod.GET,
-                        "/api/vet/prescriptions/pet/**"
+                        "/api/prescriptions/**"
                     ).hasAnyRole(
-                        "OWNER"
+                        "VETERINARY", "PHARMACY"
                     )
                     .requestMatchers(
-                        "/api/vet/prescriptions/**"
+                        HttpMethod.POST,
+                        "/api/prescriptions/**"
+                    ).hasAnyRole(
+                        "VETERINARY"
+                    )
+                    .requestMatchers(
+                        HttpMethod.PUT,
+                        "/api/prescriptions/**"
+                    ).hasAnyRole(
+                        "VETERINARY"
+                    )
+                    .requestMatchers(
+                        HttpMethod.DELETE,
+                        "/api/prescriptions/**"
                     ).hasAnyRole(
                         "VETERINARY"
                     )
