@@ -12,6 +12,8 @@ interface PrescriptionRepository {
     fun findByVeterinaryIdAndPetId(veterinaryId: UUID, petId: UUID): List<Prescription>
     fun findByIdAndUserId(id: UUID, userId: UUID): Prescription?
     fun findById(id: UUID): Optional<Prescription>
+    fun existsByPetIdAndVeterinaryIdNot(petId: UUID, veterinaryId: UUID): Boolean
+    fun existsByPetId(petId: UUID): Boolean
     fun save(prescription: Prescription): Prescription
     fun deleteById(id: UUID)
     fun deleteByPetId(petId: UUID)

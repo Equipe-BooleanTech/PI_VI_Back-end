@@ -18,5 +18,7 @@ interface JpaExamRepository : JpaRepository<ExamEntity, UUID> {
         results: String,
         notes: String
     ): List<ExamEntity>
+    fun existsByPetIdAndVeterinaryIdNot(petId: UUID, veterinaryId: UUID): Boolean
+    fun existsByPetId(petId: UUID): Boolean
     fun deleteByPetId(petId: UUID)
 }

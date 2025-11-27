@@ -40,6 +40,14 @@ class PrescriptionRepositoryAdapter(
         return repository.findById(id).map { it.toDomain() }
     }
 
+    override fun existsByPetIdAndVeterinaryIdNot(petId: UUID, veterinaryId: UUID): Boolean {
+        return repository.existsByPetIdAndVeterinaryIdNot(petId, veterinaryId)
+    }
+
+    override fun existsByPetId(petId: UUID): Boolean {
+        return repository.existsByPetId(petId)
+    }
+
     override fun save(prescription: Prescription): Prescription {
         val entity = prescription.toEntity()
         return repository.save(entity).toDomain()

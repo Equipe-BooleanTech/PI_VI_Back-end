@@ -24,6 +24,9 @@ class DeletePetUseCase(
             throw Exception("Você não tem permissão para remover este pet")
         }
 
+        // Verificar se existem dados de veterinários associados ao pet
+        validateNoVeterinaryData(petId)
+
         // Delete related data
         appointmentRepository.deleteByPetId(petId)
         vaccineRepository.deleteByPetId(petId)
@@ -40,5 +43,22 @@ class DeletePetUseCase(
         petRepository.deleteById(petId)
         logger.info("Pet $petId removido pelo usuário $userId")
         return MessageResponse("Pet removido com sucesso")
+    }
+
+    private fun validateNoVeterinaryData(petId: UUID) {
+        val hasVaccines = vaccineRepository.existsByPetId(petId)
+        val hasPrescriptions = prescriptionRepository.existsByPetId(petId)
+        val hasExams = examRepository.existsByPetId(petId)
+
+        if (hasVaccines || hasPrescriptions || hasExams) {
+            val relatedData = mutableListOf<String>()
+            if (hasVaccines) relatedData.add("vacinas")
+            if (hasPrescriptions) relatedData.add("prescrições")
+            if (hasExams) relatedData.add("exames")
+            
+            throw IllegalStateException(
+                "Não é possível remover o pet pois existem ${relatedData.joinToString(", ")} registradas por veterinários"
+            )
+        }
     }
 }

@@ -17,6 +17,8 @@ interface ExamRepository {
         results: String,
         notes: String
     ): List<Exam>
+    fun existsByPetIdAndVeterinaryIdNot(petId: UUID, veterinaryId: UUID): Boolean
+    fun existsByPetId(petId: UUID): Boolean
     fun save(exam: Exam): Exam
     fun deleteById(id: UUID)
     fun deleteByPetId(petId: UUID)

@@ -48,6 +48,14 @@ class VaccineRepositoryAdapter(
         return repository.countByPetIdAndVaccineType(petId, vaccineType)
     }
 
+    override fun existsByPetIdAndVeterinarianIdNot(petId: UUID, veterinarianId: UUID): Boolean {
+        return repository.existsByPetIdAndVeterinarianIdNot(petId, veterinarianId)
+    }
+
+    override fun existsByPetId(petId: UUID): Boolean {
+        return repository.existsByPetId(petId)
+    }
+
     override fun save(vaccine: Vaccine): Vaccine {
         val entity = vaccine.toEntity()
         return repository.save(entity).toDomain()
