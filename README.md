@@ -166,8 +166,6 @@ SPRING_PROFILES_ACTIVE=dev
 - Espécie obrigatória (DOG, CAT, BIRD, RABBIT, OTHER)
 - Gênero obrigatório (MALE, FEMALE)
 - Status de saúde obrigatório
-- Nome do dono obrigatório
-- Telefone do dono obrigatório
 - Idade >= 0
 - Peso > 0
 
