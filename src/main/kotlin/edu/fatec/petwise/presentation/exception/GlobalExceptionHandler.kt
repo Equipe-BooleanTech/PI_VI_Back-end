@@ -17,7 +17,7 @@ data class ErrorResponse(
     val timestamp: String = LocalDateTime.now().toString(),
     val status: Int,
     val error: String,
-    val message: String,
+    val message: String?,
     val path: String? = null,
     val validationErrors: Map<String, String>? = null
 )
@@ -88,24 +88,33 @@ class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error)
     }
 
-    @ExceptionHandler(IllegalArgumentException::class)
-    fun handleIllegalArgumentException(ex: IllegalArgumentException): ResponseEntity<ErrorResponse> {
-        logger.warn("Argumento ilegal: ${ex.message}")
+    @ExceptionHandler(IllegalStateException::class)
+    fun handleIllegalStateException(ex: IllegalStateException): ResponseEntity<ErrorResponse> {
+        logger.warn("Estado ilegal: ${ex.message}")
         val error = ErrorResponse(
-            status = HttpStatus.BAD_REQUEST.value(),
-            error = "Requisição inválida",
-            message = ex.message ?: "Argumento inválido"
+            status = HttpStatus.UNPROCESSABLE_ENTITY.value(),
+            error = "Operação não permitida",
+            message = ex.message ?: "Operação não pode ser realizada"
         )
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error)
+        return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(error)
     }
 
     @ExceptionHandler(Exception::class)
     fun handleGenericException(ex: Exception): ResponseEntity<ErrorResponse> {
         logger.error("Erro interno do servidor: ${ex.message}", ex)
+        
+        // For specific business logic errors, return the actual message
+        val message = when {
+            ex.message?.contains("Pet não encontrado") == true -> ex.message
+            ex.message?.contains("Você não tem permissão") == true -> ex.message
+            ex.message?.contains("Não é possível remover o pet") == true -> ex.message
+            else -> "Ocorreu um erro inesperado. Por favor, tente novamente mais tarde."
+        }
+        
         val error = ErrorResponse(
             status = HttpStatus.INTERNAL_SERVER_ERROR.value(),
             error = "Erro interno do servidor",
-            message = "Ocorreu um erro inesperado. Por favor, tente novamente mais tarde."
+            message = message
         )
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error)
     }

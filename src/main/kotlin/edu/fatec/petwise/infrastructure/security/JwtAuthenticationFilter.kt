@@ -45,6 +45,7 @@ class JwtAuthenticationFilter(
 
         try {
             val token = authHeader.substring(7)
+            val maskedToken = token.take(10) + "..." + token.takeLast(10)
 
             // ✅ CORREÇÃO 2: validateToken agora aceita 1 parâmetro (usa "ACCESS" como padrão)
             if (jwtService.validateToken(token)) {
@@ -57,6 +58,9 @@ class JwtAuthenticationFilter(
                     UsernamePasswordAuthenticationToken(userId, null, authorities)
 
                 SecurityContextHolder.getContext().authentication = authentication
+                logger.debug("Authentication set successfully for user $userId with role ROLE_$role on path $path")
+            } else {
+                logger.warn("Token validation failed for path $path - token: $maskedToken")
             }
         } catch (e: Exception) {
             // 🔒 SEGURANÇA: Não expõe detalhes do erro (apenas loga)

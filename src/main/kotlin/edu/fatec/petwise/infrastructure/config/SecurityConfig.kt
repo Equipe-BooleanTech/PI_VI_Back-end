@@ -53,6 +53,8 @@ class SecurityConfig(
                         "/swagger-ui/**",
                         "/swagger-ui.html"
                     ).permitAll()
+                    // Logout requires authentication - any authenticated user can logout
+                    .requestMatchers("/api/auth/logout").authenticated()
                     .requestMatchers("/api/auth/profile").hasAnyRole(
                         "OWNER", "VETERINARY", "PETSHOP", "PHARMACY"
                     )
@@ -100,7 +102,7 @@ class SecurityConfig(
                     .requestMatchers(
                         "/api/medications/**"
                     ).hasAnyRole(
-                        "VETERINARY"
+                        "PHARMACY"
                     )
                     .requestMatchers(
                         HttpMethod.GET,
@@ -117,23 +119,32 @@ class SecurityConfig(
                         HttpMethod.GET,
                         "/api/exams/pet/**"
                     ).hasAnyRole(
-                        "OWNER"
+                        "OWNER", "VETERINARY"
                     )
                     .requestMatchers(
                         "/api/exams/**"
                     ).hasAnyRole(
                         "VETERINARY"
+                    ).requestMatchers(
+                        HttpMethod.GET,
+                        "/api/prescriptions/pet/**"
+                    ).hasAnyRole(
+                        "OWNER", "VETERINARY"
+                    )
+                    .requestMatchers(
+                        "/api/prescriptions/**"
+                    ).hasAnyRole(
+                        "VETERINARY"
                     )
                     .requestMatchers(
                         HttpMethod.GET,
-                        "/api/vet/prescriptions/pet/**"
+                        "/api/medications/pet/**"
                     ).hasAnyRole(
-                        "OWNER"
-                    )
-                    .requestMatchers(
-                        "/api/vet/prescriptions/**"
+                        "OWNER", "PHARMACY"
+                    ).requestMatchers(
+                        "api/medications/**"
                     ).hasAnyRole(
-                        "VETERINARY"
+                        "PHARMACY"
                     )
                     .requestMatchers(
                         "/api/foods/**"

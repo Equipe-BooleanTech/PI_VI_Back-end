@@ -9,6 +9,10 @@ import java.util.UUID
 interface JpaPrescriptionRepository: JpaRepository<PrescriptionEntity, UUID> {
     fun findByPetId(petId: UUID): List<PrescriptionEntity>
     fun findByUserId(userId: UUID): List<PrescriptionEntity>
+    fun findByVeterinaryId(veterinaryId: UUID): List<PrescriptionEntity>
+    fun findByVeterinaryIdAndPetId(veterinaryId: UUID, petId: UUID): List<PrescriptionEntity>
     fun findByIdAndUserId(id: UUID, userId: UUID): PrescriptionEntity?
+    fun existsByPetIdAndVeterinaryIdNot(petId: UUID, veterinaryId: UUID): Boolean
+    fun existsByPetId(petId: UUID): Boolean
     fun deleteByPetId(petId: UUID)
 }

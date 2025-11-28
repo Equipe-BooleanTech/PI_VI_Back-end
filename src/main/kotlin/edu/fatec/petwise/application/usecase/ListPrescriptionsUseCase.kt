@@ -50,10 +50,10 @@ class ListPrescriptionsUseCase(
                 }
             }
             UserType.VETERINARY -> {
-                // VETERINARY users can see prescriptions they created or for any pet
+                // VETERINARY users can see prescriptions they created
                 when {
                     petId != null && status != null -> {
-                        val allPrescriptions = prescriptionRepository.findByPetId(petId)
+                        val allPrescriptions = prescriptionRepository.findByVeterinaryId(userId)
                         val prescriptionStatus = try {
                             Prescription.PrescriptionStatus.valueOf(status.uppercase())
                         } catch (e: IllegalArgumentException) {
@@ -62,10 +62,10 @@ class ListPrescriptionsUseCase(
                         allPrescriptions.filter { it.status == prescriptionStatus.name }
                     }
                     petId != null -> {
-                        prescriptionRepository.findByPetId(petId)
+                        prescriptionRepository.findByVeterinaryIdAndPetId(userId, petId)
                     }
                     status != null -> {
-                        val allPrescriptions = prescriptionRepository.findAll()
+                        val allPrescriptions = prescriptionRepository.findByVeterinaryId(userId)
                         val prescriptionStatus = try {
                             Prescription.PrescriptionStatus.valueOf(status.uppercase())
                         } catch (e: IllegalArgumentException) {
@@ -74,7 +74,7 @@ class ListPrescriptionsUseCase(
                         allPrescriptions.filter { it.status == prescriptionStatus.name }
                     }
                     else -> {
-                        prescriptionRepository.findAll()
+                        prescriptionRepository.findByVeterinaryId(userId)
                     }
                 }
             }

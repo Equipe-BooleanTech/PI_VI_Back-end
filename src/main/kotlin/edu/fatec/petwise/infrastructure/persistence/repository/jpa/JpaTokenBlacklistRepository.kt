@@ -11,4 +11,5 @@ interface JpaTokenBlacklistRepository : JpaRepository<TokenBlacklistEntity, UUID
     fun existsByToken(token: String): Boolean
     fun deleteByExpiresAtBefore(date: LocalDateTime): Int
     fun findByUserId(userId: UUID): List<TokenBlacklistEntity>
+    fun deleteByUserId(userId: UUID): Int
 }

@@ -166,4 +166,32 @@ class AuthController(
                 .body(mapOf("message" to "Erro durante logout"))
         }
     }
+
+    /**
+     * 🔧 DEBUG/ADMIN - Limpa tokens blacklistados de um usuário
+     * Útil quando o usuário está com token blacklistado e não consegue fazer login
+     * Este endpoint deve ser protegido em produção ou removido
+     */
+    @DeleteMapping("/clear-blacklist")
+    fun clearUserBlacklist(
+        authentication: Authentication
+    ): ResponseEntity<Map<String, Any>> {
+        val userId = UUID.fromString(authentication.name)
+        logger.info("Solicitação de limpeza de blacklist para usuário: $userId")
+
+        return try {
+            val deletedCount = getUserProfileUseCase.clearUserBlacklist(userId)
+            logger.info("Blacklist limpa com sucesso para usuário $userId: $deletedCount tokens removidos")
+
+            ResponseEntity.ok(mapOf(
+                "message" to "Blacklist limpa com sucesso",
+                "deletedTokens" to deletedCount,
+                "note" to "Faça logout e login novamente para obter um novo token"
+            ))
+        } catch (e: Exception) {
+            logger.error("Erro ao limpar blacklist: ${e.message}")
+            ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(mapOf("message" to "Erro ao limpar blacklist", "error" to (e.message ?: "Erro desconhecido")))
+        }
+    }
 }

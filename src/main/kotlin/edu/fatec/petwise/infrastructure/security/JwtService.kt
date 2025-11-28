@@ -115,18 +115,42 @@ class JwtService(
         return try {
             val claims = extractAllClaims(token)
             val now = Date()
-            val expiration = claims.expiration ?: return false
-            val type = claims["type"] as? String ?: return false
+            val expiration = claims.expiration ?: run {
+                logger.warn("Token validation failed: no expiration claim")
+                return false
+            }
+            val type = claims["type"] as? String ?: run {
+                logger.warn("Token validation failed: no type claim")
+                return false
+            }
+            val userId = claims.subject
+            val role = claims["role"]?.toString() ?: "UNKNOWN"
 
             // Check if token is blacklisted
             if (tokenBlacklistRepository.isTokenBlacklisted(token)) {
-                logger.warn("Token blacklisted: $token")
+                // Only log a masked version of the token for security
+                val maskedToken = token.take(10) + "..." + token.takeLast(10)
+                logger.warn("Token validation failed: token is blacklisted for user $userId (role: $role). Token: $maskedToken")
                 return false
             }
 
-            !expiration.before(now) && type == expectedType
+            val isExpired = expiration.before(now)
+            val typeMatches = type == expectedType
+            
+            if (isExpired) {
+                logger.warn("Token validation failed: token expired for user $userId (role: $role)")
+                return false
+            }
+            
+            if (!typeMatches) {
+                logger.warn("Token validation failed: expected type $expectedType but got $type for user $userId (role: $role)")
+                return false
+            }
+            
+            logger.debug("Token validated successfully for user $userId (role: $role, type: $type)")
+            true
         } catch (e: Exception) {
-            logger.warn("Token inválido: ${e.message}")
+            logger.warn("Token validation failed with exception: ${e.message}")
             false
         }
     }

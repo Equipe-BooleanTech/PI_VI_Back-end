@@ -9,4 +9,5 @@ interface TokenBlacklistRepository {
     fun save(tokenBlacklist: TokenBlacklist): TokenBlacklist
     fun deleteByExpiresAtBefore(date: LocalDateTime): Int
     fun findByUserId(userId: UUID): List<TokenBlacklist>
+    fun deleteByUserId(userId: UUID): Int
 }

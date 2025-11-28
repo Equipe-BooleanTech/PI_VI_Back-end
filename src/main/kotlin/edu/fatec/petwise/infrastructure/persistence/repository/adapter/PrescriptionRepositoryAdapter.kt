@@ -24,12 +24,28 @@ class PrescriptionRepositoryAdapter(
         return repository.findByUserId(userId).map { it.toDomain() }
     }
 
+    override fun findByVeterinaryId(veterinaryId: UUID): List<Prescription> {
+        return repository.findByVeterinaryId(veterinaryId).map { it.toDomain() }
+    }
+
+    override fun findByVeterinaryIdAndPetId(veterinaryId: UUID, petId: UUID): List<Prescription> {
+        return repository.findByVeterinaryIdAndPetId(veterinaryId, petId).map { it.toDomain() }
+    }
+
     override fun findByIdAndUserId(id: UUID, userId: UUID): Prescription? {
         return repository.findByIdAndUserId(id, userId)?.toDomain()
     }
 
     override fun findById(id: UUID): Optional<Prescription> {
         return repository.findById(id).map { it.toDomain() }
+    }
+
+    override fun existsByPetIdAndVeterinaryIdNot(petId: UUID, veterinaryId: UUID): Boolean {
+        return repository.existsByPetIdAndVeterinaryIdNot(petId, veterinaryId)
+    }
+
+    override fun existsByPetId(petId: UUID): Boolean {
+        return repository.existsByPetId(petId)
     }
 
     override fun save(prescription: Prescription): Prescription {

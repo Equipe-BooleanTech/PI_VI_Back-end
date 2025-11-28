@@ -16,6 +16,8 @@ interface VaccineRepository {
     fun findByVaccineType(vaccineType: VaccineType): List<Vaccine>
     fun findByPetIdAndVaccinationDateBetween(petId: UUID, startDate: LocalDateTime, endDate: LocalDateTime): List<Vaccine>
     fun countByPetIdAndVaccineType(petId: UUID, vaccineType: VaccineType): Long
+    fun existsByPetIdAndVeterinarianIdNot(petId: UUID, veterinarianId: UUID): Boolean
+    fun existsByPetId(petId: UUID): Boolean
     fun save(vaccine: Vaccine): Vaccine
     fun deleteById(id: UUID)
     fun deleteByPetId(petId: UUID)

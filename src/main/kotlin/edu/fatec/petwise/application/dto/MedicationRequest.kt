@@ -8,7 +8,7 @@ import java.util.UUID
 
 data class MedicationRequest(
     @field:NotNull(message = "Prescription ID é obrigatório")
-    val prescriptionId: UUID,
+    val prescriptionId: UUID?,
 
     @field:NotBlank(message = "Nome da medicação é obrigatório")
     val medicationName: String,

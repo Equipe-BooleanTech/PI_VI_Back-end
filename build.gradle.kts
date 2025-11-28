@@ -6,6 +6,7 @@ plugins {
 	kotlin("plugin.jpa") version "1.9.25"
 	kotlin("plugin.noarg") version "1.9.25"
 	kotlin("plugin.serialization") version "1.9.25"
+	jacoco // Plugin para cobertura de testes
 }
 
 group = "edu.fatec"
@@ -89,6 +90,167 @@ noArg {
 	annotation("jakarta.persistence.Embeddable")
 }
 
+// ============================================================================
+// CONFIGURAÇÃO DE TESTES
+// ============================================================================
+
 tasks.withType<Test> {
 	useJUnitPlatform()
+	
+	// Configuração de logs e relatórios de teste
+	testLogging {
+		events("passed", "skipped", "failed")
+		showExceptions = true
+		showCauses = true
+		showStackTraces = true
+		exceptionFormat = org.gradle.api.tasks.testing.logging.TestExceptionFormat.FULL
+	}
+	
+	// Relatório HTML de testes
+	reports {
+		html.required.set(true)
+		junitXml.required.set(true)
+	}
+	
+	finalizedBy(tasks.jacocoTestReport)
+}
+
+// Task para executar apenas testes do caso de uso Pet
+tasks.register<Test>("testPet") {
+	description = "Executa apenas os testes do caso de uso Pet"
+	group = "verification"
+	
+	useJUnitPlatform()
+	
+	filter {
+		includeTestsMatching("edu.fatec.petwise.pets.*")
+	}
+	
+	testLogging {
+		events("passed", "skipped", "failed")
+		showExceptions = true
+		showCauses = true
+		showStackTraces = true
+		exceptionFormat = org.gradle.api.tasks.testing.logging.TestExceptionFormat.FULL
+	}
+	
+	reports {
+		html.required.set(true)
+		html.outputLocation.set(layout.buildDirectory.dir("reports/tests/pet"))
+		junitXml.required.set(true)
+		junitXml.outputLocation.set(layout.buildDirectory.dir("test-results/pet"))
+	}
+	
+	finalizedBy("jacocoTestReportPet")
+}
+
+// ============================================================================
+// CONFIGURAÇÃO DO JACOCO - COBERTURA DE TESTES
+// ============================================================================
+
+jacoco {
+	toolVersion = "0.8.11"
+}
+
+// Relatório de cobertura geral
+tasks.jacocoTestReport {
+	dependsOn(tasks.test)
+	
+	reports {
+		xml.required.set(true)
+		csv.required.set(true)
+		html.required.set(true)
+		html.outputLocation.set(layout.buildDirectory.dir("reports/jacoco/html"))
+	}
+	
+	classDirectories.setFrom(
+		files(classDirectories.files.map {
+			fileTree(it) {
+				exclude(
+					"**/dto/**",
+					"**/config/**",
+					"**/entity/**",
+					"**/enums/**",
+					"**/exception/**",
+					"**/valueobject/**",
+					"**/infrastructure/**",
+					"**/presentation/**",
+					"**/*Application*",
+					"**/*Config*",
+					"**/*Request*",
+					"**/*Response*"
+				)
+			}
+		})
+	)
+}
+
+// Relatório de cobertura específico para Pet
+tasks.register<JacocoReport>("jacocoTestReportPet") {
+	dependsOn("testPet")
+	
+	description = "Gera relatório de cobertura para os testes do caso de uso Pet"
+	group = "verification"
+	
+	executionData.setFrom(fileTree(layout.buildDirectory).include("jacoco/testPet.exec"))
+	
+	sourceDirectories.setFrom(files("src/main/kotlin"))
+	classDirectories.setFrom(
+		files(layout.buildDirectory.dir("classes/kotlin/main")).asFileTree.matching {
+			include(
+				"**/usecase/*Pet*.class",
+				"**/usecase/Create*UseCase.class",
+				"**/usecase/Update*UseCase.class",
+				"**/usecase/Delete*UseCase.class",
+				"**/usecase/Get*UseCase.class",
+				"**/usecase/Filter*UseCase.class",
+				"**/usecase/Toggle*UseCase.class",
+				"**/usecase/Search*UseCase.class"
+			)
+		}
+	)
+	
+	reports {
+		xml.required.set(true)
+		csv.required.set(true)
+		html.required.set(true)
+		html.outputLocation.set(layout.buildDirectory.dir("reports/jacoco/pet"))
+	}
+}
+
+// Verificação de cobertura mínima
+tasks.jacocoTestCoverageVerification {
+	violationRules {
+		rule {
+			limit {
+				minimum = "0.60".toBigDecimal()
+			}
+		}
+		
+		rule {
+			element = "CLASS"
+			includes = listOf("edu.fatec.petwise.application.usecase.*")
+			limit {
+				counter = "LINE"
+				value = "COVEREDRATIO"
+				minimum = "0.70".toBigDecimal()
+			}
+		}
+	}
+}
+
+// Task para executar testes e gerar relatório completo
+tasks.register("testWithReport") {
+	description = "Executa todos os testes e gera relatório de cobertura"
+	group = "verification"
+	
+	dependsOn("test", "jacocoTestReport")
+}
+
+// Task para executar testes Pet e gerar relatório
+tasks.register("testPetWithReport") {
+	description = "Executa testes do Pet e gera relatório de cobertura"
+	group = "verification"
+	
+	dependsOn("testPet", "jacocoTestReportPet")
 }

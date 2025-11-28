@@ -20,6 +20,11 @@ class ExamRepositoryAdapter(
     override fun findByExamType(examType: String): List<Exam> = repository.findByExamType(examType).map { it.toDomain() }
     override fun findByPetIdAndExamDateBetween(petId: UUID, startDate: LocalDateTime, endDate: LocalDateTime): List<Exam> = repository.findByPetIdAndExamDateBetween(petId, startDate, endDate).map { it.toDomain() }
     override fun findByExamTypeContainingIgnoreCaseOrResultsContainingIgnoreCaseOrNotesContainingIgnoreCase(examType: String, results: String, notes: String): List<Exam> = repository.findByExamTypeContainingIgnoreCaseOrResultsContainingIgnoreCaseOrNotesContainingIgnoreCase(examType, results, notes).map { it.toDomain() }
+
+    override fun existsByPetIdAndVeterinaryIdNot(petId: UUID, veterinaryId: UUID): Boolean = repository.existsByPetIdAndVeterinaryIdNot(petId, veterinaryId)
+
+    override fun existsByPetId(petId: UUID): Boolean = repository.existsByPetId(petId)
+
     override fun save(exam: Exam): Exam {
         val entity = exam.toEntity()
         val saved = repository.save(entity)
