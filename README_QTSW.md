@@ -1,10 +1,10 @@
-# README_QTSW - Quality Test Summary and Workflow
+# README_QTSW
 
 ## Visão Geral dos Testes
 
 Este documento apresenta o resumo completo da suíte de testes unitários implementada para o projeto PetWise. Foram desenvolvidos **20 testes unitários** abrangendo todos os casos de uso principais, com foco em:
 
-- **Caminhos Felizes** (Happy Path)
+- **Caminhos Felizes**
 - **Fluxos Alternativos**
 - **Fluxos de Exceção**
 - **Regras de Negócio**
@@ -215,24 +215,6 @@ fun `T10 - deve impedir delecao de pet com dados de veterinarios`() {
 | RN18 | Estado consistente no toggle | T18 |
 | RN19 | Pet deve existir para toggle | T19 |
 | RN20 | Timestamp atualizado no toggle | T20 |
-
----
-
-## Métricas de Qualidade
-
-### Cobertura de Código
-- **Linhas**: ~85%
-- **Branches**: ~90%
-- **Classes**: 100% dos Use Cases
-
-### Complexidade Ciclomática
-- **Média por método**: 2.1
-- **Máximo por método**: 5
-
-### Manutenibilidade
-- **Índice**: A (Excelente)
-- **Dívida Técnica**: Baixa
-
 ---
 
 ## Como Executar os Testes
@@ -247,12 +229,6 @@ cd server
 ```bash
 # Apenas testes de Pet
 ./gradlew test --tests "*PetUseCaseTests*"
-
-# Apenas criação
-./gradlew test --tests "*PetUseCaseTests.CreatePetTests*"
-
-# Apenas deleção
-./gradlew test --tests "*PetUseCaseTests.DeletePetTests*"
 ```
 
 ### Relatório de Cobertura

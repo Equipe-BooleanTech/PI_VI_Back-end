@@ -17,7 +17,7 @@ data class ErrorResponse(
     val timestamp: String = LocalDateTime.now().toString(),
     val status: Int,
     val error: String,
-    val message: String,
+    val message: String?,
     val path: String? = null,
     val validationErrors: Map<String, String>? = null
 )
