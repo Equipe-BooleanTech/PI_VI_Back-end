@@ -50,8 +50,9 @@ dependencies {
 	runtimeOnly("io.jsonwebtoken:jjwt-impl:0.12.3")
 	runtimeOnly("io.jsonwebtoken:jjwt-jackson:0.12.3")
 
-	// ✅ CORREÇÃO 5: Rate Limiting com Bucket4j
 	implementation("com.bucket4j:bucket4j-core:8.10.1")
+	implementation("org.springframework.integration:spring-integration-mqtt:6.3.0")
+	implementation("org.eclipse.paho:org.eclipse.paho.client.mqttv3:1.2.5")
 
 	compileOnly("org.projectlombok:lombok")
 	annotationProcessor("org.projectlombok:lombok")

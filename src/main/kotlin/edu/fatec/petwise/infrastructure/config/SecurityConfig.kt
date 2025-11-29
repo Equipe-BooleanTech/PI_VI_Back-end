@@ -51,8 +51,9 @@ class SecurityConfig(
                         "/api/auth/reset-password",
                         "/v3/api-docs/**",
                         "/swagger-ui/**",
-                        "/swagger-ui.html"
-                    ).permitAll()
+                        "/swagger-ui.html",
+                        "/api/iot/**",
+                        ).permitAll()
                     // Logout requires authentication - any authenticated user can logout
                     .requestMatchers("/api/auth/logout").authenticated()
                     .requestMatchers("/api/auth/profile").hasAnyRole(

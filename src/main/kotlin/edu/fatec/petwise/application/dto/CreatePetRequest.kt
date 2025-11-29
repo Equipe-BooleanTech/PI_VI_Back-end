@@ -44,5 +44,10 @@ data class CreatePetRequest(
     val healthHistory: String = "",
 
     @field:Size(max = 500, message = "URL da imagem deve ter no máximo 500 caracteres")
-    val profileImageUrl: String? = null
+    val profileImageUrl: String? = null,
+
+    val shouldPairNfc: Boolean = false,
+
+    @field:Size(max = 50, message = "Reader ID deve ter no máximo 50 caracteres")
+    val readerId: String? = null
 )

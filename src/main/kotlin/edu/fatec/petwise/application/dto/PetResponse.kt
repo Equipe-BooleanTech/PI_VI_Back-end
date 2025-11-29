@@ -23,7 +23,11 @@ data class PetResponse(
     val nextAppointment: LocalDateTime?,
     val active: Boolean,
     val createdAt: LocalDateTime,
-    val updatedAt: LocalDateTime
+    val updatedAt: LocalDateTime,
+
+    // 🆕 IOT: Informações sobre NFC
+    val hasNfcTag: Boolean = false,
+    val nfcPairingStatus: String? = null  // "WAITING_TAG", "PAIRED", "NOT_PAIRED"
 ) {
     companion object {
         fun fromEntity(pet: Pet): PetResponse {

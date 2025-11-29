@@ -13,7 +13,8 @@ class DeletePetUseCase(
     private val vaccineRepository: VaccineRepository,
     private val prescriptionRepository: PrescriptionRepository,
     private val medicationRepository: MedicationRepository,
-    private val examRepository: ExamRepository
+    private val examRepository: ExamRepository,
+    private val petTagRepository: PetTagRepository
 ) {
     private val logger = LoggerFactory.getLogger(javaClass)
 
@@ -31,6 +32,7 @@ class DeletePetUseCase(
         appointmentRepository.deleteByPetId(petId)
         vaccineRepository.deleteByPetId(petId)
         examRepository.deleteByPetId(petId)
+        petTagRepository.deleteByPetId(petId)
 
         // Get prescriptions for the pet and delete medications for each prescription
         val prescriptions = prescriptionRepository.findByPetId(petId)
