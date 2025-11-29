@@ -13,6 +13,7 @@ import edu.fatec.petwise.domain.enums.UserType
 import edu.fatec.petwise.domain.repository.*
 import edu.fatec.petwise.domain.valueobject.Email
 import edu.fatec.petwise.domain.valueobject.Telefone
+import edu.fatec.petwise.infrastructure.service.IotService
 import io.mockk.*
 import io.mockk.impl.annotations.InjectMockKs
 import io.mockk.impl.annotations.MockK
@@ -62,6 +63,8 @@ class PetUseCaseTests {
     @MockK private lateinit var prescriptionRepository: PrescriptionRepository
     @MockK private lateinit var medicationRepository: MedicationRepository
     @MockK private lateinit var examRepository: ExamRepository
+    @MockK private lateinit var petTagRepository: PetTagRepository
+    @MockK private lateinit var iotService: IotService
     
     // Use Cases (SUT - System Under Test)
     private lateinit var createPetUseCase: CreatePetUseCase
@@ -78,11 +81,12 @@ class PetUseCaseTests {
     @BeforeEach
     fun setUp() {
         MockKAnnotations.init(this)
-        createPetUseCase = CreatePetUseCase(petRepository)
+        createPetUseCase = CreatePetUseCase(petRepository, iotService)
         updatePetUseCase = UpdatePetUseCase(petRepository)
         deletePetUseCase = DeletePetUseCase(
             petRepository, appointmentRepository, vaccineRepository,
-            prescriptionRepository, medicationRepository, examRepository
+            prescriptionRepository, medicationRepository, examRepository,
+            petTagRepository
         )
         getAllPetsUseCase = GetAllPetsUseCase(petRepository, userRepository)
         toggleFavoriteUseCase = ToggleFavoriteUseCase(petRepository)
@@ -359,6 +363,7 @@ class PetUseCaseTests {
             every { appointmentRepository.deleteByPetId(testPetId) } just runs
             every { vaccineRepository.deleteByPetId(testPetId) } just runs
             every { examRepository.deleteByPetId(testPetId) } just runs
+            every { petTagRepository.deleteByPetId(testPetId) } just runs
             every { prescriptionRepository.findByPetId(testPetId) } returns emptyList()
             every { prescriptionRepository.deleteByPetId(testPetId) } just runs
             every { petRepository.deleteById(testPetId) } just runs
@@ -374,6 +379,7 @@ class PetUseCaseTests {
                 appointmentRepository.deleteByPetId(testPetId)
                 vaccineRepository.deleteByPetId(testPetId)
                 examRepository.deleteByPetId(testPetId)
+                petTagRepository.deleteByPetId(testPetId)
                 petRepository.deleteById(testPetId)
             }
         }
