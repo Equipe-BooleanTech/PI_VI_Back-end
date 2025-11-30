@@ -16,8 +16,7 @@ class ToggleFavoriteUseCase(
     fun execute(userId: String, petId: UUID): ToggleFavoriteResponse {
         val pet = petRepository.findById(petId).orElseThrow { Exception("Pet não encontrado") }
 
-        // For now, we'll allow any user to toggle favorite
-        // In a real app, you might want to track favorites per user
+        
         pet.isFavorite = !pet.isFavorite
         pet.updatedAt = LocalDateTime.now()
 

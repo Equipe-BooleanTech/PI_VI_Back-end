@@ -19,10 +19,10 @@ class RateLimitFilter : OncePerRequestFilter() {
 
     private val logger = LoggerFactory.getLogger(javaClass)
 
-    // Cache de buckets por IP
+    
     private val cache = ConcurrentHashMap<String, Bucket>()
 
-    // Configurações de rate limit por endpoint
+    
     private val rateLimits = mapOf(
         "/api/auth/login" to RateLimitConfig(capacity = 5, refillTokens = 5, refillDuration = Duration.ofMinutes(1)),
         "/api/auth/register" to RateLimitConfig(capacity = 3, refillTokens = 3, refillDuration = Duration.ofMinutes(1)),
@@ -37,7 +37,7 @@ class RateLimitFilter : OncePerRequestFilter() {
         val path = request.requestURI
         val rateLimitConfig = rateLimits[path]
 
-        // Se a rota não tem rate limit configurado, passa adiante
+        
         if (rateLimitConfig == null) {
             filterChain.doFilter(request, response)
             return
@@ -53,11 +53,11 @@ class RateLimitFilter : OncePerRequestFilter() {
         val probe = bucket.tryConsumeAndReturnRemaining(1)
 
         if (probe.isConsumed) {
-            // Adiciona headers informativos
+            
             response.addHeader("X-Rate-Limit-Remaining", probe.remainingTokens.toString())
             filterChain.doFilter(request, response)
         } else {
-            // Rate limit excedido
+            
             logger.warn("Rate limit excedido para IP $clientIp na rota $path")
             response.status = HttpStatus.TOO_MANY_REQUESTS.value()
             response.contentType = "application/json"
@@ -87,7 +87,7 @@ class RateLimitFilter : OncePerRequestFilter() {
     }
 
     private fun getClientIp(request: HttpServletRequest): String {
-        // Verifica headers de proxy reverso
+        
         val xForwardedFor = request.getHeader("X-Forwarded-For")
         if (!xForwardedFor.isNullOrEmpty()) {
             return xForwardedFor.split(",")[0].trim()
@@ -110,6 +110,6 @@ class RateLimitFilter : OncePerRequestFilter() {
 
 @Configuration
 class RateLimitConfiguration {
-    // Configuração adicional pode ser adicionada aqui
-    // Por exemplo: limpeza periódica do cache, configurações por perfil, etc.
+    
+    
 }

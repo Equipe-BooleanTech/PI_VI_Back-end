@@ -19,10 +19,10 @@ class SearchPetsUseCase(
         val user = userRepository.findById(userId).orElseThrow { Exception("User not found") }
         
         val pets = if (user.userType.name == "OWNER") {
-            // For owners, search only their own pets
+            
             petRepository.searchByNameAndOwnerId(query, userId)
         } else {
-            // For other user types, search all pets
+            
             petRepository.searchByName(query)
         }
 

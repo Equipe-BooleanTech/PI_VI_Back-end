@@ -24,7 +24,7 @@ class PetRepositoryAdapter(
     override fun searchByNameAndOwnerId(query: String, ownerId: UUID): List<Pet> = repository.searchByNameAndOwnerId(query, ownerId).map { it.toDomain() }
     override fun searchByName(query: String): List<Pet> = repository.searchByName(query).map { it.toDomain() }
     override fun filterPets(options: PetFilterOptions): List<Pet> {
-        // Implement naive filtering using repository.findAll and in-memory filtering as fallback
+        
         var pets = repository.findAll().map { it.toDomain() }
         options.species?.let { species -> pets = pets.filter { it.species == species } }
         options.healthStatus?.let { health -> pets = pets.filter { it.healthStatus == health } }

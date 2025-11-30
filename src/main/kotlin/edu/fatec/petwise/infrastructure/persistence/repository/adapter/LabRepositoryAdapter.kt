@@ -17,7 +17,7 @@ class LabRepositoryAdapter(
     }
 
     override fun finByVeterinaryId(veterinaryId: UUID): List<Lab> {
-        // TODO: Implement if needed, currently returning empty
+        
         return emptyList()
     }
 

@@ -21,13 +21,13 @@ class SearchExamsUseCase(
 
         val exams = when (user.userType) {
             UserType.VETERINARY -> {
-                // Veterinarians can search all exams
+                
                 examRepository.findByExamTypeContainingIgnoreCaseOrResultsContainingIgnoreCaseOrNotesContainingIgnoreCase(
                     query, query, query
                 )
             }
             UserType.OWNER -> {
-                // Owners can only search exams for their pets
+                
                 val ownerPets = petRepository.findByOwnerId(userId)
                 val petIds = ownerPets.map { it.id }
                 val allExams = petIds.flatMap { petId ->

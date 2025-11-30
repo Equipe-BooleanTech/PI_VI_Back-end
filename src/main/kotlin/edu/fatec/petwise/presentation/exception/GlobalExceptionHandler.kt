@@ -103,7 +103,7 @@ class GlobalExceptionHandler {
     fun handleGenericException(ex: Exception): ResponseEntity<ErrorResponse> {
         logger.error("Erro interno do servidor: ${ex.message}", ex)
         
-        // For specific business logic errors, return the actual message
+        
         val message = when {
             ex.message?.contains("Pet não encontrado") == true -> ex.message
             ex.message?.contains("Você não tem permissão") == true -> ex.message

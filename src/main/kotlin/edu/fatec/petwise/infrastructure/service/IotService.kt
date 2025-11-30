@@ -164,26 +164,26 @@ class IotService(
         }
     }
     
-    // 🆕 Frontend consulta última leitura
+    
     fun getLastTagRead(): LastTagReadResponse? {
         return lastTagRead
     }
 
-    // Lógica de Cadastro (Privada)
+    
     private fun registerNewTag(tagUid: String, readerId: String): IotCheckInResponse {
-        val petId = pairingCache[readerId]!! // Pega o ID do Pet da memória
+        val petId = pairingCache[readerId]!! 
 
-        // Verifica se a tag já não é de outro bicho
+        
         val tagExistente = petTagRepository.findByTagUid(tagUid)
         if (tagExistente != null) {
-            // Se já existe, removemos do modo de pareamento para evitar loops de erro
+            
             pairingCache.remove(readerId)
-            // Retornamos uma mensagem de erro para aparecer no OLED
-            // Usamos um Pet temporário ou null safe para retornar o erro
+            
+            
             return IotCheckInResponse(petId, "ERRO", "TAG JA", "USADA", "", "ERRO: TAG EM USO")
         }
 
-        // Salva a nova tag
+        
         val novaTag = PetTag(
             id = null,
             tagUid = tagUid,
@@ -194,23 +194,23 @@ class IotService(
         )
         petTagRepository.save(novaTag)
 
-        // Tira do modo de espera
+        
         pairingCache.remove(readerId)
 
         return buildResponse(petId, "Cadastrado!")
     }
 
-    // Lógica de Check-in (Privada)
+    
     private fun performCheckIn(tagUid: String): IotCheckInResponse {
         val petTag = petTagRepository.findByTagUid(tagUid)
-            ?: throw RuntimeException("Tag nao cadastrada") // Isso vira 404 no Controller
+            ?: throw RuntimeException("Tag nao cadastrada") 
 
         if (!petTag.active) throw RuntimeException("Tag inativa")
 
         return buildResponse(petTag.petId, "Bem-vindo")
     }
 
-    // Auxiliar para montar a resposta JSON bonita
+    
     private fun buildResponse(petId: UUID, message: String): IotCheckInResponse {
         val pet = petRepository.findById(petId)
             .orElseThrow { RuntimeException("Pet nao encontrado") }
@@ -227,9 +227,9 @@ class IotService(
         )
     }
 
-    // 🆕 NOVO: Buscar Pet completo por Tag UID (para o frontend exibir informações)
+    
     fun getPetByTagUid(tagUid: String): PetWithOwnerResponse {
-        // 1. Buscar a tag
+        
         val petTag = petTagRepository.findByTagUid(tagUid)
             ?: throw RuntimeException("Tag NFC não cadastrada no sistema")
 
@@ -237,17 +237,17 @@ class IotService(
             throw RuntimeException("Tag NFC está inativa")
         }
 
-        // 2. Buscar o Pet
+        
         val pet = petRepository.findById(petTag.petId)
             .orElseThrow { RuntimeException("Pet não encontrado para esta tag") }
 
-        // 3. Buscar o Dono
+        
         val owner = userRepository.findById(pet.ownerId)
             .orElseThrow { RuntimeException("Dono do pet não encontrado") }
 
-        // 4. Montar resposta completa
+        
         return PetWithOwnerResponse(
-            // Dados do Pet
+            
             petId = pet.id!!,
             petName = pet.name,
             breed = pet.breed,
@@ -262,7 +262,7 @@ class IotService(
             isFavorite = pet.isFavorite,
             nextAppointment = pet.nextAppointment,
 
-            // Dados do Dono
+            
             ownerId = owner.id!!,
             ownerName = owner.fullName,
             ownerEmail = owner.email,
@@ -270,7 +270,7 @@ class IotService(
             ownerCpf = owner.cpf,
             ownerUserType = owner.userType.name,
 
-            // Metadados
+            
             nfcTagUid = tagUid,
             lastCheckIn = LocalDateTime.now()
         )

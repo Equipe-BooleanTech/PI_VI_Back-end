@@ -22,16 +22,16 @@ class CreateExamUseCase(
         val userId = UUID.fromString(authentication.principal.toString())
         val user = userRepository.findById(userId).orElseThrow { IllegalArgumentException("Usuário não encontrado") }
 
-        // Only VETERINARY users can create exams
+        
         if (user.userType != UserType.VETERINARY) {
             throw IllegalArgumentException("Apenas veterinários podem criar exames")
         }
 
-        // Verifica se o pet existe
+        
         val petId = UUID.fromString(request.petId)
         val pet = petRepository.findById(petId).orElseThrow { IllegalArgumentException("Pet não encontrado") }
 
-        // Cria o exame
+        
         val exam = Exam(
             id = null,
             petId = petId,

@@ -45,7 +45,7 @@ class UpdateProfileUseCase(
                     throw DuplicateEntityException("Já existe um usuário cadastrado com este email")
                 }
                 user.email = Email(newEmail)
-                requiresLogout = true // Email change requires logout
+                requiresLogout = true 
                 logger.info("Email atualizado para usuário: $userId")
             }
         }

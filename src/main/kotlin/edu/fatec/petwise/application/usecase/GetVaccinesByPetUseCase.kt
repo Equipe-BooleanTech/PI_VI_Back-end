@@ -19,10 +19,10 @@ class GetVaccinesByPetUseCase(
         val userId = UUID.fromString(authentication.principal.toString())
         val user = userRepository.findById(userId).orElseThrow { IllegalArgumentException("Usuário não encontrado") }
 
-        // Verificar se o pet existe
+        
         val pet = petRepository.findById(petId).orElseThrow { IllegalArgumentException("Pet não encontrado") }
 
-        // If user is OWNER, check if the pet belongs to them
+        
         if (user.userType == UserType.OWNER && pet.ownerId != userId) {
             throw IllegalArgumentException("Pet não pertence ao usuário")
         }

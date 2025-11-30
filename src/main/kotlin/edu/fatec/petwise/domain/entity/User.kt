@@ -35,7 +35,7 @@ class User(
 
     var updatedAt: LocalDateTime = LocalDateTime.now()
 ) {
-    // Default constructor for JPA
+    
     constructor(): this(
         id = null,
         fullName = "",

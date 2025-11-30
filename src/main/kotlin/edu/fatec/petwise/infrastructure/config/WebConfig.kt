@@ -49,14 +49,14 @@ class LocalDateTimeDeserializer : JsonDeserializer<LocalDateTime>() {
         for (formatter in formatters) {
             try {
                 return if (formatter == DateTimeFormatter.ofPattern("dd/MM/yyyy")) {
-                    // For date only, assume 00:00:00
+                    
                     val date = java.time.LocalDate.parse(value, formatter)
                     LocalDateTime.of(date, java.time.LocalTime.MIDNIGHT)
                 } else {
                     LocalDateTime.parse(value, formatter)
                 }
             } catch (e: DateTimeParseException) {
-                // Try next formatter
+                
             }
         }
 

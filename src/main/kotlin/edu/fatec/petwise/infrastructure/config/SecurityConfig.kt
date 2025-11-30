@@ -54,7 +54,7 @@ class SecurityConfig(
                         "/swagger-ui.html",
                         "/api/iot/**",
                         ).permitAll()
-                    // Logout requires authentication - any authenticated user can logout
+                    
                     .requestMatchers("/api/auth/logout").authenticated()
                     .requestMatchers("/api/auth/profile").hasAnyRole(
                         "OWNER", "VETERINARY", "PETSHOP", "PHARMACY"

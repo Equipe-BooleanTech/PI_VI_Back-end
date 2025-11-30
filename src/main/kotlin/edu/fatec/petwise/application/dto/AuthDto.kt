@@ -59,5 +59,3 @@ data class AuthResponse(
     val expiresIn: Long
 )
 
-
-// `UserResponse` is declared in its own file `UserResponse.kt` to be shared across DTOs

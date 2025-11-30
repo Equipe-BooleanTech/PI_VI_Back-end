@@ -22,12 +22,12 @@ class CancelAppointmentUseCase(
         val appointment = appointmentRepository.findById(appointmentId).orElse(null)
             ?: throw Exception("Consulta não encontrada")
 
-        // Check permissions: VETERINARY and OWNER can cancel
+        
         if (user.userType != UserType.VETERINARY && user.userType != UserType.OWNER) {
             throw IllegalArgumentException("Usuário não tem permissão para cancelar consultas")
         }
 
-        // Verificar se a consulta pode ser cancelada
+        
         if (!appointment.canCancel()) {
             throw IllegalStateException(
                 "Consultas com status ${appointment.status} não podem ser canceladas. " +
@@ -35,7 +35,7 @@ class CancelAppointmentUseCase(
             )
         }
 
-        // Alterar status para CANCELLED
+        
         appointment.status = ConsultaStatus.CANCELLED
         appointmentRepository.save(appointment)
 

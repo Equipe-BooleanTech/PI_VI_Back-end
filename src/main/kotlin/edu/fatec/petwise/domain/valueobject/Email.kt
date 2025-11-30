@@ -7,7 +7,7 @@ data class Email(
     @jakarta.persistence.Column(name = "email")
     val value: String
 ) {
-    // Default constructor for JPA
+    
     constructor(): this("")
     init {
         require(value.isNotBlank()) { "Email não pode estar vazio" }

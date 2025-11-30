@@ -19,7 +19,7 @@ class TokenBlacklistRepositoryAdapter(
     override fun isTokenBlacklisted(token: String): Boolean {
         val isBlacklisted = repository.existsByToken(token)
         if (isBlacklisted) {
-            // Log when we find a blacklisted token for debugging
+            
             val maskedToken = token.take(10) + "..." + token.takeLast(10)
             logger.debug("Token found in blacklist: $maskedToken")
         }

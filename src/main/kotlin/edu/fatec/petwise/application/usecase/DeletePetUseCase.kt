@@ -25,23 +25,23 @@ class DeletePetUseCase(
             throw Exception("Você não tem permissão para remover este pet")
         }
 
-        // Verificar se existem dados de veterinários associados ao pet
+        
         validateNoVeterinaryData(petId)
 
-        // Delete related data
+        
         appointmentRepository.deleteByPetId(petId)
         vaccineRepository.deleteByPetId(petId)
         examRepository.deleteByPetId(petId)
         petTagRepository.deleteByPetId(petId)
 
-        // Get prescriptions for the pet and delete medications for each prescription
+        
         val prescriptions = prescriptionRepository.findByPetId(petId)
         prescriptions.forEach { prescription ->
             medicationRepository.deleteByPrescriptionId(prescription.id!!)
         }
         prescriptionRepository.deleteByPetId(petId)
 
-        // Finally delete the pet
+        
         petRepository.deleteById(petId)
         logger.info("Pet $petId removido pelo usuário $userId")
         return MessageResponse("Pet removido com sucesso")

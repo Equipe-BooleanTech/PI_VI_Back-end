@@ -22,12 +22,12 @@ class UpdateHealthStatusUseCase(
         
         val pet = petRepository.findById(petId).orElseThrow { Exception("Pet não encontrado") }
 
-        // Check if user owns the pet or has permission to update
+        
         if (pet.ownerId != userId) {
             throw Exception("Usuário não tem permissão para atualizar este pet")
         }
 
-        // Parse healthStatus
+        
         val healthStatus = try {
             HealthStatus.valueOf(request.healthStatus.uppercase())
         } catch (e: IllegalArgumentException) {

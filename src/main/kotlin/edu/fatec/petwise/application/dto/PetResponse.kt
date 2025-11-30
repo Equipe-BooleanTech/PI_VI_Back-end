@@ -25,9 +25,9 @@ data class PetResponse(
     val createdAt: LocalDateTime,
     val updatedAt: LocalDateTime,
 
-    // 🆕 IOT: Informações sobre NFC
+    
     val hasNfcTag: Boolean = false,
-    val nfcPairingStatus: String? = null  // "WAITING_TAG", "PAIRED", "NOT_PAIRED"
+    val nfcPairingStatus: String? = null  
 ) {
     companion object {
         fun fromEntity(pet: Pet): PetResponse {
@@ -48,7 +48,7 @@ data class PetResponse(
                 profileImageUrl = pet.profileImageUrl,
                 isFavorite = pet.isFavorite,
                 nextAppointment = pet.nextAppointment,
-                active = true, // TODO
+                active = true, 
                 createdAt = pet.createdAt,
                 updatedAt = pet.updatedAt
             )

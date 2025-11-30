@@ -19,14 +19,14 @@ class UpdateExamUseCase(
         val userId = UUID.fromString(authentication.principal.toString())
         val user = userRepository.findById(userId).orElseThrow { IllegalArgumentException("Usuário não encontrado") }
 
-        // Only VETERINARY users can update exams
+        
         if (user.userType != UserType.VETERINARY) {
             throw IllegalArgumentException("Apenas veterinários podem atualizar exames")
         }
 
         val existingExam = examRepository.findById(id).orElseThrow { IllegalArgumentException("Exame não encontrado") }
 
-        // Update the exam
+        
         existingExam.examType = request.examType
         existingExam.examDate = request.examDate
         existingExam.results = request.results

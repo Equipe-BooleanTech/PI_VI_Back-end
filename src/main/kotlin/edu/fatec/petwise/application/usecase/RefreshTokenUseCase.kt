@@ -16,7 +16,7 @@ class RefreshTokenUseCase(
     private val logger = LoggerFactory.getLogger(javaClass)
 
     fun execute(refreshToken: String): AuthResponse {
-        // ✅ CORREÇÃO 6: Logs sanitizados - não expõe tokens
+        
         logger.info("Renovando token...")
 
         if (!jwtService.validateToken(refreshToken, "REFRESH")) {
@@ -36,7 +36,7 @@ class RefreshTokenUseCase(
             userType = user.userType
         )
 
-        // ✅ MELHORIA: Rotação de refresh token (recomendação de segurança)
+        
         val newRefreshToken = jwtService.generateRefreshToken(
             userId = user.id.toString(),
             email = user.email.value
@@ -55,7 +55,7 @@ class RefreshTokenUseCase(
         )
     }
 
-    // 🔒 SEGURANÇA: Função para mascarar email nos logs
+    
     private fun maskEmail(email: String): String {
         val parts = email.split("@")
         if (parts.size != 2) return "***@***"

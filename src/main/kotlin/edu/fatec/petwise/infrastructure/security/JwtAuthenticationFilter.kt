@@ -21,7 +21,7 @@ class JwtAuthenticationFilter(
     ) {
         val path = request.requestURI
 
-        // 🔒 Ignora rotas públicas e do Swagger/OpenAPI
+        
         if (path == "/api/auth/register" ||
             path == "/api/auth/login" ||
             path == "/api/auth/forgot-password" ||
@@ -47,9 +47,9 @@ class JwtAuthenticationFilter(
             val token = authHeader.substring(7)
             val maskedToken = token.take(10) + "..." + token.takeLast(10)
 
-            // ✅ CORREÇÃO 2: validateToken agora aceita 1 parâmetro (usa "ACCESS" como padrão)
+            
             if (jwtService.validateToken(token)) {
-                // ✅ CORREÇÃO 1: Métodos renomeados para getUserIdFromToken e getRoleFromToken
+                
                 val userId = jwtService.getUserIdFromToken(token)
                 val role = jwtService.getRoleFromToken(token)
 
@@ -63,9 +63,9 @@ class JwtAuthenticationFilter(
                 logger.warn("Token validation failed for path $path - token: $maskedToken")
             }
         } catch (e: Exception) {
-            // 🔒 SEGURANÇA: Não expõe detalhes do erro (apenas loga)
+            
             logger.error("Erro ao processar token JWT: ${e.javaClass.simpleName}")
-            // 🔒 Log detalhado apenas em nível DEBUG
+            
             logger.debug("Detalhes do erro JWT: ${e.message}", e)
         }
 

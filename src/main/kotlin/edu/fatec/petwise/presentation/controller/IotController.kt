@@ -54,8 +54,7 @@ class IotController(
         }
     }
 
-    // 🆕 ROTA 3: FRONTEND -> Busca informações completas do Pet + Dono pelo NFC
-    // Usado para exibir página de detalhes após leitura do cartão
+    
     @GetMapping("/pet-by-tag/{tagUid}")
     fun getPetByTag(@PathVariable tagUid: String): ResponseEntity<PetWithOwnerResponse> {
         return try {

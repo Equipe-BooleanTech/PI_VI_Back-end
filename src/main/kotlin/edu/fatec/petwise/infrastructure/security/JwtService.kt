@@ -25,17 +25,17 @@ class JwtService(
     private lateinit var secret: String
 
     @Value("\${JWT_EXPIRATION}")
-    private var expiration: Long = 86400000 // 1 dia
+    private var expiration: Long = 86400000 
 
-    @Value("\${JWT_RESET_EXPIRATION:900000}") // 15 minutos padrão
+    @Value("\${JWT_RESET_EXPIRATION:900000}") 
     private var resetExpiration: Long = 900000
 
-    @Value("\${JWT_REFRESH_EXPIRATION:604800000}") // 7 dias padrão
+    @Value("\${JWT_REFRESH_EXPIRATION:604800000}") 
     private var refreshExpiration: Long = 604800000
 
     @PostConstruct
     fun validateSecretKey() {
-        // 🔒 VALIDAÇÃO DE SEGURANÇA: JWT Secret deve ter no mínimo 256 bits (64 caracteres hex)
+        
         if (secret.length < 64) {
             throw IllegalStateException(
                 "JWT_SECRET deve ter no mínimo 256 bits (64 caracteres). " +
@@ -126,9 +126,9 @@ class JwtService(
             val userId = claims.subject
             val role = claims["role"]?.toString() ?: "UNKNOWN"
 
-            // Check if token is blacklisted
+            
             if (tokenBlacklistRepository.isTokenBlacklisted(token)) {
-                // Only log a masked version of the token for security
+                
                 val maskedToken = token.take(10) + "..." + token.takeLast(10)
                 logger.warn("Token validation failed: token is blacklisted for user $userId (role: $role). Token: $maskedToken")
                 return false

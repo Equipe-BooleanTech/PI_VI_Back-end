@@ -25,7 +25,7 @@ class CreateAppointmentUseCase(
     fun execute(userId: UUID, request: CreateAppointmentRequest): AppointmentResponse {
         val user = userRepository.findById(userId).orElseThrow { Exception("Usuário não encontrado") }
 
-        // Only VETERINARY users can create appointments
+        
         if (user.userType != UserType.VETERINARY) {
             throw IllegalArgumentException("Apenas veterinários podem criar consultas")
         }

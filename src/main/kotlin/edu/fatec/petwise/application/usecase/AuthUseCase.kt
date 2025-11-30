@@ -127,7 +127,7 @@ class RegisterUserUseCase(
         }
     }
 
-    // 🔒 SEGURANÇA: Função para mascarar email nos logs
+    
     private fun maskEmail(email: String): String {
         val parts = email.split("@")
         if (parts.size != 2) return "***@***"
@@ -155,7 +155,7 @@ class LoginUserUseCase(
     private val logger = LoggerFactory.getLogger(javaClass)
 
     fun execute(request: LoginRequest): AuthResponse {
-        // ✅ CORREÇÃO 6: Logs sanitizados - não expõe email completo
+        
         val maskedEmail = maskEmail(request.email)
         logger.info("Tentativa de login para: $maskedEmail")
 
@@ -167,7 +167,7 @@ class LoginUserUseCase(
         }
 
         if (!passwordEncoder.matches(request.password, user.passwordHash)) {
-            // 🔒 SEGURANÇA: Mensagem genérica para não revelar se email existe
+            
             throw BusinessRuleException("Email ou senha incorretos")
         }
 
@@ -195,7 +195,7 @@ class LoginUserUseCase(
         )
     }
 
-    // 🔒 SEGURANÇA: Função para mascarar email nos logs
+    
     private fun maskEmail(email: String): String {
         val parts = email.split("@")
         if (parts.size != 2) return "***@***"
@@ -222,13 +222,13 @@ class LogoutUserUseCase(
     fun execute(token: String, userId: String) {
         logger.info("Logout solicitado para usuário: $userId")
 
-        // Blacklist the token to prevent further use
+        
         jwtService.blacklistToken(token, userId, "User logout")
 
         logger.info("Token blacklisted com sucesso para usuário: $userId")
     }
 
-    // 🔒 SEGURANÇA: Função para mascarar email nos logs
+    
     private fun maskEmail(email: String): String {
         val parts = email.split("@")
         if (parts.size != 2) return "***@***"

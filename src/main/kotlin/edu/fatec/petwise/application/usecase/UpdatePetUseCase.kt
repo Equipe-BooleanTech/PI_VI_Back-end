@@ -20,12 +20,12 @@ class UpdatePetUseCase(
     fun execute(userId: UUID, petId: UUID, request: UpdatePetRequest): PetResponse {
         val pet = petRepository.findById(petId).orElseThrow { Exception("Pet não encontrado") }
 
-        // Check if user is the owner
+        
         if (pet.ownerId != userId) {
             throw Exception("Você não tem permissão para atualizar este pet")
         }
 
-        // Update pet
+        
         request.name?.let { pet.name = it.trim() }
         request.breed?.let { pet.breed = it.trim() }
         request.species?.let { pet.species = PetSpecies.valueOf(it.uppercase()) }

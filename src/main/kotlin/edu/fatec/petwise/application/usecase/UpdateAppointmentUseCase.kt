@@ -24,9 +24,9 @@ class UpdateAppointmentUseCase(
 
         val appointment = appointmentRepository.findById(appointmentId).orElseThrow { Exception("Consulta não encontrada") }
 
-        // Check permissions
+        
         if (user.userType == UserType.VETERINARY) {
-            // VETERINARY can update any appointment
+            
             if (!appointment.canUpdate()) {
                 throw IllegalStateException(
                     "Consultas com status ${appointment.status} não podem ser atualizadas. " +
@@ -34,18 +34,17 @@ class UpdateAppointmentUseCase(
                 )
             }
         } else if (user.userType == UserType.OWNER) {
-            // OWNERS can only cancel their appointments
+            
             if (request.status != ConsultaStatus.CANCELLED) {
                 throw IllegalArgumentException("Proprietários só podem cancelar consultas")
             }
-            // Check if the appointment belongs to one of their pets
-            // This would require checking if the pet belongs to the owner
-            // For now, we'll assume they can cancel any appointment (simplified)
+            
+            
         } else {
             throw IllegalArgumentException("Usuário não tem permissão para atualizar consultas")
         }
 
-        // Apply updates
+        
         request.petName?.let { appointment.petName = it.trim() }
         request.veterinarianName?.let { appointment.veterinarianName = it.trim() }
         request.consultaType?.let { appointment.consultaType = it }

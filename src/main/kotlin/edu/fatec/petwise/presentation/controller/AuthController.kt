@@ -35,12 +35,12 @@ class AuthController(
     private val registerUserUseCase: RegisterUserUseCase,
     private val loginUserUseCase: LoginUserUseCase,
     private val getUserProfileUseCase: GetUserProfileUseCase,
-    private val updateProfileUseCase: UpdateProfileUseCase, // NOVO
-    private val deleteUserUseCase: DeleteUserUseCase, // NOVO
+    private val updateProfileUseCase: UpdateProfileUseCase, 
+    private val deleteUserUseCase: DeleteUserUseCase, 
     private val refreshTokenUseCase: RefreshTokenUseCase,
-    private val forgotPasswordUseCase: ForgotPasswordUseCase, // NOVO
-    private val resetPasswordUseCase: ResetPasswordUseCase, // NOVO
-    private val logoutUserUseCase: LogoutUserUseCase // NOVO
+    private val forgotPasswordUseCase: ForgotPasswordUseCase, 
+    private val resetPasswordUseCase: ResetPasswordUseCase, 
+    private val logoutUserUseCase: LogoutUserUseCase 
 ) {
     private val logger = LoggerFactory.getLogger(javaClass)
 
@@ -66,11 +66,7 @@ class AuthController(
         return ResponseEntity.ok(response)
     }
 
-    /**
-     * ✨ NOVO - Sprint 1
-     * Atualiza perfil do usuário autenticado
-     * Permite atualização parcial (apenas campos enviados são atualizados)
-     */
+    
     @PutMapping("/profile")
     fun updateProfile(
         authentication: Authentication,
@@ -82,11 +78,7 @@ class AuthController(
         return ResponseEntity.ok(response)
     }
 
-    /**
-     * ✨ NOVO - Sprint 1
-     * Exclui perfil do usuário autenticado
-     * Requer confirmação para evitar exclusões acidentais
-     */
+    
     @DeleteMapping("/profile")
     fun deleteProfile(authentication: Authentication): ResponseEntity<MessageResponse> {
         val userId = UUID.fromString(authentication.name)
@@ -106,13 +98,7 @@ class AuthController(
         return ResponseEntity.ok(response)
     }
 
-    /**
-     * ✨ NOVO - Sprint 1
-     * Solicita redefinição de senha
-     * Gera token de reset e simula envio de email
-     *
-     * 🔒 SEGURANÇA: Sempre retorna mesma mensagem (não revela se email existe)
-     */
+    
     @PostMapping("/forgot-password")
     fun forgotPassword(@Valid @RequestBody request: ForgotPasswordDto): ResponseEntity<MessageResponse> {
         logger.info("Requisição de forgot password recebida")
@@ -120,11 +106,7 @@ class AuthController(
         return ResponseEntity.ok(response)
     }
 
-    /**
-     * ✨ NOVO - Sprint 1
-     * Redefine senha usando token de reset
-     * Valida token e atualiza senha do usuário
-     */
+    
     @PostMapping("/reset-password")
     fun resetPassword(@Valid @RequestBody request: ResetPasswordDto): ResponseEntity<MessageResponse> {
         logger.info("Requisição de reset password recebida")
@@ -167,11 +149,7 @@ class AuthController(
         }
     }
 
-    /**
-     * 🔧 DEBUG/ADMIN - Limpa tokens blacklistados de um usuário
-     * Útil quando o usuário está com token blacklistado e não consegue fazer login
-     * Este endpoint deve ser protegido em produção ou removido
-     */
+    
     @DeleteMapping("/clear-blacklist")
     fun clearUserBlacklist(
         authentication: Authentication

@@ -12,11 +12,8 @@ class TokenCleanupService(
 ) {
     private val logger = LoggerFactory.getLogger(javaClass)
 
-    /**
-     * Limpa tokens expirados da blacklist diariamente às 3:00 AM
-     * Remove tokens que já expiraram, liberando espaço no banco de dados
-     */
-    @Scheduled(cron = "0 0 3 * * ?") // Todos os dias às 3:00 AM
+    
+    @Scheduled(cron = "0 0 3 * * ?") 
     fun cleanupExpiredTokens() {
         logger.info("Iniciando limpeza de tokens expirados da blacklist")
 

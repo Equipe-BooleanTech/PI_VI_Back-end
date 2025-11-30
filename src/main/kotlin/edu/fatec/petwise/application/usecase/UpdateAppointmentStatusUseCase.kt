@@ -16,21 +16,21 @@ class UpdateAppointmentStatusUseCase(
     fun execute(id: UUID, newStatus: String, authentication: Authentication): AppointmentResponse {
         val userId = UUID.fromString(authentication.principal.toString())
         
-        // Buscar consulta
+        
         val appointment = appointmentRepository.findByIdAndOwnerId(id, userId)
             ?: throw IllegalArgumentException("Consulta não encontrada ou não pertence ao usuário")
         
-        // Parse status
+        
         val status = try {
             ConsultaStatus.valueOf(newStatus.uppercase())
         } catch (e: IllegalArgumentException) {
             throw IllegalArgumentException("Status inválido: $newStatus")
         }
         
-        // Verificar transições válidas de status
+        
         validateStatusTransition(appointment.status, status)
         
-        // Atualizar status
+        
         appointment.status = status
         appointment.updatedAt = LocalDateTime.now()
         
@@ -39,7 +39,7 @@ class UpdateAppointmentStatusUseCase(
     }
     
     private fun validateStatusTransition(currentStatus: ConsultaStatus, newStatus: ConsultaStatus) {
-        // Regras de transição de status
+        
         when (currentStatus) {
             ConsultaStatus.SCHEDULED -> {
                 if (newStatus !in listOf(

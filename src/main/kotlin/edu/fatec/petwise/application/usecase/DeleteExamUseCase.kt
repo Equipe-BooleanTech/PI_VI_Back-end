@@ -16,7 +16,7 @@ class DeleteExamUseCase(
         val userId = UUID.fromString(authentication.principal.toString())
         val user = userRepository.findById(userId).orElseThrow { IllegalArgumentException("Usuário não encontrado") }
 
-        // Only VETERINARY users can delete exams
+        
         if (user.userType != UserType.VETERINARY) {
             throw IllegalArgumentException("Apenas veterinários podem excluir exames")
         }

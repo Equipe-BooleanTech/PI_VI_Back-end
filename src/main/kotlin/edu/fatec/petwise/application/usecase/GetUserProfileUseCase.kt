@@ -21,10 +21,7 @@ class GetUserProfileUseCase(
         return userRepository.findById(userId)
     }
 
-    /**
-     * Limpa todos os tokens blacklistados de um usuário específico.
-     * Útil quando o usuário está com problemas de autenticação devido a tokens antigos.
-     */
+    
     @Transactional
     fun clearUserBlacklist(userId: UUID): Int {
         logger.info("Limpando blacklist de tokens para usuário: $userId")

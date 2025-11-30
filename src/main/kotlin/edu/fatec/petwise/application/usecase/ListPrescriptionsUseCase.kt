@@ -21,7 +21,7 @@ class ListPrescriptionsUseCase(
 
         val prescriptions = when (user.userType) {
             UserType.PHARMACY -> {
-                // PHARMACY users can see all prescriptions from VETERINARY users
+                
                 when {
                     petId != null && status != null -> {
                         val allPrescriptions = prescriptionRepository.findByPetId(petId)
@@ -50,7 +50,7 @@ class ListPrescriptionsUseCase(
                 }
             }
             UserType.VETERINARY -> {
-                // VETERINARY users can see prescriptions they created
+                
                 when {
                     petId != null && status != null -> {
                         val allPrescriptions = prescriptionRepository.findByVeterinaryId(userId)
@@ -79,7 +79,7 @@ class ListPrescriptionsUseCase(
                 }
             }
             UserType.ADMIN -> {
-                // ADMIN users can see all prescriptions
+                
                 when {
                     petId != null && status != null -> {
                         val allPrescriptions = prescriptionRepository.findByPetId(petId)
@@ -108,7 +108,7 @@ class ListPrescriptionsUseCase(
                 }
             }
             else -> {
-                // Other users (OWNER) see prescriptions for their own pets
+                
                 when {
                     petId != null && status != null -> {
                         val allPrescriptions = prescriptionRepository.findByPetId(petId)

@@ -22,15 +22,15 @@ class CreateVaccineUseCase(
         val userId = UUID.fromString(authentication.principal.toString())
         val user = userRepository.findById(userId).orElseThrow { IllegalArgumentException("Usuário não encontrado") }
 
-        // Only VETERINARY users can create vaccines
+        
         if (user.userType != UserType.VETERINARY) {
             throw IllegalArgumentException("Apenas veterinários podem criar vacinas")
         }
 
-        // Verifica se o pet existe
+        
         val pet = petRepository.findById(petId).orElseThrow { IllegalArgumentException("Pet não encontrado") }
 
-        // Cria a vacina
+        
         val vaccine = Vaccine(
             id = null,
             petId = petId,

@@ -18,7 +18,7 @@ class ListAppointmentsUseCase(
     private val logger = LoggerFactory.getLogger(javaClass)
 
     fun execute(status: ConsultaStatus? = null, page: Int = 1, pageSize: Int = 20): AppointmentListResponse {
-        val pageable: Pageable = PageRequest.of(page - 1, pageSize) // PageRequest is 0-based
+        val pageable: Pageable = PageRequest.of(page - 1, pageSize) 
 
         val appointmentsPage: Page<edu.fatec.petwise.domain.entity.Appointment> = if (status != null) {
             appointmentRepository.findByStatus(status, pageable)

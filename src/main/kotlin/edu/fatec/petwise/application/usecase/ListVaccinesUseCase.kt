@@ -21,21 +21,21 @@ class ListVaccinesUseCase(
         val user = userRepository.findById(userId).orElseThrow { IllegalArgumentException("Usuário não encontrado") }
 
         val vaccines = if (petId != null) {
-            // Verificar se o pet existe
+            
             val pet = petRepository.findById(petId).orElseThrow { IllegalArgumentException("Pet não encontrado") }
 
-            // If user is OWNER, check if the pet belongs to them
+            
             if (user.userType == UserType.OWNER && pet.ownerId != userId) {
                 throw IllegalArgumentException("Pet não pertence ao usuário")
             }
 
             vaccineRepository.findByPetIdOrderByVaccinationDateDesc(petId)
         } else {
-            // If no petId specified, return vaccines based on user type
+            
             when (user.userType) {
                 UserType.VETERINARY -> vaccineRepository.findByVeterinarianIdOrderByVaccinationDateDesc(userId)
                 UserType.OWNER -> {
-                    // For owners, get all vaccines for their pets
+                    
                     val ownerPets = petRepository.findByOwnerId(userId)
                     val petIds = ownerPets.map { it.id }
                     petIds.flatMap { vaccineRepository.findByPetIdOrderByVaccinationDateDesc(it) }

@@ -16,7 +16,7 @@ class FilterAppointmentsUseCase(
     fun execute(options: ConsultaFilterOptions): List<AppointmentResponse> {
         var appointments = appointmentRepository.findAll()
 
-        // Apply filters
+        
         if (options.consultaType != null) {
             appointments = appointments.filter { it.consultaType == options.consultaType }
         }

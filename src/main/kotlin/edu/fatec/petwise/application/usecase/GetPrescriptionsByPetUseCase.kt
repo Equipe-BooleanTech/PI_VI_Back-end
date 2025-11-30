@@ -19,13 +19,10 @@ class GetPrescriptionsByPetUseCase(
         val userId = UUID.fromString(authentication.principal.toString())
         val user = userRepository.findById(userId).orElseThrow { IllegalArgumentException("Usuário não encontrado") }
 
-        // Verificar se o pet existe
+        
         val pet = petRepository.findById(petId).orElseThrow { IllegalArgumentException("Pet não encontrado") }
 
-        // Allow access based on user type:
-        // - VETERINARY: can see prescriptions for any pet
-        // - OWNER: can only see prescriptions for their own pets
-        // - ADMIN/PHARMACY: can see all prescriptions
+        
         when (user.userType) {
             UserType.OWNER -> {
                 if (pet.ownerId != userId) {
@@ -33,10 +30,10 @@ class GetPrescriptionsByPetUseCase(
                 }
             }
             UserType.VETERINARY -> {
-                // Veterinarians can see prescriptions for any pet
+                
             }
             UserType.ADMIN, UserType.PHARMACY -> {
-                // Admins and pharmacies can see all prescriptions
+                
             }
             else -> {
                 throw IllegalArgumentException("Tipo de usuário não autorizado")

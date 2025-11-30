@@ -3,12 +3,9 @@ package edu.fatec.petwise.application.dto
 import java.time.LocalDateTime
 import java.util.UUID
 
-/**
- * 🆕 IOT: Response completo com dados do Pet + Dono
- * Usado pelo frontend para exibir informações após leitura do cartão NFC
- */
+
 data class PetWithOwnerResponse(
-    // === DADOS DO PET ===
+    
     val petId: UUID,
     val petName: String,
     val breed: String,
@@ -23,7 +20,7 @@ data class PetWithOwnerResponse(
     val isFavorite: Boolean,
     val nextAppointment: LocalDateTime?,
     
-    // === DADOS DO DONO ===
+    
     val ownerId: UUID,
     val ownerName: String,
     val ownerEmail: String,
@@ -31,7 +28,7 @@ data class PetWithOwnerResponse(
     val ownerCpf: String?,
     val ownerUserType: String,
     
-    // === METADADOS ===
+    
     val nfcTagUid: String,
     val lastCheckIn: LocalDateTime = LocalDateTime.now()
 )

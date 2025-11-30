@@ -19,14 +19,14 @@ class UpdateVaccineUseCase(
         val userId = UUID.fromString(authentication.principal.toString())
         val user = userRepository.findById(userId).orElseThrow { IllegalArgumentException("Usuário não encontrado") }
 
-        // Only VETERINARY users can update vaccines
+        
         if (user.userType != UserType.VETERINARY) {
             throw IllegalArgumentException("Apenas veterinários podem atualizar vacinas")
         }
 
         val existingVaccine = vaccineRepository.findById(id).orElseThrow { IllegalArgumentException("Vacina não encontrada") }
 
-        // Update the vaccine
+        
         existingVaccine.vaccineType = request.vaccineType
         existingVaccine.vaccinationDate = request.vaccinationDate
         existingVaccine.nextDoseDate = request.nextDoseDate

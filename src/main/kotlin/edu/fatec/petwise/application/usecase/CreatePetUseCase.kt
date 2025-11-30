@@ -21,10 +21,10 @@ class CreatePetUseCase(
     private val logger = LoggerFactory.getLogger(javaClass)
 
     fun execute(userId: UUID, request: CreatePetRequest): PetResponse {
-        // Validação de campos obrigatórios
+        
         validateRequiredFields(request)
         
-        // Criar entidade Pet
+        
         val pet = Pet(
             id = null,
             ownerId = userId,
@@ -71,10 +71,7 @@ class CreatePetUseCase(
     }
 }
     
-    /**
-     * Valida campos obrigatórios do request.
-     * Lança IllegalArgumentException se algum campo obrigatório estiver vazio.
-     */
+    
     private fun validateRequiredFields(request: CreatePetRequest) {
         if (request.name.isBlank()) {
             throw IllegalArgumentException("Nome do pet é obrigatório")

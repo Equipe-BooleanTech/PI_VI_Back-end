@@ -16,7 +16,7 @@ class ForgotPasswordUseCase(
     private val userRepository: UserRepository,
     private val passwordResetTokenRepository: PasswordResetTokenRepository,
     private val jwtService: JwtService,
-    @Value("\${JWT_RESET_EXPIRATION:900000}") private val resetTokenExpiration: Long // 15 minutos
+    @Value("\${JWT_RESET_EXPIRATION:900000}") private val resetTokenExpiration: Long 
 ) {
     private val logger = LoggerFactory.getLogger(javaClass)
 

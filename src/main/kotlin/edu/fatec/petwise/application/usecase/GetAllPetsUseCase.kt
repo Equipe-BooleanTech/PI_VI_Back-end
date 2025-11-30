@@ -20,7 +20,7 @@ class GetAllPetsUseCase(
             userRepository.findById(userId).orElseThrow { Exception("User not found") }
         } catch (e: Exception) {
             logger.warn("User with ID $userId not found, returning empty pet list")
-            // For non-existent users, return empty list
+            
             return PetListResponse(
                 pets = emptyList(),
                 total = 0,
@@ -30,10 +30,10 @@ class GetAllPetsUseCase(
         }
         
         val pets = if (user.userType.name == "OWNER") {
-            // For owners, only return their own pets
+            
             petRepository.findByOwnerId(userId)
         } else {
-            // For other user types (VETERINARY, PHARMACY, etc.), return all pets
+            
             petRepository.findAll()
         }
 

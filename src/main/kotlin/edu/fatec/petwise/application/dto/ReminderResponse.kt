@@ -3,11 +3,11 @@ package edu.fatec.petwise.application.dto
 import java.time.LocalDateTime
 
 enum class ReminderType {
-    CONSULTA_PROXIMA,      // Consulta se aproximando
-    VACINA_PENDENTE,       // Vacinação pendente
-    MEDICAMENTO,           // Horário de medicamento
-    ANIVERSARIO_PET,       // Aniversário do pet
-    RETORNO_CONSULTA       // Lembrete de retorno
+    CONSULTA_PROXIMA,      
+    VACINA_PENDENTE,       
+    MEDICAMENTO,           
+    ANIVERSARIO_PET,       
+    RETORNO_CONSULTA       
 }
 enum class ReminderPriority {
     BAIXA,
